@@ -1,0 +1,50 @@
+{
+    "name": "venus-ts",
+    "version": "1.0.0",
+    "author": "VenNeptury",
+    "license": "MIT",
+    "main": "dist/src/index.js",
+    "scripts": {
+        "dev": "npm run build && export NODE_ENV=development && npm run start",
+        "production": "npm run build && export NODE_ENV=production && npm run start",
+        "test": "tsc -p tsconfig.test.json && npm run lint",
+        "lint": "eslint ./src/**/*.ts",
+        "clean": "rm -rf out/*",
+        "reinstall": "npm run cleanCache && npm run deleteModules && npm run deleteLock && npm run installModules",
+        "build": "tsc",
+        "start": "node dist/src/index",
+        "cleanCache": "npm cache clean --force",
+        "deleteModules": "rm -rf node_modules/*",
+        "deleteLock": "rm yarn.lock",
+        "installModules": "yarn install"
+    },
+    "husky": {
+        "hooks": {
+            "pre-commit": "precise-commits && npm run lint"
+        }
+    },
+    "dependencies": {
+        "@types/mongoose": "^5.7.12",
+        "@types/node": "^13.13.1",
+        "@types/node-fetch": "^2.5.6",
+        "@types/ws": "^7.2.4",
+        "discord.js": "^12.2.0",
+        "mongoose": "^5.9.10",
+        "node-fetch": "^2.6.0",
+        "typescript": "^3.8.3"
+    },
+    "devDependencies": {
+        "@typescript-eslint/eslint-plugin": "^2.27.0",
+        "@typescript-eslint/parser": "^2.27.0",
+        "eslint": "^6.8.0",
+        "eslint-config-prettier": "^6.10.1",
+        "eslint-plugin-prettier": "^3.1.2",
+        "husky": "^4.2.3",
+        "precise-commits": "^1.0.2",
+        "prettier": "^2.0.4"
+    },
+    "eslintIgnore": [
+        "dist",
+        ".vscode"
+    ]
+}
