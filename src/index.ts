@@ -3,6 +3,9 @@ import path from 'path';
 import { config } from '../config';
 import { Client, ClientEventTypes, Command } from './interfaces/Client';
 import { handleError } from './util';
+import dotenv from 'dotenv';
+
+dotenv.config({ path: __dirname + '/.env' });
 
 /* 
     Initiates our client with the following options:
@@ -21,6 +24,13 @@ export const client = new Client({
     },
     partials: ['MESSAGE', 'REACTION']
 });
+
+export const updateActivity = async () => {
+    return await client.user?.setActivity(`${client.guilds.cache.size} guilds | ${config.defaultPrefix}help`, {
+        type: 'LISTENING',
+        url: 'https://www.twitch.tv/.'
+    });
+};
 
 const listenerPath = path.join(__dirname, './events'),
     commandPath = path.join(__dirname, './commands');

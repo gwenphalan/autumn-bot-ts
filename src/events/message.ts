@@ -1,5 +1,5 @@
-import { Client } from '../interfaces/Client';
-import { Message } from 'discord.js';
+import { Client, sendEmbed } from '../interfaces/Client';
+import { TextChannel, MessageEmbed, Message } from 'discord.js';
 
 export default async (client: Client, message: Message) => {
     // We have partials enabled, so we have to make sure the message is fetched
@@ -33,14 +33,33 @@ export default async (client: Client, message: Message) => {
         );
     if (message.member && message.channel.type === 'text') {
         if (command.userPermissions && !message.channel.permissionsFor(message.member)?.has(command.userPermissions))
-            return message.channel.send(`This command requires you to have the \`${command.userPermissions}\` Permission!`);
+            return sendEmbed(
+                message,
+                'Commands',
+                'Oh No!',
+                `You need to have the \`${command.userPermissions}\` permission to run \`${prefix}${command.name}\``
+            );
         if (command.botPermissions && !message.channel.permissionsFor(message.member)?.has(command.botPermissions))
-            return message.channel.send(`I need the \`${command.botPermissions}\` Permission to use this command!`);
+            return sendEmbed(message, 'Commands', 'Oh No!', `I need to have the \`${command.userPermissions}\` permission to run \`${prefix}${command.name}\``);
     }
-
     // Execute the command and handle any potential errors
     return command.callback(message, args).catch(err => {
-        message.reply('Sorry, something went wrong.');
+        const oops = new MessageEmbed()
+            .setTimestamp()
+            .setColor(client.config.accentColor)
+            .setTitle(`Oops! Something went wrong!`)
+            .setDescription("Don't  worry, the developers have been notified and are getting to work on fixing the issue!");
+        message.channel.send(oops);
         console.error(err);
+        if (err) {
+            const embed = new MessageEmbed()
+                .setTimestamp()
+                .setColor(client.config.accentColor)
+                .setTitle(`ERROR`)
+                .setDescription(err.stack ? err.stack : err);
+            const errorChannel = client.channels.cache.get(client.config.errorChannel);
+            if (!errorChannel || !(errorChannel instanceof TextChannel)) throw new Error('Provided error channel is unreachable or not a text channel.');
+            errorChannel.send(embed);
+        }
     });
 };

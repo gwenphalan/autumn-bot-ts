@@ -3,6 +3,7 @@ import { config } from '../../config';
 import { Infraction, InfractionTypes } from './schemas/Infraction';
 import { Message } from 'discord.js';
 import { GuildSettings } from './schemas/GuildSettings';
+import { UserProfile } from './schemas/UserProfile';
 
 // Connect to MongoDB
 mongoose.connect(config.mongoString, {
@@ -22,7 +23,8 @@ db.once('open', () => console.log(`Connected to MongoDB Atlas at ${db.name}!`));
 // Export our database with the different Schemas
 export const database = {
     infractions: Infraction,
-    guildSettings: GuildSettings
+    guildSettings: GuildSettings,
+    userProfiles: UserProfile
 };
 
 // Helper function to get a guild's settings
@@ -38,6 +40,52 @@ export const getGuildInfractions = async (guildId: string) => {
 // Helper function to get a users' infractions on a guild
 export const getUserInfractions = async (guildId: string, userId: string) => {
     return await Infraction.findOne({ guild: guildId, user: userId });
+};
+
+// Helper function to get a users' profile
+export const getUserProfile = async (userID: string) => {
+    return await UserProfile.findOne({ userID: userID });
+};
+
+export type profileProperty = 'color' | 'pronouns' | 'gender' | 'age' | 'biography';
+
+// Helper function to update a users' profile
+export const updateUserProfile = async (userId: string, property: profileProperty, value: string) => {
+    const entry = await UserProfile.findOne({ userID: userId });
+    if (!entry) return;
+    switch (property) {
+        case 'color':
+            entry.color = value;
+            break;
+        case 'pronouns':
+            entry.pronouns = value;
+            break;
+        case 'gender':
+            entry.gender = value;
+            break;
+        case 'age':
+            entry.age = value;
+            break;
+        case 'biography':
+            entry.biography = value;
+            break;
+        default:
+            break;
+    }
+    entry.save();
+};
+
+// Helper function to create a user profile
+export const createUserProfile = async (userId: string, color: string, pronouns: string, gender: string, age: string, biography: string) => {
+    const profile = await UserProfile.create({
+        userID: userId,
+        color: color,
+        pronouns: pronouns,
+        gender: gender,
+        age: age,
+        biography: biography
+    });
+    return profile;
 };
 
 // Helper function to create modlog entries

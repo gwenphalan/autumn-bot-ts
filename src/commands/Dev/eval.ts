@@ -1,8 +1,8 @@
-import { Message } from 'discord.js';
 import { uploadHaste } from '../../util/hastebin';
-import { Command, Client } from '../../interfaces/Client';
+import { Command, Client, MyMessage } from '../../interfaces/Client';
+import { MessageEmbed } from 'discord.js';
 
-const callback = async (message: Message, args: string[]) => {
+const callback = async (message: MyMessage, args: string[]) => {
     // Define a bunch of shortcuts which will be usable in your eval code
     const client = message.client as Client;
     //@ts-ignore
@@ -11,13 +11,14 @@ const callback = async (message: Message, args: string[]) => {
         channel = message.channel,
         author = message.author,
         commands = client.commands,
-        database = client.database;
-
+        database = client.database,
+        embed = MessageEmbed;
     /* 
         Do some voodoo magic to evaluate the input and send it to your channel
         This supports the await keyword
         Please note that whatever you eval will run twice if you don't include a return keyword 
     */
+
     try {
         let output =
             (await eval(`( async () => {

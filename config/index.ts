@@ -7,4 +7,5 @@ export interface Config {
     developers: string[];
     infoChannel: string;
     errorChannel: string;
+    accentColor: string;
 }

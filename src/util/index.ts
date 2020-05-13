@@ -1,7 +1,8 @@
 import nodeFetch, { RequestInfo, RequestInit } from 'node-fetch';
-import { Client } from '../interfaces/Client';
-import { TextChannel } from 'discord.js';
+import { Client, MyMessage } from '../interfaces/Client';
+import { TextChannel, MessageEmbed, User, GuildMember, MessageReaction, GuildChannel } from 'discord.js';
 import { inspect } from 'util';
+import { client } from '../index';
 
 // Fetches remote content
 export const fetch = async (requestInfo: RequestInfo, requestOptions?: RequestInit) => {
@@ -35,3 +36,214 @@ export const handleError = async (client: Client, err: Error) => {
             '```'
     );
 };
+
+type GuildChannelType = 'text' | 'voice' | 'category' | 'news' | 'store';
+
+function channelFilterInexact(search: string) {
+    return (chan: GuildChannel) => chan.name.toLowerCase().includes(search.toLowerCase()) || search.toLowerCase().includes(chan.id);
+}
+
+export const getChannel = async (message: MyMessage, args: string[], channelType: GuildChannelType, spot?: number) => {
+    if (!message.guild) throw new Error('getChannel was used in a DmChannel.');
+
+    if (!args[0]) return null;
+
+    const input = spot || spot === 0 ? args[spot].toLowerCase() : args.join(' ').toLowerCase();
+
+    const channels = message.guild.channels.cache;
+
+    const result = channels.filter(channelFilterInexact(input));
+
+    let channel = result.first() ? result.first() : null;
+
+    if (result.size > 1) {
+        const channelsFound: string[] = [];
+
+        result.each((channel: GuildChannel) => channelsFound.push(channel.toString()));
+
+        const reply = await options(message, 'Multiple Channels Found', channelsFound);
+
+        const idRegex = /\d+/g;
+
+        if (reply.canceled || reply.choice === '') return null;
+
+        const idMatch = reply.choice?.match(idRegex);
+
+        const id = idMatch ? idMatch[0] : null;
+
+        const x = id ? message.guild.channels.cache.get(id) : null;
+
+        channel = x ? x : null;
+    } else if (!result.size) {
+        return null;
+    }
+    if (channel?.type !== channelType) return null;
+    return channel;
+};
+
+function memberFilterInexact(search: string) {
+    return (mem: GuildMember) =>
+        mem.user.username.toLowerCase().includes(search.toLowerCase()) ||
+        (mem.nickname && mem.nickname.toLowerCase().includes(search.toLowerCase())) ||
+        `${mem.user.username.toLowerCase()}#${mem.user.discriminator}`.includes(search.toLowerCase()) ||
+        search.includes(mem.user.id);
+}
+
+export const getMember = async (message: MyMessage, args: string[], spot?: number) => {
+    if (!message.guild) throw new Error('getMember was used in a DmChannel.');
+
+    if (!args[0]) return null;
+
+    const input = spot || spot === 0 ? args[spot].toLowerCase() : args.join(' ').toLowerCase();
+
+    const members = message.guild.members.cache;
+
+    const result = members.filter(memberFilterInexact(input));
+
+    const member = result.first();
+
+    if (result.size === 1) return member;
+
+    if (result.size > 1) {
+        const membersFound: string[] = [];
+
+        result.each((member: GuildMember) => membersFound.push(member.toString()));
+
+        const reply = await options(message, 'Multiple Members Found', membersFound);
+
+        const idRegex = /\d+/g;
+
+        if (reply.canceled || reply.choice === '') return null;
+
+        const idMatch = reply.choice?.match(idRegex);
+
+        const id = idMatch ? idMatch[0] : null;
+
+        return id ? message.guild.members.cache.get(id) : null;
+    } else if (!result.size) {
+        return null;
+    }
+    return null;
+};
+
+type type = 'string' | 'hexColor' | 'number';
+
+function parseType(type: type, string: string) {
+    if (type === 'number') {
+        const result = string.match(/\d+/);
+        return result ? result[0] : null;
+    } else if (type === 'hexColor') {
+        const result = string.match(/#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})/);
+        return result ? result[0] : null;
+    } else if (type === 'string') {
+        return string ? string : null;
+    } else {
+        return null;
+    }
+}
+
+async function options(message: MyMessage, question: string, options: string[]) {
+    let choice;
+    let canceled = false;
+
+    let choiceString = '';
+    let invalid = false;
+
+    options.forEach((option, index) => {
+        choiceString += `\`${index}\`: ${option}\n`;
+    });
+
+    for (let x = 0; x < 3; x++) {
+        if (canceled) {
+            return {
+                choice: choice,
+                canceled: canceled
+            };
+        } else if (invalid && choice && !parseType('number', choice)) {
+            const retry = await tryAgain(message, choice, 'number');
+
+            if (retry) {
+                choice = '';
+            } else {
+                choice = '';
+                canceled = true;
+            }
+        } else if (choice) {
+            break;
+        } else {
+            const response = new MessageEmbed()
+                .setColor(message.client.config.accentColor)
+                .setAuthor('Autumn Bot', client.user?.displayAvatarURL({ dynamic: true, format: 'png' }))
+                .setTimestamp()
+                .setTitle(`${question}`)
+                .setDescription(`Choose one of the options by replying with the number of the option.\n\n ${choiceString}\n\nReply with \`cancel\` to cancel.`);
+
+            const msg = await message.channel.send(response);
+
+            const filter = (msg: MyMessage) => {
+                return msg.author.id === message.author.id;
+            };
+
+            const value = (await msg.channel.awaitMessages(filter, { max: 1, time: 60000 })).first();
+
+            await msg.delete({
+                timeout: 200
+            });
+
+            const reply = value?.content ? value.content : 'cancel';
+
+            if (reply === 'cancel') {
+                choice = '';
+                canceled = true;
+            }
+
+            if (!parseType('number', reply)) {
+                invalid = true;
+                choice = reply;
+            } else {
+                const index = parseType('number', reply) ? parseInt(reply) : 0;
+
+                choice = options[index];
+                break;
+            }
+        }
+    }
+    return {
+        choice: choice,
+        canceled: canceled
+    };
+}
+
+async function tryAgain(message: MyMessage, value: string, type: type) {
+    const response = new MessageEmbed()
+        .setColor(message.client.config.accentColor)
+        .setAuthor('Profiles', client.user?.displayAvatarURL({ dynamic: true, format: 'png' }))
+        .setTimestamp()
+        .setTitle('Uh Oh!')
+        .setDescription(
+            `\`${value}\` is not a valid ${type}!\n\nReact with <:yes:709981119721766955> to give a valid ${type}, or <:no:709981096066023444> to cancel.`
+        );
+    const msg = await message.channel.send(response);
+
+    await msg.react('709981119721766955');
+    await msg.react('709981096066023444');
+
+    const filter = (reaction: MessageReaction, user: User) => {
+        return ['709981119721766955', '709981096066023444'].includes(reaction.emoji.id || reaction.emoji.name) && user.id === message.author.id;
+    };
+
+    const answer = (await msg.awaitReactions(filter, { max: 1, time: 60000 })).first();
+
+    await msg.delete({
+        timeout: 200
+    });
+
+    switch (answer?.emoji.id || answer?.emoji.name) {
+        case '709981119721766955':
+            return true;
+        case '709981096066023444':
+            return false;
+        default:
+            return false;
+    }
+}

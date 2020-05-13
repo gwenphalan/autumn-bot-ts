@@ -1,20 +1,36 @@
-import { Message, MessageEmbed } from 'discord.js';
-import { Command, Client } from '../../interfaces/Client';
+import { MessageEmbed } from 'discord.js';
+import { Command, Client, MyMessage } from '../../interfaces/Client';
+import { client } from '../../index';
+import { config } from '../../../config';
 
-const callback = async (message: Message, args: string[]) => {
+const bot = client;
+
+const callback = async (message: MyMessage, args: string[]) => {
     // Get the guild's settings if on a guild and determine the prefix that needs to be used in the help
     const client = message.client as Client;
     const guildSettings = message.guild ? await client.database.guildSettings.findOne({ guild: message.guild.id }) : null;
     const prefix = guildSettings?.prefix || client.config.defaultPrefix;
+    const developers = config.developers;
 
     // Initiate the output embed
-    const output = new MessageEmbed().setTimestamp().setColor('RANDOM');
+    const output = new MessageEmbed()
+        .setTimestamp()
+        .setColor(message.client.config.accentColor)
+        .setAuthor(
+            'Help Command',
+            bot?.user?.displayAvatarURL({
+                format: 'png',
+                dynamic: true,
+                size: 512
+            })
+        );
 
     // If no arguments are provided, send all commands
     if (!args.length) {
         // Do some Voodoo magic to create an object having all commands sorted by their category
         const commandList: { [key: string]: string[] } = {};
         client.commands.forEach(command => {
+            if (command.devOnly && !developers.includes(message.author.id)) return;
             if (!commandList[command.category]) commandList[command.category] = [];
             commandList[command.category].push(`\`${prefix}${command.name}\` - ${command.description || 'This command has no description.'}`);
         });

@@ -18,11 +18,11 @@
     "Create basic command structure": {
         "prefix": "commandStructure",
         "body": [
-            "import { Message } from 'discord.js';\nimport { Command } from '../../interfaces/Client';\n\nconst callback = async (message: Message, args: string[]) => {};\n\nexport const command: Command = {\nname: '',\naliases: [],\ndescription: '',\nusage: '',\nrequiresArgs: 0,\ndevOnly: false,\nguildOnly: false,\nuserPermissions: '',\nbotPermissions: '',\ncallback: callback\n};"
+            "import { Command, MyMessage } from '../../interfaces/Client';\nimport { getGuildSettings } from '../../database';\n\nconst callback = async (message: MyMessage, args: string[]) => {\nconst guildSettings = message.guild?.id ? await getGuildSettings(message.guild?.id) : null;\n};\nconst prefix = guildSettings?.prefix || client.config.defaultPrefix;\n\nexport const command: Command = {\nname: '',\ncategory: '',\naliases: [],\ndescription: '',\nusage: '',\nrequiresArgs: 0,\ndevOnly: false,\nguildOnly: false,\nuserPermissions: '',\nbotPermissions: '',\ncallback: callback\n};"
         ],
         "description": "This will automatically insert the basic command structure"
     },
-    "Create basic eventHandler stcuture": {
+    "Create basic eventHandler structure": {
         "prefix": "eventHandlerStructure",
         "body": ["import { Client } from '../interfaces/Client';\n\nexport default async (client: Client) => {}"],
         "description": "This will automatically insert the basic event handler structure"
