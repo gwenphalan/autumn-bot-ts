@@ -37,7 +37,8 @@ const callback = async (message: MyMessage, args: string[]) => {
                     dynamic: true,
                     format: 'png'
                 }),
-                fields
+                fields,
+                Profile.color
             );
             return;
         } else {
@@ -69,7 +70,8 @@ const callback = async (message: MyMessage, args: string[]) => {
                     dynamic: true,
                     format: 'png'
                 }),
-                fields
+                fields,
+                Profile.color
             );
             return;
         } else {
@@ -94,10 +96,12 @@ const callback = async (message: MyMessage, args: string[]) => {
             );
             return;
         }
-        const begin = await message.client.sendConfirm(message, 'Are you sure you want to create a profile?');
+        const GUI = await message.channel.send('Loading GUI...');
+
+        const begin = await message.client.sendConfirm(GUI, message.author, 'Are you sure you want to create a profile?');
 
         if (begin) {
-            const x = await message.client.sendQuestions(message, [
+            const x = await message.client.sendQuestions(GUI, message.author, [
                 {
                     question: '`biography`\n\nTell me about yourself!',
                     type: 'string',
@@ -152,7 +156,9 @@ const callback = async (message: MyMessage, args: string[]) => {
             return;
         }
     } else if (action?.toLowerCase() === 'edit') {
-        const reply = await message.client.sendOptions(message, 'Which property of your profile would you like to edit?', [
+        const GUI = await message.channel.send('Loading GUI...');
+
+        const reply = await message.client.sendOptions(GUI, message.author, 'Which property of your profile would you like to edit?', [
             'color',
             'biography',
             'age',
@@ -195,7 +201,7 @@ const callback = async (message: MyMessage, args: string[]) => {
                 break;
         }
 
-        const answer = await message.client.sendQuestions(message, [
+        const answer = await message.client.sendQuestions(GUI, message.author, [
             {
                 question: `What would you like to set ${reply.choice} to?`,
                 optional: true,
@@ -230,6 +236,7 @@ export const command: Command = {
     requiresArgs: 0,
     devOnly: false,
     guildOnly: true,
+    NSFW: false,
     userPermissions: '',
     botPermissions: '',
     callback: callback

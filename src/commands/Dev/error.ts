@@ -16,6 +16,7 @@ export const command: Command = {
     requiresArgs: 0,
     devOnly: true,
     guildOnly: false,
+    NSFW: false,
     userPermissions: '',
     botPermissions: '',
     callback: callback

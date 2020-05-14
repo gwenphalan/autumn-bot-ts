@@ -2,6 +2,7 @@ import { Client as DClient, Collection, Message, PermissionString, MessageEmbed,
 import { config } from '../../config';
 import { database } from '../database';
 import { client } from '../index';
+import { format, parseType } from '../util';
 
 // Our custom client adding new properties to the Discord Client
 export class Client extends DClient {
@@ -12,6 +13,8 @@ export class Client extends DClient {
     sendConfirm = sendConfirm;
     sendEmbed = sendEmbed;
     sendQuestions = sendQuestions;
+    sendYesNo = sendYesNo;
+    editEmbed = editEmbed;
 }
 
 export interface Command {
@@ -23,6 +26,7 @@ export interface Command {
     requiresArgs: number; // How many args this command requires
     devOnly: boolean; // Whether this command should only be usable by developers
     guildOnly: boolean; // Whether this command should only be usable on a guild
+    NSFW: boolean;
     userPermissions: '' | PermissionString;
     botPermissions: '' | PermissionString;
     callback(message: Message, args: string[]): Promise<void | Message>; // The command function
@@ -31,8 +35,6 @@ export interface Command {
 export interface MyMessage extends Message {
     client: Client;
 }
-
-type type = 'string' | 'hexColor' | 'number';
 // Client events, no need to touch these unless new events are added to discord.js
 export type ClientEventTypes =
     | 'channelCreate'
@@ -93,13 +95,47 @@ type EmbedField = {
 };
 
 // src/interfaces/Client.ts
-export const sendEmbed = async (message: Message, module?: string, title?: string, body?: string, thumbnail?: string, fields?: EmbedField[]) => {
+export const editEmbed = async (
+    message: Message,
+    module?: string,
+    title?: string,
+    body?: string,
+    thumbnail?: string,
+    fields?: EmbedField[],
+    color?: string
+) => {
+    const embedPermission = checkPerm(message, 'EMBED_LINKS');
+
+    const embed = new MessageEmbed().setTimestamp().setColor(color ? color : config.accentColor);
+
+    module ? embed.setAuthor(module, client.user?.displayAvatarURL({ dynamic: true, format: 'png' })) : null;
+    title ? embed.setTitle(title) : null;
+    body ? embed.setDescription(body) : null;
+    thumbnail ? embed.setThumbnail(thumbnail) : null;
+    fields?.forEach(field => embed.addField(field.name, field.value, field.inline));
+
+    let fieldString = '';
+    fields?.forEach(field => (fieldString += `\n\n**${field.name}**\n${field.value}`));
+    const text = `**${title}**${body ? `\n\n${body}` : ''}${fieldString}`;
+
+    return await message.edit(embedPermission ? embed : text);
+};
+
+export const sendEmbed = async (
+    message: Message,
+    module?: string,
+    title?: string,
+    body?: string,
+    thumbnail?: string,
+    fields?: EmbedField[],
+    color?: string
+) => {
     const embedPermission = checkPerm(message, 'EMBED_LINKS');
 
     const embed = new MessageEmbed()
         .setTimestamp()
         .setFooter(`Requested By ${message.author.username}#${message.author.discriminator}`, message.author.displayAvatarURL({ dynamic: true, format: 'png' }))
-        .setColor(config.accentColor);
+        .setColor(color ? color : config.accentColor);
 
     module ? embed.setAuthor(module, client.user?.displayAvatarURL({ dynamic: true, format: 'png' })) : null;
     title ? embed.setTitle(title) : null;
@@ -114,9 +150,10 @@ export const sendEmbed = async (message: Message, module?: string, title?: strin
     return await message.channel.send(embedPermission ? embed : text);
 };
 
-export const sendOptions = async (message: Message, question: string, options: string[]) => {
+export const sendOptions = async (message: Message, user: User, question: string, options: string[]) => {
     let choice;
     let canceled = false;
+    let choiceIndex = 0;
 
     let choiceString = '';
     let invalid = false;
@@ -129,10 +166,11 @@ export const sendOptions = async (message: Message, question: string, options: s
         if (canceled) {
             return {
                 choice: choice,
-                canceled: canceled
+                canceled: canceled,
+                index: 0
             };
         } else if (invalid && choice && !parseType('number', choice)) {
-            const retry = await tryAgain(message, choice, 'number');
+            const retry = await tryAgain(message, user, choice, 'number');
 
             if (retry) {
                 choice = '';
@@ -143,7 +181,7 @@ export const sendOptions = async (message: Message, question: string, options: s
         } else if (choice) {
             break;
         } else {
-            const msg = await sendEmbed(
+            await editEmbed(
                 message,
                 'Options',
                 `${question}`,
@@ -151,14 +189,12 @@ export const sendOptions = async (message: Message, question: string, options: s
             );
 
             const filter = (msg: Message) => {
-                return msg.author.id === message.author.id;
+                return msg.author.id === user.id;
             };
 
-            const value = (await msg.channel.awaitMessages(filter, { max: 1, time: 60000 })).first();
+            const value = (await message.channel.awaitMessages(filter, { max: 1, time: 60000 })).first();
 
-            await msg.delete({
-                timeout: 200
-            });
+            await message.edit(new MessageEmbed());
 
             const reply = value?.content ? value.content : 'cancel';
 
@@ -167,11 +203,20 @@ export const sendOptions = async (message: Message, question: string, options: s
                 canceled = true;
             }
 
+            if (value) {
+                value
+                    .delete({
+                        timeout: 10
+                    })
+                    .catch(() => null);
+            }
+
             if (!parseType('number', reply)) {
                 invalid = true;
                 choice = reply;
             } else {
                 const index = parseType('number', reply) ? parseInt(reply) : 0;
+                choiceIndex = index;
 
                 choice = options[index];
                 break;
@@ -180,7 +225,8 @@ export const sendOptions = async (message: Message, question: string, options: s
     }
     return {
         choice: choice,
-        canceled: canceled
+        canceled: canceled,
+        index: choiceIndex
     };
 };
 
@@ -194,13 +240,19 @@ export const checkPerm = (message: Message, permission: PermissionString) => {
     return true;
 };
 
-type Question = {
+interface Question {
     question: string;
-    type: type;
+    type: format;
     optional: boolean;
-};
+}
 
-export const sendQuestions = async (message: Message, questions: Question[]) => {
+/**
+ * * sendQuestions method requires a message already exist.
+ * @param message GUI message that will be edited with the questions.
+ * @param user User who is being asked the questions.
+ * @param questions Array of Question objects that will be asked.
+ */
+export const sendQuestions = async (message: Message, user: User, questions: Question[]) => {
     const answers: string[] = [];
     let canceled = false;
     for (let i = 0; i < questions.length; i++) {
@@ -213,15 +265,15 @@ export const sendQuestions = async (message: Message, questions: Question[]) => 
                     answers: answers,
                     canceled: canceled
                 };
-            } else if (answer && parseType(question.type, answer)) {
-                answer = parseType(question.type, answer);
+            } else if ((answer && parseType(question.type, answer)) || (question.optional && answer && answer === 'none')) {
+                answer = question.optional && answer && answer === 'none' ? answer : parseType(question.type, answer);
                 answers.push(answer ? answer : '');
                 break;
             } else if (
                 (question.optional && answer && answer !== 'none' && !parseType(question.type, answer)) ||
                 (!question.optional && answer && !parseType(question.type, answer))
             ) {
-                const retry = await tryAgain(message, answer, question.type);
+                const retry = await tryAgain(message, user, answer, question.type);
 
                 if (retry) {
                     answer = '';
@@ -229,24 +281,22 @@ export const sendQuestions = async (message: Message, questions: Question[]) => 
                     canceled = true;
                 }
             } else {
-                const msg = await sendEmbed(
+                await editEmbed(
                     message,
                     'Questions',
                     `${question.question}`,
                     `${question.optional ? '\n\n Reply with `none` if you wish to leave this blank.' : ''}${
-                        question.type === 'hexColor' ? '\n\n • [Google Color Picker](https://www.google.com/search?q=color+picker)' : ''
+                        question.type === 'hexColor' ? '\n\n • [Adobe Color Picker](https://color.adobe.com/create)' : ''
                     }\n\nReply with your answer, or \`cancel\` to cancel.`
                 );
 
                 const filter = (msg: MyMessage) => {
-                    return msg.author.id === message.author.id;
+                    return msg.author.id === user.id;
                 };
 
-                const value = (await msg.channel.awaitMessages(filter, { max: 1, time: 60000 })).first();
+                const value = (await message.channel.awaitMessages(filter, { max: 1, time: 120000 })).first();
 
-                await msg.delete({
-                    timeout: 200
-                });
+                await message.edit(new MessageEmbed());
 
                 answer = value?.content ? value.content : 'cancel';
 
@@ -254,6 +304,13 @@ export const sendQuestions = async (message: Message, questions: Question[]) => 
                     answer = '';
                     canceled = true;
                 }
+
+                if (value)
+                    value
+                        .delete({
+                            timeout: 10
+                        })
+                        .catch(() => null);
             }
         }
     }
@@ -263,72 +320,100 @@ export const sendQuestions = async (message: Message, questions: Question[]) => 
     };
 };
 
-export const sendConfirm = async (message: Message, question: string) => {
-    const msg = await sendEmbed(message, 'Confirmation', 'Hold on a sec!', `${question}`);
+export const sendConfirm = async (message: Message, user: User, question: string) => {
+    await editEmbed(message, 'Confirmation', 'Hold on a sec!', `${question}`);
 
-    await msg.react('709981119721766955');
-    await msg.react('709981096066023444');
+    await message.react('709981119721766955');
+    await message.react('709981096066023444');
 
-    const filter = (reaction: MessageReaction, user: User) => {
-        return ['709981119721766955', '709981096066023444'].includes(reaction.emoji.id || reaction.emoji.name) && user.id === message.author.id;
-    };
+    const filter = (reaction: MessageReaction, reactionUser: User) =>
+        ['709981119721766955', '709981096066023444'].includes(reaction.emoji.id || reaction.emoji.name) && reactionUser.id === user.id;
 
-    const answer = (await msg.awaitReactions(filter, { max: 1, time: 60000 })).first();
+    const answer = (await message.awaitReactions(filter, { max: 1, time: 60000 })).first();
 
-    await msg.delete({
-        timeout: 200
-    });
+    await message.edit(new MessageEmbed());
 
     switch (answer?.emoji.id || answer?.emoji.name) {
         case '709981119721766955':
+            message.reactions.removeAll();
             return true;
         case '709981096066023444':
+            message.reactions.removeAll();
             return false;
         default:
+            message.reactions.removeAll();
             return false;
     }
 };
+export const sendYesNo = async (message: Message, question: string) => {
+    await editEmbed(message, 'Yes/No', `${question}`, `\nReact with <:no:709981096066023444> to cancel.`);
+    let reply = false;
+    let canceled = false;
 
-function parseType(type: type, string: string) {
-    if (type === 'number') {
-        const result = string.match(/\d+/);
-        return result ? result[0] : null;
-    } else if (type === 'hexColor') {
-        const result = string.match(/#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})/);
-        return result ? result[0] : null;
-    } else if (type === 'string') {
-        return string ? string : null;
-    } else {
-        return null;
+    await message.react('709981095747387465');
+    await message.react('709981095646593136');
+    await message.react('709981096066023444');
+
+    const filter = (reaction: MessageReaction, user: User) =>
+        ['709981095747387465', '709981095646593136', '709981096066023444'].includes(reaction.emoji.id || reaction.emoji.name) && user.id === message.author.id;
+
+    const answer = (await message.awaitReactions(filter, { max: 1, time: 60000 })).first();
+
+    await message
+        .delete({
+            timeout: 10
+        })
+        .catch(() => null);
+
+    switch (answer?.emoji.id || answer?.emoji.name) {
+        case '709981095747387465':
+            reply = true;
+            break;
+        case '709981095646593136':
+            reply = false;
+            break;
+        case '709981096066023444':
+            canceled = false;
+            break;
+        default:
+            reply = false;
+            canceled = true;
+            break;
     }
-}
-async function tryAgain(message: Message, value: string, type: type) {
-    const msg = await sendEmbed(
+
+    return {
+        reply: reply,
+        canceled: canceled
+    };
+};
+async function tryAgain(message: Message, user: User, value: string, type: format) {
+    await editEmbed(
         message,
         'Invalid Response',
         'Uh Oh!',
         `\`${value}\` is not a valid ${type}!\n\nReact with <:yes:709981119721766955> to give a valid ${type}, or <:no:709981096066023444> to cancel.`
     );
 
-    await msg.react('709981119721766955');
-    await msg.react('709981096066023444');
+    await message.react('709981119721766955');
+    await message.react('709981096066023444');
 
-    const filter = (reaction: MessageReaction, user: User) => {
-        return ['709981119721766955', '709981096066023444'].includes(reaction.emoji.id || reaction.emoji.name) && user.id === message.author.id;
+    const filter = (reaction: MessageReaction, reactionUser: User) => {
+        return ['709981119721766955', '709981096066023444'].includes(reaction.emoji.id || reaction.emoji.name) && reactionUser.id === user.id;
     };
 
-    const answer = (await msg.awaitReactions(filter, { max: 1, time: 60000 })).first();
+    const answer = (await message.awaitReactions(filter, { max: 1, time: 60000 })).first();
 
-    await msg.delete({
-        timeout: 200
-    });
+    await message.reactions.removeAll();
 
     switch (answer?.emoji.id || answer?.emoji.name) {
         case '709981119721766955':
+            await message.edit(new MessageEmbed());
             return true;
         case '709981096066023444':
+            await message.edit(new MessageEmbed());
             return false;
         default:
+            await message.edit(new MessageEmbed());
             return false;
     }
 }

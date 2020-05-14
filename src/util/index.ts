@@ -39,9 +39,8 @@ export const handleError = async (client: Client, err: Error) => {
 
 type GuildChannelType = 'text' | 'voice' | 'category' | 'news' | 'store';
 
-function channelFilterInexact(search: string) {
-    return (chan: GuildChannel) => chan.name.toLowerCase().includes(search.toLowerCase()) || search.toLowerCase().includes(chan.id);
-}
+const channelFilterInexact = (search: string) => (chan: GuildChannel) =>
+    chan.name.toLowerCase().includes(search.toLowerCase()) || search.toLowerCase().includes(chan.id);
 
 export const getChannel = async (message: MyMessage, args: string[], channelType: GuildChannelType, spot?: number) => {
     if (!message.guild) throw new Error('getChannel was used in a DmChannel.');
@@ -81,13 +80,8 @@ export const getChannel = async (message: MyMessage, args: string[], channelType
     return channel;
 };
 
-function memberFilterInexact(search: string) {
-    return (mem: GuildMember) =>
-        mem.user.username.toLowerCase().includes(search.toLowerCase()) ||
-        (mem.nickname && mem.nickname.toLowerCase().includes(search.toLowerCase())) ||
-        `${mem.user.username.toLowerCase()}#${mem.user.discriminator}`.includes(search.toLowerCase()) ||
-        search.includes(mem.user.id);
-}
+const memberFilterInexact = (search: string) => (mem: GuildMember) =>
+    mem.displayName.toLowerCase().includes(search.toLowerCase()) || mem.user.tag.toLowerCase().includes(search.toLowerCase());
 
 export const getMember = async (message: MyMessage, args: string[], spot?: number) => {
     if (!message.guild) throw new Error('getMember was used in a DmChannel.');
@@ -126,23 +120,34 @@ export const getMember = async (message: MyMessage, args: string[], spot?: numbe
     return null;
 };
 
-type type = 'string' | 'hexColor' | 'number';
+export type format = 'string' | 'hexColor' | 'number' | 'url' | 'imageUrl';
 
-function parseType(type: type, string: string) {
-    if (type === 'number') {
-        const result = string.match(/\d+/);
-        return result ? result[0] : null;
-    } else if (type === 'hexColor') {
-        const result = string.match(/#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})/);
-        return result ? result[0] : null;
-    } else if (type === 'string') {
-        return string ? string : null;
-    } else {
-        return null;
+export const linkRegex = /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/gi;
+
+export const parseType = (type: format, str: string) => {
+    switch (type) {
+        case 'number':
+            const number = str.match(/\d+/);
+            return number ? number[0] : null;
+        case 'hexColor':
+            const hexColor = str.match(/#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})/);
+            return hexColor ? hexColor[0] : null;
+        case 'imageUrl':
+            const imageUrl = str.match(/https?\:\/\/.*\..*.(gif|png|web(p|m)|jpe?g)/gi);
+            console.log(imageUrl);
+            return imageUrl ? imageUrl[0] : null;
+        case 'string':
+            return str || null;
+        case 'url':
+            const url = str.match(linkRegex);
+            console.log(url);
+            return url ? url[0] : null;
+        default:
+            return null;
     }
-}
+};
 
-async function options(message: MyMessage, question: string, options: string[]) {
+const options = async (message: MyMessage, question: string, options: string[]) => {
     let choice;
     let canceled = false;
 
@@ -212,9 +217,9 @@ async function options(message: MyMessage, question: string, options: string[]) 
         choice: choice,
         canceled: canceled
     };
-}
+};
 
-async function tryAgain(message: MyMessage, value: string, type: type) {
+const tryAgain = async (message: MyMessage, value: string, type: format) => {
     const response = new MessageEmbed()
         .setColor(message.client.config.accentColor)
         .setAuthor('Profiles', client.user?.displayAvatarURL({ dynamic: true, format: 'png' }))
@@ -246,4 +251,4 @@ async function tryAgain(message: MyMessage, value: string, type: type) {
         default:
             return false;
     }
-}
+};

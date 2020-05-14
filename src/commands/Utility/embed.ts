@@ -2,22 +2,25 @@ import { MessageEmbed, TextChannel } from 'discord.js';
 import { Command, MyMessage } from '../../interfaces/Client';
 import { getChannel } from '../../util';
 import { getGuildSettings } from '../../database';
+import { uploadHaste, fetchHaste } from '../../util/hastebin';
 
 const callback = async (message: MyMessage, args: string[]) => {
+    // * Load Guild Settings
     const guildSettings = message.guild?.id ? await getGuildSettings(message.guild?.id) : null;
     const prefix = guildSettings?.prefix || message.client.config.defaultPrefix;
 
-    const embed = new MessageEmbed();
+    let embed = new MessageEmbed();
 
-    // * Variable Parsing
-    const arg1 = args[0] ? args[0] : null;
-    const arg2 = args[1] ? args[1] : null;
-    const arg3 = args[2] ? args[2] : null;
+    const [arg1, arg2, arg3] = args;
 
     if (arg1 === 'create') {
-        if (!arg2) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `Please provide a text channel!`);
+        let channel;
 
-        const channel = await getChannel(message, args, 'text', 1);
+        if (arg2) {
+            channel = await getChannel(message, args, 'text', 1);
+        } else {
+            channel = message.channel;
+        }
 
         if (!channel || !(channel instanceof TextChannel))
             return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `I couldn't find \`${arg2}\`! Please provide a valid text channel!`);
@@ -26,17 +29,21 @@ const callback = async (message: MyMessage, args: string[]) => {
 
         embed
             .setTitle('Custom Embed')
-            .setDescription(`You can customize this embed by doing the command \`${prefix}embed edit ${msg.id}\``)
+            .setDescription(`You can customize this embed by doing the command \`${prefix}embed edit ${msg.channel.toString()} ${msg.id}\``)
             .setFooter(`ID: ${msg.id}`);
 
         await msg.edit(embed);
 
-        await message.client.sendEmbed(
-            message,
-            'Custom Embeds',
-            'Embed Created',
-            `You can customize the new embed by doing the command \`${prefix}embed edit ${msg.id}\``
-        );
+        if (channel !== message.channel) {
+            await message.client.sendEmbed(
+                message,
+                'Custom Embeds',
+                'Embed Created',
+                `You can customize the new embed by doing the command \`${prefix}embed edit ${msg.channel.toString()} ${msg.id}\``
+            );
+        }
+
+        await message.delete({ timeout: 100 });
     } else if (arg1 === 'edit') {
         const channel = await getChannel(message, args, 'text', 1);
 
@@ -49,9 +56,11 @@ const callback = async (message: MyMessage, args: string[]) => {
 
         if (!msg) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `I couldn't find message with ID \`${arg3}\` in ${channel.toString()}!`);
 
-        const msgEmbed = msg.embeds[0];
+        embed = msg.embeds[0];
 
-        if (!msgEmbed) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `Message with ID \`${arg3}\` does not have an embed!`);
+        if (!msg.embeds.length) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `Message with ID \`${arg3}\` does not have an embed!`);
+
+        const GUI = await message.channel.send('Loading GUI...');
 
         type embedAction =
             | 'setTitle'
@@ -78,25 +87,312 @@ const callback = async (message: MyMessage, args: string[]) => {
             'setColor'
         ];
 
-        const answer = await message.client.sendOptions(message, 'Which action would you like to perform on the embed?', embedActions);
+        const answer = await message.client.sendOptions(GUI, message.author, 'Which action would you like to perform on the embed?', embedActions);
 
-        if (answer.canceled || !answer.choice) return message.client.sendEmbed(message, 'Custom Embeds', 'Embed Edit Canceled');
+        if (answer.canceled || !answer.choice) {
+            message.client.editEmbed(GUI, 'Custom Embeds', 'Embed Edit Canceled');
+            await GUI.delete({
+                timeout: 5000
+            }).catch(() => null);
+            return;
+        }
 
         const action = answer.choice;
 
         if (action === 'setTitle') {
-            const title = await message.client.sendQuestions(message, [
+            const title = await message.client.sendQuestions(GUI, message.author, [
                 {
                     question: 'What would you like to set the title to?',
+                    type: 'string',
+                    optional: true
+                }
+            ]);
+
+            if (title.canceled || !title.answers[0]) {
+                message.client.editEmbed(GUI, 'Custom Embeds', 'Embed Edit Canceled');
+                await GUI.delete({
+                    timeout: 5000
+                }).catch(() => null);
+                return;
+            }
+
+            embed.setTitle(title.answers[0] !== 'none' ? title.answers[0] : '');
+        } else if (action === 'setURL') {
+            const url = await message.client.sendQuestions(GUI, message.author, [
+                {
+                    question: 'What would you like to set the URL to?',
+                    type: 'url',
+                    optional: true
+                }
+            ]);
+
+            if (url.canceled || !url.answers[0]) {
+                message.client.editEmbed(GUI, 'Custom Embeds', 'Embed Edit Canceled');
+                await GUI.delete({
+                    timeout: 5000
+                }).catch(() => null);
+                return;
+            }
+
+            embed.setURL(url.answers[0] !== 'none' ? url.answers[0] : '');
+        } else if (action === 'setDescription') {
+            const desc = await message.client.sendQuestions(GUI, message.author, [
+                {
+                    question: 'What would you like to set the description to?',
+                    type: 'string',
+                    optional: true
+                }
+            ]);
+
+            if (desc.canceled || !desc.answers[0]) {
+                message.client.editEmbed(GUI, 'Custom Embeds', 'Embed Edit Canceled');
+                await GUI.delete({
+                    timeout: 5000
+                }).catch(() => null);
+                return;
+            }
+
+            embed.setDescription(desc.answers[0] !== 'none' ? desc.answers[0] : '');
+        } else if (action === 'addField') {
+            const answers = await message.client.sendQuestions(GUI, message.author, [
+                {
+                    question: 'What would you like to set the name to be?',
+                    type: 'string',
+                    optional: false
+                },
+                {
+                    question: 'What would you like to set the value to be?',
                     type: 'string',
                     optional: false
                 }
             ]);
+            if (answers.canceled || !answers.answers[0]) {
+                message.client.editEmbed(GUI, 'Custom Embeds', 'Embed Edit Canceled');
+                await GUI.delete({
+                    timeout: 5000
+                }).catch(() => null);
+                return;
+            }
 
-            if (title.canceled || !title.answers[0]) return message.client.sendEmbed(message, 'Custom Embeds', 'Embed Edit Canceled');
+            const inline = await message.client.sendYesNo(message, 'Would you like the field to be inline?');
 
-            embed.setTitle(title.answers[0]);
+            if (inline.canceled) {
+                message.client.editEmbed(GUI, 'Custom Embeds', 'Embed Edit Canceled');
+                await GUI.delete({
+                    timeout: 5000
+                }).catch(() => null);
+                return;
+            }
+
+            const [name, value] = answers.answers;
+
+            embed.addField(name, value, inline.reply);
+        } else if (action === 'removeField') {
+            const options: string[] = [];
+            if (!embed.fields.length)
+                return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `Embed with ID \`${arg3}\` doesn't have any fields to remove!`);
+            if (embed.fields.length === 1) {
+                embed.fields = [];
+            } else {
+                embed.fields.forEach(field => options.push(`\n**Name**: ${field.name}\n**Value**: ${field.value}\n**Inline**: ${field.inline}`));
+                const reply = await message.client.sendOptions(GUI, message.author, 'Which field would you like to remove?', options);
+
+                const { canceled, index } = reply;
+
+                if (canceled) {
+                    message.client.editEmbed(GUI, 'Custom Embeds', 'Embed Edit Canceled');
+                    await GUI.delete({
+                        timeout: 5000
+                    }).catch(() => null);
+                    return;
+                }
+
+                const fields = embed.fields;
+
+                const a = fields.indexOf(fields[index], 0);
+
+                if (a > -1) {
+                    fields.splice(a, 1);
+                }
+
+                embed.fields = fields;
+            }
+        } else if (action === 'setAuthor') {
+            const answers = await message.client.sendQuestions(GUI, message.author, [
+                {
+                    question: "What would you like the author's name to be?",
+                    type: 'string',
+                    optional: false
+                },
+                {
+                    question: "What would you like the author's avatar to be?",
+                    type: 'imageUrl',
+                    optional: true
+                },
+                {
+                    question: "What would you like the author's link to be?",
+                    type: 'url',
+                    optional: true
+                }
+            ]);
+            if (answers.canceled || !answers.answers[0]) {
+                message.client.editEmbed(GUI, 'Custom Embeds', 'Embed Edit Canceled');
+                await GUI.delete({
+                    timeout: 5000
+                }).catch(() => null);
+                return;
+            }
+
+            const [name, avatar, link] = answers.answers;
+
+            embed.setAuthor(name, avatar !== 'none' ? avatar : undefined, link !== 'none' ? link : undefined);
+        } else if (action === 'setFooter') {
+            const answers = await message.client.sendQuestions(GUI, message.author, [
+                {
+                    question: 'What would you like the footer to say?',
+                    type: 'string',
+                    optional: true
+                },
+                {
+                    question: 'What would you like the icon to be?',
+                    type: 'imageUrl',
+                    optional: true
+                }
+            ]);
+            if (answers.canceled || !answers.answers[0]) {
+                message.client.editEmbed(GUI, 'Custom Embeds', 'Embed Edit Canceled');
+                await GUI.delete({
+                    timeout: 5000
+                }).catch(() => null);
+                return;
+            }
+
+            const [name, avatar] = answers.answers;
+
+            if (name === 'none') {
+                delete embed['footer'];
+            } else {
+                embed.setFooter(name, avatar !== 'none' ? avatar : undefined);
+            }
+        } else if (action === 'setImage') {
+            const answers = await message.client.sendQuestions(GUI, message.author, [
+                {
+                    question: 'What would you like the image to be?',
+                    type: 'imageUrl',
+                    optional: true
+                }
+            ]);
+            if (answers.canceled || !answers.answers[0]) {
+                message.client.editEmbed(GUI, 'Custom Embeds', 'Embed Edit Canceled');
+                await GUI.delete({
+                    timeout: 5000
+                }).catch(() => null);
+                return;
+            }
+
+            const image = answers.answers[0];
+
+            if (image === 'none') {
+                delete embed['image'];
+            } else {
+                embed.setImage(image);
+            }
+        } else if (action === 'setThumbnail') {
+            const answers = await message.client.sendQuestions(GUI, message.author, [
+                {
+                    question: 'What would you like the thumbnail to be?',
+                    type: 'imageUrl',
+                    optional: true
+                }
+            ]);
+            if (answers.canceled || !answers.answers[0]) {
+                message.client.editEmbed(GUI, 'Custom Embeds', 'Embed Edit Canceled');
+                await GUI.delete({
+                    timeout: 5000
+                }).catch(() => null);
+                return;
+            }
+
+            const [image] = answers.answers;
+
+            if (image === 'none') {
+                delete embed['thumbnail'];
+            } else {
+                embed.setThumbnail(image);
+            }
+        } else if (action === 'setColor') {
+            const answers = await message.client.sendQuestions(GUI, message.author, [
+                {
+                    question: 'What would you like the color to be?',
+                    type: 'hexColor',
+                    optional: true
+                }
+            ]);
+            if (answers.canceled || !answers.answers[0]) {
+                message.client.editEmbed(GUI, 'Custom Embeds', 'Embed Edit Canceled');
+                await GUI.delete({
+                    timeout: 5000
+                }).catch(() => null);
+                return;
+            }
+
+            const [color] = answers.answers;
+
+            if (color === 'none') {
+                embed.setColor('#2f3136');
+            } else {
+                embed.setColor(color);
+            }
         }
+        msg.edit(embed);
+
+        message.client.editEmbed(GUI, 'Custom Embeds', 'Embed Edited');
+
+        await message
+            .delete({
+                timeout: 100
+            })
+            .catch(() => null);
+
+        await GUI.delete({
+            timeout: 5000
+        }).catch(() => null);
+    } else if (arg1 === 'copy') {
+        const channel = await getChannel(message, args, 'text', 1);
+
+        if (!channel || !(channel instanceof TextChannel))
+            return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `I couldn't find \`${arg2}\`! Please provide a valid text channel!`);
+
+        if (!arg3) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `Please provide a messageID!`);
+
+        const msg = await channel.messages.fetch(arg3).catch(() => null);
+
+        if (!msg) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `I couldn't find message with ID \`${arg3}\` in ${channel.toString()}!`);
+
+        embed = msg.embeds[0];
+
+        if (!msg.embeds.length) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `Message with ID \`${arg3}\` does not have an embed!`);
+
+        const key = await uploadHaste(JSON.stringify(embed.toJSON()));
+
+        message.client.sendEmbed(message, 'Custom Embeds', 'Embed Copied', `You can paste the embed with \`${prefix}embed paste <channel> ${key}\``);
+    } else if (arg1 === 'paste') {
+        const channel = await getChannel(message, args, 'text', 1);
+
+        if (!channel || !(channel instanceof TextChannel))
+            return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `I couldn't find \`${arg2}\`! Please provide a valid text channel!`);
+
+        if (!arg3) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `Please provide a pasteID!`);
+
+        const paste = await fetchHaste(arg3);
+
+        if (!paste) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `I couldn't find a copied embed with id \`${arg3}\`!`);
+
+        embed = paste;
+
+        channel.send(embed);
+
+        message.client.sendEmbed(message, 'Custom Embeds', 'Embed Pasted');
     }
     return;
 };
@@ -106,10 +402,11 @@ export const command: Command = {
     category: 'Utility',
     aliases: [],
     description: 'Create/Edit a Message Embed',
-    usage: '<Create | Edit> <TextChannel> <MessageID (Edit Only)>',
-    requiresArgs: 2,
+    usage: '<Create | Edit | Copy | Paste> <TextChannel> <MessageID | PasteID>',
+    requiresArgs: 0,
     devOnly: false,
     guildOnly: true,
+    NSFW: false,
     userPermissions: 'MANAGE_MESSAGES',
     botPermissions: 'EMBED_LINKS',
     callback: callback

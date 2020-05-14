@@ -29,7 +29,7 @@ const callback = async (message: MyMessage, args: string[]) => {
           })()`));
 
         if (typeof output !== 'string') output = require('util').inspect(output);
-        if (output.length > 2000) return message.channel.send(await uploadHaste(output));
+        if (output.length > 2000) return message.channel.send(`https://hasteb.in/${await uploadHaste(output)}`);
 
         return message.channel.send(output, { code: 'xl' }).catch(err => {
             return message.channel.send(err, { code: 'xl' });
@@ -48,6 +48,7 @@ export const command: Command = {
     requiresArgs: 1,
     devOnly: true,
     guildOnly: false,
+    NSFW: false,
     userPermissions: '',
     botPermissions: '',
     callback: callback

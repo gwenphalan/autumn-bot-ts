@@ -27,6 +27,8 @@ export default async (client: Client, message: Message) => {
     // Check the conditions set in the command
     if (command.devOnly && !client.config.developers.includes(message.author.id)) return;
     if (command.guildOnly && !message.guild) return message.channel.send('This command can only be used on a server!');
+    if (command.NSFW && message.channel instanceof TextChannel && !message.channel.nsfw)
+        return client.sendEmbed(message, 'NSFW', 'Uh Oh!', `The command \`${prefix}${command.name}\` can only be used in channels marked as **NSFW**!`);
     if (args.length < command.requiresArgs)
         return message.channel.send(
             `This command requires ${command.requiresArgs} arguments and you only provided ${args.length}.\nPlease use the command like this: \`${prefix}${command.name} ${command.usage}\``
