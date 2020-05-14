@@ -45,12 +45,14 @@ const callback = async (message: MyMessage, args: string[]) => {
 
         await message.delete({ timeout: 100 });
     } else if (arg1 === 'edit') {
+        if (!arg2) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `Please provide a text channel!`);
+
         const channel = await getChannel(message, args, 'text', 1);
 
-        if (!channel || !(channel instanceof TextChannel))
-            return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `I couldn't find \`${arg2}\`! Please provide a valid text channel!`);
+        if (!channel) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `I couldn't find \`${arg2}\`! Please provide a valid text channel!`);
+        if (!(channel instanceof TextChannel)) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `\`${arg2}\` is not a text channel!`);
 
-        if (!arg3) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `Please provide a messageID!`);
+        if (!arg3) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `Please provide a message ID!`);
 
         const msg = await channel.messages.fetch(arg3).catch(() => null);
 
@@ -358,29 +360,31 @@ const callback = async (message: MyMessage, args: string[]) => {
             timeout: 5000
         }).catch(() => null);
     } else if (arg1 === 'copy') {
+        if (!arg2) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `Please provide a text channel!`);
+
         const channel = await getChannel(message, args, 'text', 1);
 
-        if (!channel || !(channel instanceof TextChannel))
-            return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `I couldn't find \`${arg2}\`! Please provide a valid text channel!`);
+        if (!channel) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `I couldn't find \`${arg2}\`! Please provide a valid text channel!`);
+        if (!(channel instanceof TextChannel)) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `\`${arg2}\` is not a text channel!`);
 
-        if (!arg3) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `Please provide a messageID!`);
+        if (!arg3) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `Please provide a message ID!`);
 
         const msg = await channel.messages.fetch(arg3).catch(() => null);
 
         if (!msg) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `I couldn't find message with ID \`${arg3}\` in ${channel.toString()}!`);
 
-        embed = msg.embeds[0];
-
         if (!msg.embeds.length) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `Message with ID \`${arg3}\` does not have an embed!`);
 
-        const key = await uploadHaste(JSON.stringify(embed.toJSON()));
+        const key = await uploadHaste(JSON.stringify(msg.embeds[0].toJSON()));
 
         message.client.sendEmbed(message, 'Custom Embeds', 'Embed Copied', `You can paste the embed with \`${prefix}embed paste <channel> ${key}\``);
     } else if (arg1 === 'paste') {
+        if (!arg2) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `Please provide a text channel!`);
+
         const channel = await getChannel(message, args, 'text', 1);
 
-        if (!channel || !(channel instanceof TextChannel))
-            return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `I couldn't find \`${arg2}\`! Please provide a valid text channel!`);
+        if (!channel) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `I couldn't find \`${arg2}\`! Please provide a valid text channel!`);
+        if (!(channel instanceof TextChannel)) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `\`${arg2}\` is not a text channel!`);
 
         if (!arg3) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `Please provide a pasteID!`);
 
@@ -388,11 +392,21 @@ const callback = async (message: MyMessage, args: string[]) => {
 
         if (!paste) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `I couldn't find a copied embed with id \`${arg3}\`!`);
 
-        embed = paste;
+        try {
+            embed = JSON.parse(paste);
+        } catch (err) {
+            message.client.sendEmbed(message, undefined, 'Error', err);
+            return console.log(err);
+        }
 
-        channel.send(embed);
+        channel.send({ embed: embed });
 
-        message.client.sendEmbed(message, 'Custom Embeds', 'Embed Pasted');
+        const response = await message.client.sendEmbed(message, 'Custom Embeds', 'Embed Pasted');
+        await response
+            .delete({
+                timeout: 5000
+            })
+            .catch(() => null);
     }
     return;
 };
@@ -402,7 +416,7 @@ export const command: Command = {
     category: 'Utility',
     aliases: [],
     description: 'Create/Edit a Message Embed',
-    usage: '<Create | Edit | Copy | Paste> <TextChannel> <MessageID | PasteID>',
+    usage: '<Create | Edit | Copy> <TextChannel> <MessageID | PasteID>',
     requiresArgs: 0,
     devOnly: false,
     guildOnly: true,
