@@ -1,4 +1,4 @@
-import { Command, MyMessage } from '../../interfaces/Client';
+import { Command, AMessage } from '../../interfaces/Client';
 import { getMember } from '../../util';
 import { getUserProfile, createUserProfile, updateUserProfile, getGuildSettings, profileProperty } from '../../database';
 import { client } from '../../index';
@@ -6,7 +6,7 @@ type type = 'string' | 'hexColor' | 'number';
 
 //* Command Code
 
-const callback = async (message: MyMessage, args: string[]) => {
+const callback = async (message: AMessage, args: string[]) => {
     const actions = ['edit', 'create'];
 
     const action = args[0] && actions.includes(args[0].toString()) ? args[0].toLowerCase() : null;
@@ -47,7 +47,7 @@ const callback = async (message: MyMessage, args: string[]) => {
                 'Profiles',
                 `Uh Oh!`,
                 `${user.user} doesn't have a profile!\nHowever they can set one up with \`${
-                    guildSettings?.prefix || client.config.defaultPrefix
+                    guildSettings?.general.prefix || client.config.defaultPrefix
                 }profile create\`.`
             );
             return;
@@ -79,7 +79,7 @@ const callback = async (message: MyMessage, args: string[]) => {
                 message,
                 'Profiles',
                 `Uh Oh!`,
-                `You don't have a profile!\nHowever you can set one up with \`${guildSettings?.prefix || client.config.defaultPrefix}profile create\`.`
+                `You don't have a profile!\nHowever you can set one up with \`${guildSettings?.general.prefix || client.config.defaultPrefix}profile create\`.`
             );
             return;
         }
@@ -90,9 +90,9 @@ const callback = async (message: MyMessage, args: string[]) => {
                 message,
                 'Profiles',
                 `Uh Oh!`,
-                `You already have a profile! You can view it with \`${guildSettings?.prefix || client.config.defaultPrefix}profile\` or edit it with \`${
-                    guildSettings?.prefix || client.config.defaultPrefix
-                }profile edit\``
+                `You already have a profile! You can view it with \`${
+                    guildSettings?.general.prefix || client.config.defaultPrefix
+                }profile\` or edit it with \`${guildSettings?.general.prefix || client.config.defaultPrefix}profile edit\``
             );
             return;
         }
@@ -151,7 +151,7 @@ const callback = async (message: MyMessage, args: string[]) => {
                 message,
                 'Profiles',
                 `Profile Created`,
-                `You can view your new profile with \`${guildSettings?.prefix || client.config.defaultPrefix}profile\`.`
+                `You can view your new profile with \`${guildSettings?.general.prefix || client.config.defaultPrefix}profile\`.`
             );
             return;
         }
@@ -221,7 +221,9 @@ const callback = async (message: MyMessage, args: string[]) => {
             message,
             'Profiles',
             `Profile Edited`,
-            `\`${property}\` has been set to \`${value}\`\n\nDo \`${guildSettings?.prefix || client.config.defaultPrefix}profile\` to view your changes.`
+            `\`${property}\` has been set to \`${value}\`\n\nDo \`${
+                guildSettings?.general.prefix || client.config.defaultPrefix
+            }profile\` to view your changes.`
         );
         return;
     }

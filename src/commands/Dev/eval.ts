@@ -1,8 +1,8 @@
 import { uploadHaste } from '../../util/hastebin';
-import { Command, Client, MyMessage } from '../../interfaces/Client';
+import { Command, Client, AMessage } from '../../interfaces/Client';
 import { MessageEmbed } from 'discord.js';
 
-const callback = async (message: MyMessage, args: string[]) => {
+const callback = async (message: AMessage, args: string[]) => {
     // Define a bunch of shortcuts which will be usable in your eval code
     const client = message.client as Client;
     //@ts-ignore

@@ -10,13 +10,13 @@ export default async (client: Client, message: Message) => {
 
     // Get the settings for the current guild and use the prefix defined there, or use the default prefix if no settings found.
     const guildSettings = message.guild ? await client.database.guildSettings.findOne({ guild: message.guild.id }) : null;
-    const prefix = guildSettings?.prefix || client.config.defaultPrefix;
+    const prefix = guildSettings?.general.prefix || client.config.defaultPrefix;
 
     // Check whether message starts with the prefix determined above
     if (!message.content.startsWith(prefix)) return;
 
     // Prepare args
-    const args = message.content.slice(prefix.length).trim().split(' ');
+    const args = message.content.slice(prefix.length).trim().split(/ +/);
     const commandName = args.shift();
     if (!commandName) return;
 

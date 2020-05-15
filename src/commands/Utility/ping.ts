@@ -1,6 +1,6 @@
-import { Command, MyMessage } from '../../interfaces/Client';
+import { Command, AMessage } from '../../interfaces/Client';
 
-const callback = async (message: MyMessage, _args: string[]) => {
+const callback = async (message: AMessage, _args: string[]) => {
     const msg = await message.channel.send('Pinging...');
     return msg.edit(`Pong! Took ${msg.createdTimestamp - message.createdTimestamp}ms`);
 };

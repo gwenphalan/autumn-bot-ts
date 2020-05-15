@@ -10,7 +10,7 @@
         "production": "npm run build && export NODE_ENV=production && npm run start",
         "test": "tsc -p tsconfig.test.json && npm run lint",
         "lint": "eslint ./src/**/*.ts --fix",
-        "clean": "rm -rf out/*",
+        "clean": "rm -rf dist/*",
         "reinstall": "npm run cleanCache && npm run deleteModules && npm run deleteLock && npm run installModules",
         "build": "tsc",
         "start": "node dist/src/index",

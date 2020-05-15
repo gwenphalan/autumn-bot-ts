@@ -1,13 +1,13 @@
 import { MessageEmbed, TextChannel } from 'discord.js';
-import { Command, MyMessage } from '../../interfaces/Client';
+import { Command, AMessage } from '../../interfaces/Client';
 import { getChannel } from '../../util';
 import { getGuildSettings } from '../../database';
 import { uploadHaste, fetchHaste } from '../../util/hastebin';
 
-const callback = async (message: MyMessage, args: string[]) => {
+const callback = async (message: AMessage, args: string[]) => {
     // * Load Guild Settings
     const guildSettings = message.guild?.id ? await getGuildSettings(message.guild?.id) : null;
-    const prefix = guildSettings?.prefix || message.client.config.defaultPrefix;
+    const prefix = guildSettings?.general.prefix || message.client.config.defaultPrefix;
 
     let embed = new MessageEmbed();
 

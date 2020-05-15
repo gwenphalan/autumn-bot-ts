@@ -4,7 +4,6 @@ import { updateActivity } from '../index';
 import { Guild, TextChannel, MessageEmbed } from 'discord.js';
 
 export default async (client: Client, guild: Guild) => {
-    await client.database.guildSettings.deleteOne({ guild: guild.id });
     // Get the info channel
     const infoChannel = client.channels.cache.get(client.config.infoChannel) || (await client.channels.fetch(client.config.infoChannel));
     if (!infoChannel || !(infoChannel instanceof TextChannel)) throw new Error('Provided info channel is unreachable or not a text channel.');

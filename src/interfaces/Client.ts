@@ -1,8 +1,10 @@
-import { Client as DClient, Collection, Message, PermissionString, MessageEmbed, MessageReaction, User } from 'discord.js';
+import { Client as DClient, Collection, Message as BaseMessage, PermissionString, MessageEmbed, MessageReaction, User } from 'discord.js';
 import { config } from '../../config';
 import { database } from '../database';
 import { client } from '../index';
-import { format, parseType } from '../util';
+import { format, parseType, replace } from '../util';
+import { getGuildSettings } from '../database';
+import { valueType } from '../interfaces/SettingsGroup';
 
 // Our custom client adding new properties to the Discord Client
 export class Client extends DClient {
@@ -15,6 +17,7 @@ export class Client extends DClient {
     sendQuestions = sendQuestions;
     sendYesNo = sendYesNo;
     editEmbed = editEmbed;
+    settings = getGuildSettings;
 }
 
 export interface Command {
@@ -29,10 +32,10 @@ export interface Command {
     NSFW: boolean;
     userPermissions: '' | PermissionString;
     botPermissions: '' | PermissionString;
-    callback(message: Message, args: string[]): Promise<void | Message>; // The command function
+    callback(message: BaseMessage, args: string[]): Promise<void | BaseMessage>; // The command function
 }
 
-export interface MyMessage extends Message {
+export interface AMessage extends BaseMessage {
     client: Client;
 }
 // Client events, no need to touch these unless new events are added to discord.js
@@ -96,7 +99,7 @@ type EmbedField = {
 
 // src/interfaces/Client.ts
 export const editEmbed = async (
-    message: Message,
+    message: AMessage | BaseMessage,
     module?: string,
     title?: string,
     body?: string,
@@ -122,35 +125,63 @@ export const editEmbed = async (
 };
 
 export const sendEmbed = async (
-    message: Message,
+    message: AMessage | BaseMessage,
     module?: string,
     title?: string,
     body?: string,
     thumbnail?: string,
     fields?: EmbedField[],
-    color?: string
+    color?: string,
+    footer?: {
+        text: any;
+        iconURL?: string;
+    },
+    displayAuthor?: boolean
 ) => {
     const embedPermission = checkPerm(message, 'EMBED_LINKS');
 
-    const embed = new MessageEmbed()
-        .setTimestamp()
-        .setFooter(`Requested By ${message.author.username}#${message.author.discriminator}`, message.author.displayAvatarURL({ dynamic: true, format: 'png' }))
-        .setColor(color ? color : config.accentColor);
+    const guildSettings = message.guild ? await getGuildSettings(message.guild?.id) : null;
 
-    module ? embed.setAuthor(module, client.user?.displayAvatarURL({ dynamic: true, format: 'png' })) : null;
-    title ? embed.setTitle(title) : null;
-    body ? embed.setDescription(body) : null;
+    const embed = new MessageEmbed().setTimestamp().setColor(color ? color : config.accentColor);
+
+    const prefix = guildSettings?.general.prefix;
+
+    console.log(prefix ? prefix : config.defaultPrefix);
+
+    const placeholders: { [prop: string]: string } = {
+        guildName: message.guild ? message.guild.name : message.author.username,
+        username: message.author.username,
+        defaultPrefix: config.defaultPrefix,
+        prefix: prefix ? prefix : config.defaultPrefix
+    };
+
+    footer ? embed.setFooter(replace(footer.text, placeholders), footer.iconURL) : null;
+
+    displayAuthor
+        ? embed.setFooter(
+              `Requested By ${message.author.username}#${message.author.discriminator}`,
+              message.author.displayAvatarURL({ dynamic: true, format: 'png' })
+          )
+        : null;
+
+    module ? embed.setAuthor(replace(module, placeholders), client.user?.displayAvatarURL({ dynamic: true, format: 'png' })) : null;
+
+    title ? embed.setTitle(replace(title, placeholders)) : null;
+
+    body ? embed.setDescription(replace(body, placeholders)) : null;
+
     thumbnail ? embed.setThumbnail(thumbnail) : null;
-    fields?.forEach(field => embed.addField(field.name, field.value, field.inline));
+
+    fields?.forEach(field => embed.addField(replace(field.name, placeholders), replace(field.value, placeholders), field.inline));
 
     let fieldString = '';
-    fields?.forEach(field => (fieldString += `\n\n**${field.name}**\n${field.value}`));
-    const text = `**${title}**${body ? `\n\n${body}` : ''}${fieldString}`;
+    fields?.forEach(field => (fieldString += `\n\n**${replace(field.name, placeholders)}**\n${replace(field.value, placeholders)}`));
+    const text = `${title ? `***${replace(title, placeholders)}*` : ''}${body ? `\n\n${replace(body, placeholders)}` : ''}${fieldString}`;
 
     return await message.channel.send(embedPermission ? embed : text);
 };
 
-export const sendOptions = async (message: Message, user: User, question: string, options: string[]) => {
+export const sendOptions = async (message: AMessage | BaseMessage, user: User, question: string, options: string[]) => {
     let choice;
     let canceled = false;
     let choiceIndex = 0;
@@ -188,7 +219,7 @@ export const sendOptions = async (message: Message, user: User, question: string
                 `Choose one of the options by replying with the number of the option.\n\n${choiceString}\nReply with \`cancel\` to cancel.`
             );
 
-            const filter = (msg: Message) => {
+            const filter = (msg: AMessage) => {
                 return msg.author.id === user.id;
             };
 
@@ -230,7 +261,7 @@ export const sendOptions = async (message: Message, user: User, question: string
     };
 };
 
-export const checkPerm = (message: Message, permission: PermissionString) => {
+export const checkPerm = (message: AMessage | BaseMessage, permission: PermissionString) => {
     if (!client.user?.id) return false;
     const member = message?.guild?.members.cache.get(client.user.id);
     if (!member) return false;
@@ -252,7 +283,7 @@ interface Question {
  * @param user User who is being asked the questions.
  * @param questions Array of Question objects that will be asked.
  */
-export const sendQuestions = async (message: Message, user: User, questions: Question[]) => {
+export const sendQuestions = async (message: AMessage | BaseMessage, user: User, questions: Question[]) => {
     const answers: string[] = [];
     let canceled = false;
     for (let i = 0; i < questions.length; i++) {
@@ -290,7 +321,7 @@ export const sendQuestions = async (message: Message, user: User, questions: Que
                     }\n\nReply with your answer, or \`cancel\` to cancel.`
                 );
 
-                const filter = (msg: MyMessage) => {
+                const filter = (msg: AMessage) => {
                     return msg.author.id === user.id;
                 };
 
@@ -320,7 +351,7 @@ export const sendQuestions = async (message: Message, user: User, questions: Que
     };
 };
 
-export const sendConfirm = async (message: Message, user: User, question: string) => {
+export const sendConfirm = async (message: AMessage | BaseMessage, user: User, question: string) => {
     await editEmbed(message, 'Confirmation', 'Hold on a sec!', `${question}`);
 
     await message.react('709981119721766955');
@@ -345,7 +376,7 @@ export const sendConfirm = async (message: Message, user: User, question: string
             return false;
     }
 };
-export const sendYesNo = async (message: Message, question: string) => {
+export const sendYesNo = async (message: AMessage | BaseMessage, question: string) => {
     await editEmbed(message, 'Yes/No', `${question}`, `\nReact with <:no:709981096066023444> to cancel.`);
     let reply = false;
     let canceled = false;
@@ -386,7 +417,7 @@ export const sendYesNo = async (message: Message, question: string) => {
         canceled: canceled
     };
 };
-async function tryAgain(message: Message, user: User, value: string, type: format) {
+export async function tryAgain(message: AMessage | BaseMessage, user: User, value: string, type: format | valueType) {
     await editEmbed(
         message,
         'Invalid Response',

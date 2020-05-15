@@ -32,6 +32,10 @@ export const getGuildSettings = async (guildId: string) => {
     return (await GuildSettings.findOne({ guild: guildId })) || (await GuildSettings.create({ guild: guildId }));
 };
 
+export const updateGuildSettings = async (guildId: string, settings: GuildSettings) => {
+    await GuildSettings.updateOne({ guild: guildId }, settings);
+};
+
 // Helper function to get a guild's infractions
 export const getGuildInfractions = async (guildId: string) => {
     return await Infraction.findOne({ guild: guildId });
