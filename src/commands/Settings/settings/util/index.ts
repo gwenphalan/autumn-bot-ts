@@ -2,11 +2,14 @@ import { AMessage, editEmbed, tryAgain, sendOptions } from '../../../../interfac
 import { Message as BaseMessage, User, GuildChannel, Role } from 'discord.js';
 import { valueType } from '../../../../interfaces/SettingsGroup';
 import { TextChannel, VoiceChannel, GuildMember, MessageReaction, MessageEmbed } from 'discord.js';
+import Color from 'color';
+import Canvas from 'canvas';
 
 export const sendSetting = async (GUI: AMessage | BaseMessage, message: AMessage | BaseMessage, setting: string, valueType: valueType, array?: boolean) => {
     let canceled = false;
+    let invalid = false;
     let answer = null;
-    let response = '';
+    let response: any = null;
 
     if (valueType === 'boolean') {
         const bool = await sendYesNoSetting(GUI, message.author, setting);
@@ -23,21 +26,24 @@ export const sendSetting = async (GUI: AMessage | BaseMessage, message: AMessage
             canceled: canceled
         };
     } else {
-        for (let x = 0; x < 3; x++) {
+        for (let x = 0; x < 4; x++) {
             if (canceled) {
                 answer = null;
                 return {
                     answer: answer,
                     canceled: canceled
                 };
-            } else if (response && parseType(GUI, message, valueType, response)) {
-                answer = parseType(GUI, message, valueType, response);
-                break;
-            } else if (response && !parseType(GUI, message, valueType, response)) {
+            } else if (!invalid && answer) {
+                return {
+                    answer: answer,
+                    canceled: canceled
+                };
+            } else if (invalid) {
                 const retry = await tryAgain(GUI, message.author, response, valueType);
 
                 if (retry) {
                     answer = null;
+                    invalid = false;
                 } else {
                     canceled = true;
                 }
@@ -47,7 +53,7 @@ export const sendSetting = async (GUI: AMessage | BaseMessage, message: AMessage
                     'Settings',
                     array ? `What would you like to add to \`${setting}\`?` : `What would you like to change ${setting} to?`,
                     `${
-                        valueType === 'hexColor' ? '\n\n • [Adobe Color Picker](https://color.adobe.com/create)' : ''
+                        valueType === 'color' ? '\n\n • [Adobe Color Picker](https://color.adobe.com/create)' : ''
                     }\n\nReply with your answer, or \`cancel\` to cancel.`
                 );
 
@@ -59,11 +65,28 @@ export const sendSetting = async (GUI: AMessage | BaseMessage, message: AMessage
 
                 await GUI.edit(new MessageEmbed());
 
-                response = value?.content ? value.content : 'cancel';
+                const content = value ? value.content : null;
+
+                const attachment = value?.attachments.first() ? value.attachments.first() : null;
+
+                if (content || attachment) {
+                    response = content ? content : attachment ? attachment.url : null;
+                }
 
                 if (response === 'cancel') {
                     answer = null;
                     canceled = true;
+                }
+
+                answer = await parseType(GUI, message, valueType, response);
+
+                if (answer === 'canceled') {
+                    answer = null;
+                    canceled = true;
+                }
+
+                if (!answer) {
+                    invalid = true;
                 }
 
                 if (value)
@@ -83,17 +106,32 @@ export const sendSetting = async (GUI: AMessage | BaseMessage, message: AMessage
 
 const linkRegex = /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/gi;
 
-const parseType = async (GUI: AMessage | BaseMessage, message: AMessage | BaseMessage, type: valueType, str: string) => {
+export const parseType = async (GUI: AMessage | BaseMessage, message: AMessage | BaseMessage, type: valueType, str: string) => {
     switch (type) {
         case 'number':
             const number = str.match(/\d+/);
             return number ? number[0] : null;
-        case 'hexColor':
-            const hexColor = str.match(/#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})/);
-            return hexColor ? hexColor[0] : null;
-        case 'imageUrl':
-            const imageUrl = str.match(/https?\:\/\/.*\..*.(gif|png|web(p|m)|jpe?g)/gi);
-            return imageUrl ? imageUrl[0] : null;
+        case 'color':
+            try {
+                return Color(str).hex();
+            } catch (err) {
+                if (err) return null;
+            }
+        case 'image':
+            let imageUrl;
+            const urlSearch = str.match(/https?\:\/\/.*\..*.(gif|png|web(p|m)|jpe?g)/gi);
+
+            if (urlSearch) imageUrl = urlSearch[0];
+            else if (message.attachments.first()) imageUrl = message.attachments.first()?.url;
+            if (!imageUrl) return null;
+
+            const image = await Canvas.loadImage(imageUrl);
+
+            const canvas = Canvas.createCanvas(image.width * (500 / image.height), 500);
+            const ctx = canvas.getContext('2d');
+
+            ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+            return canvas.toBuffer();
         case 'string':
             return str || null;
         case 'url':
@@ -101,57 +139,50 @@ const parseType = async (GUI: AMessage | BaseMessage, message: AMessage | BaseMe
             return url ? url[0] : null;
         case 'guildMember':
             const member = await getMember(GUI, message, str);
+            if (member === 'canceled') return 'canceled';
             return member ? member : null;
         case 'role':
             const role = await getRole(GUI, message, str);
+            if (role === 'canceled') return 'canceled';
             return role ? role : null;
         case 'textChannel':
             const textChannel = await getTextChannel(GUI, message, str);
+            if (textChannel === 'canceled') return 'canceled';
             return textChannel ? textChannel : null;
         case 'voiceChannel':
             const voiceChannel = await getVoiceChannel(GUI, message, str);
+            if (voiceChannel === 'canceled') return 'canceled';
             return voiceChannel ? voiceChannel : null;
         case 'boolean':
             const bool = str.match(/(true|false)/gi);
-            return bool ? bool[0] : null;
+            return bool ? bool[0] === 'true' : null;
         default:
             return null;
     }
 };
 
 const sendYesNoSetting = async (message: AMessage | BaseMessage, user: User, setting: string) => {
-    await editEmbed(
-        message,
-        'Settings',
-        `What would you like to set \`${setting}\` to?`,
-        `React with <:upvote:709981095747387465> for \`true\`.\nReact with <:downvote:709981095646593136> for \`false\`.\n\nReact with <:no:709981096066023444> to cancel.`
-    );
+    await editEmbed(message, 'Settings', `What would you like to set \`${setting}\` to?`, `\n\nReact with <:leave:710930994060066818> to cancel.`);
     let reply = false;
     let canceled = false;
 
-    await message.react('709981095747387465');
-    await message.react('709981095646593136');
+    await message.react('709981119721766955');
     await message.react('709981096066023444');
+    await message.react('710930994060066818');
 
     const filter = (reaction: MessageReaction, reactionUser: User) =>
-        ['709981095747387465', '709981095646593136', '709981096066023444'].includes(reaction.emoji.id || reaction.emoji.name) && reactionUser.id === user.id;
+        ['709981119721766955', '709981096066023444', '710930994060066818'].includes(reaction.emoji.id || reaction.emoji.name) && reactionUser.id === user.id;
 
     const answer = (await message.awaitReactions(filter, { max: 1, time: 60000 })).first();
 
-    await message
-        .delete({
-            timeout: 10
-        })
-        .catch(() => null);
-
     switch (answer?.emoji.id || answer?.emoji.name) {
-        case '709981095747387465':
+        case '709981119721766955':
             reply = true;
             break;
-        case '709981095646593136':
+        case '709981096066023444':
             reply = false;
             break;
-        case '709981096066023444':
+        case '710930994060066818':
             canceled = false;
             break;
         default:
@@ -159,6 +190,8 @@ const sendYesNoSetting = async (message: AMessage | BaseMessage, user: User, set
             canceled = true;
             break;
     }
+
+    message.reactions.removeAll();
 
     return {
         reply: reply,
@@ -189,7 +222,7 @@ const getMember = async (GUI: AMessage | BaseMessage, message: AMessage | BaseMe
 
         const idRegex = /\d+/g;
 
-        if (reply.canceled || reply.choice === '') return null;
+        if (reply.canceled || reply.choice === '') return 'canceled';
 
         const idMatch = reply.choice?.match(idRegex);
 
@@ -222,7 +255,7 @@ const getTextChannel = async (GUI: AMessage | BaseMessage, message: AMessage | B
 
         const idRegex = /\d+/g;
 
-        if (reply.canceled || reply.choice === '') return null;
+        if (reply.canceled || reply.choice === '') return 'canceled';
 
         const idMatch = reply.choice?.match(idRegex);
 
@@ -256,7 +289,7 @@ const getVoiceChannel = async (GUI: AMessage | BaseMessage, message: AMessage | 
 
         const idRegex = /\d+/g;
 
-        if (reply.canceled || reply.choice === '') return null;
+        if (reply.canceled || reply.choice === '') return 'canceled';
 
         const idMatch = reply.choice?.match(idRegex);
 
@@ -289,11 +322,11 @@ const getRole = async (GUI: AMessage | BaseMessage, message: AMessage | BaseMess
 
         result.each((role: Role) => rolesFound.push(role.toString()));
 
-        const reply = await sendOptions(GUI, message.author, 'Multiple Members Found', rolesFound);
+        const reply = await sendOptions(GUI, message.author, 'Multiple Roles Found', rolesFound);
 
         const idRegex = /\d+/g;
 
-        if (reply.canceled || reply.choice === '') return null;
+        if (reply.canceled || reply.choice === '') return 'canceled';
 
         const idMatch = reply.choice?.match(idRegex);
 

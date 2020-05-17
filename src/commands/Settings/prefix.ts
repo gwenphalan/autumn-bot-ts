@@ -22,7 +22,7 @@ const callback = async (message: AMessage, args: string[]) => {
 
 export const command: Command = {
     name: 'prefix',
-    category: 'Utility',
+    category: 'Administration',
     description: 'Sets the prefix on this guild',
     aliases: [],
     usage: '[prefix]',

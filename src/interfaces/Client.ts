@@ -1,16 +1,18 @@
-import { Client as DClient, Collection, Message as BaseMessage, PermissionString, MessageEmbed, MessageReaction, User } from 'discord.js';
+import { Client as DClient, Collection, Message as BaseMessage, PermissionString, MessageEmbed, MessageReaction, User, MessageAttachment } from 'discord.js';
 import { config } from '../../config';
 import { database } from '../database';
 import { client } from '../index';
 import { format, parseType, replace } from '../util';
 import { getGuildSettings } from '../database';
 import { valueType } from '../interfaces/SettingsGroup';
+import constants from '../constants/constants';
 
 // Our custom client adding new properties to the Discord Client
 export class Client extends DClient {
     commands: Collection<string, Command> = new Collection(); // Our commands
     config = config; // Store the config on the client for ease of access
     database = database; // Store the database on the client for ease of access
+    constants = constants;
     sendOptions = sendOptions;
     sendConfirm = sendConfirm;
     sendEmbed = sendEmbed;
@@ -105,7 +107,8 @@ export const editEmbed = async (
     body?: string,
     thumbnail?: string,
     fields?: EmbedField[],
-    color?: string
+    color?: string,
+    image?: Buffer | string
 ) => {
     const embedPermission = checkPerm(message, 'EMBED_LINKS');
 
@@ -116,6 +119,13 @@ export const editEmbed = async (
     body ? embed.setDescription(body) : null;
     thumbnail ? embed.setThumbnail(thumbnail) : null;
     fields?.forEach(field => embed.addField(field.name, field.value, field.inline));
+
+    if (image) {
+        const attachment = new MessageAttachment(image, 'attachment.png');
+
+        embed.attachFiles([attachment]);
+        embed.setImage('attachment://attachment.png');
+    }
 
     let fieldString = '';
     fields?.forEach(field => (fieldString += `\n\n**${field.name}**\n${field.value}`));
@@ -136,7 +146,8 @@ export const sendEmbed = async (
         text: any;
         iconURL?: string;
     },
-    displayAuthor?: boolean
+    displayAuthor?: boolean,
+    image?: string | Buffer
 ) => {
     const embedPermission = checkPerm(message, 'EMBED_LINKS');
 
@@ -145,8 +156,6 @@ export const sendEmbed = async (
     const embed = new MessageEmbed().setTimestamp().setColor(color ? color : config.accentColor);
 
     const prefix = guildSettings?.general.prefix;
-
-    console.log(prefix ? prefix : config.defaultPrefix);
 
     const placeholders: { [prop: string]: string } = {
         guildName: message.guild ? message.guild.name : message.author.username,
@@ -173,6 +182,13 @@ export const sendEmbed = async (
     thumbnail ? embed.setThumbnail(thumbnail) : null;
 
     fields?.forEach(field => embed.addField(replace(field.name, placeholders), replace(field.value, placeholders), field.inline));
+
+    if (image) {
+        const attachment = new MessageAttachment(image, 'attachment.png');
+
+        embed.attachFiles([attachment]);
+        embed.setImage('attachment://attachment.png');
+    }
 
     let fieldString = '';
     fields?.forEach(field => (fieldString += `\n\n**${replace(field.name, placeholders)}**\n${replace(field.value, placeholders)}`));
@@ -225,7 +241,7 @@ export const sendOptions = async (message: AMessage | BaseMessage, user: User, q
 
             const value = (await message.channel.awaitMessages(filter, { max: 1, time: 60000 })).first();
 
-            await message.edit(new MessageEmbed());
+            await message.edit(`<a:loading:${constants.emotes.aLoading}>`);
 
             const reply = value?.content ? value.content : 'cancel';
 
@@ -327,7 +343,7 @@ export const sendQuestions = async (message: AMessage | BaseMessage, user: User,
 
                 const value = (await message.channel.awaitMessages(filter, { max: 1, time: 120000 })).first();
 
-                await message.edit(new MessageEmbed());
+                await message.edit(`<a:loading:${constants.emotes.aLoading}>`);
 
                 answer = value?.content ? value.content : 'cancel';
 
@@ -362,7 +378,7 @@ export const sendConfirm = async (message: AMessage | BaseMessage, user: User, q
 
     const answer = (await message.awaitReactions(filter, { max: 1, time: 60000 })).first();
 
-    await message.edit(new MessageEmbed());
+    await message.edit(`<a:loading:${constants.emotes.aLoading}>`);
 
     switch (answer?.emoji.id || answer?.emoji.name) {
         case '709981119721766955':
@@ -376,17 +392,17 @@ export const sendConfirm = async (message: AMessage | BaseMessage, user: User, q
             return false;
     }
 };
-export const sendYesNo = async (message: AMessage | BaseMessage, question: string) => {
-    await editEmbed(message, 'Yes/No', `${question}`, `\nReact with <:no:709981096066023444> to cancel.`);
+export const sendYesNo = async (message: AMessage | BaseMessage, user: User, question: string) => {
+    await editEmbed(message, 'Yes/No', `${question}`, `\nReact with <:leave:${constants.emotes.leave}> to cancel.`);
     let reply = false;
     let canceled = false;
 
-    await message.react('709981095747387465');
-    await message.react('709981095646593136');
-    await message.react('709981096066023444');
+    await message.react(constants.emotes.yes);
+    await message.react(constants.emotes.no);
+    await message.react(constants.emotes.leave);
 
-    const filter = (reaction: MessageReaction, user: User) =>
-        ['709981095747387465', '709981095646593136', '709981096066023444'].includes(reaction.emoji.id || reaction.emoji.name) && user.id === message.author.id;
+    const filter = (reaction: MessageReaction, reactionUser: User) =>
+        [constants.emotes.yes, constants.emotes.no, constants.emotes.leave].includes(reaction.emoji.id || reaction.emoji.name) && reactionUser.id === user.id;
 
     const answer = (await message.awaitReactions(filter, { max: 1, time: 60000 })).first();
 
@@ -397,14 +413,14 @@ export const sendYesNo = async (message: AMessage | BaseMessage, question: strin
         .catch(() => null);
 
     switch (answer?.emoji.id || answer?.emoji.name) {
-        case '709981095747387465':
+        case constants.emotes.yes:
             reply = true;
             break;
-        case '709981095646593136':
+        case constants.emotes.no:
             reply = false;
             break;
-        case '709981096066023444':
-            canceled = false;
+        case constants.emotes.leave:
+            canceled = true;
             break;
         default:
             reply = false;
@@ -438,13 +454,13 @@ export async function tryAgain(message: AMessage | BaseMessage, user: User, valu
 
     switch (answer?.emoji.id || answer?.emoji.name) {
         case '709981119721766955':
-            await message.edit(new MessageEmbed());
+            await message.edit(`<a:loading:${constants.emotes.aLoading}>`);
             return true;
         case '709981096066023444':
-            await message.edit(new MessageEmbed());
+            await message.edit(`<a:loading:${constants.emotes.aLoading}>`);
             return false;
         default:
-            await message.edit(new MessageEmbed());
+            await message.edit(`<a:loading:${constants.emotes.aLoading}>`);
             return false;
     }
 }

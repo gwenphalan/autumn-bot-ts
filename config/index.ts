@@ -8,4 +8,5 @@ export interface Config {
     infoChannel: string;
     errorChannel: string;
     accentColor: string;
+    backgroundImage: string;
 }

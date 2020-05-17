@@ -3,6 +3,7 @@ import { Client, AMessage } from '../interfaces/Client';
 import { TextChannel, MessageEmbed, GuildMember, GuildChannel, Message as BaseMessage } from 'discord.js';
 import { inspect } from 'util';
 import { client } from '../index';
+import constants from '../constants/constants';
 
 // Fetches remote content
 export const fetch = async (requestInfo: RequestInfo, requestOptions?: RequestInit) => {
@@ -35,6 +36,28 @@ export const handleError = async (client: Client, err: Error) => {
             (err instanceof Error ? err.stack : inspect(err)) +
             '```'
     );
+};
+
+export const toCamelCase = (str: string) => {
+    const match = str.match(constants.regexps.camelCase);
+
+    let result = '';
+
+    if (!match?.length) return;
+
+    for (let i = 0, len = match.length; i < len; i++) {
+        const currentStr = match[i];
+
+        let tempStr = currentStr.toLowerCase();
+
+        if (i != 0) {
+            tempStr = tempStr.substr(0, 1).toUpperCase() + tempStr.substr(1);
+        }
+
+        result += tempStr;
+    }
+
+    return result;
 };
 
 export const replace = (str: string, obj: { [prop: string]: string }) => {
@@ -94,7 +117,9 @@ export const getChannel = async (message: AMessage | BaseMessage, args: string[]
 };
 
 const memberFilterInexact = (search: string) => (mem: GuildMember) =>
-    mem.displayName.toLowerCase().includes(search.toLowerCase()) || mem.user.tag.toLowerCase().includes(search.toLowerCase());
+    mem.displayName.toLowerCase().includes(search.toLowerCase()) ||
+    mem.user.tag.toLowerCase().includes(search.toLowerCase()) ||
+    search.toLowerCase().includes(mem.id);
 
 export const getMember = async (message: AMessage | BaseMessage, args: string[], spot?: number) => {
     if (!message.guild) throw new Error('getMember was used in a DmChannel.');
@@ -153,13 +178,11 @@ export const parseType = (type: format, str: string) => {
             return hexColor ? hexColor[0] : null;
         case 'imageUrl':
             const imageUrl = str.match(/https?\:\/\/.*\..*.(gif|png|web(p|m)|jpe?g)/gi);
-            console.log(imageUrl);
             return imageUrl ? imageUrl[0] : null;
         case 'string':
             return str || null;
         case 'url':
             const url = str.match(linkRegex);
-            console.log(url);
             return url ? url[0] : null;
         default:
             return null;

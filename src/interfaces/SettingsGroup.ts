@@ -1,5 +1,5 @@
 import { Message as BaseMessage } from 'discord.js';
-export type valueType = 'role' | 'textChannel' | 'voiceChannel' | 'string' | 'role' | 'guildMember' | 'boolean' | 'number' | 'hexColor' | 'url' | 'imageUrl';
+export type valueType = 'role' | 'textChannel' | 'voiceChannel' | 'string' | 'role' | 'guildMember' | 'boolean' | 'number' | 'color' | 'url' | 'image';
 
 interface Setting {
     name: string;

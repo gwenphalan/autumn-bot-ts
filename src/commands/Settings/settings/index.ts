@@ -6,8 +6,11 @@ import { Collection } from 'discord.js';
 export const groups: Collection<string, SettingsGroup> = new Collection();
 
 const groupPath = join(__dirname, './groups');
-
-readdirSync(groupPath).forEach(file => {
-    const group: SettingsGroup = require(join(groupPath, file)).group;
-    groups.set(group.name, group);
-});
+try {
+    readdirSync(groupPath).forEach(file => {
+        const group: SettingsGroup = require(join(groupPath, file)).group;
+        groups.set(group.name, group);
+    });
+} catch (err) {
+    console.log(err);
+}

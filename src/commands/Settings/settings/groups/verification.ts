@@ -1,5 +1,43 @@
 import { SettingsGroup } from '../../../../interfaces/SettingsGroup';
+import { AMessage } from '../../../../interfaces/Client';
+import { CategoryChannel } from 'discord.js';
 
+const update = async (message: AMessage) => {
+    if (!message.guild) throw new Error('Settings Group Update Method called in DMs');
+    const settings = (await message.client.settings(message.guild.id)).moderation;
+    if (!settings.enabled || !settings.mutedRole || !settings.staffRole) return;
+
+    const mutedRole = message.guild.roles.cache.get(settings.mutedRole);
+
+    if (!mutedRole) return;
+
+    const channels = message.guild.channels.cache;
+
+    channels.forEach(channel => {
+        if (channel instanceof CategoryChannel) {
+            channel.overwritePermissions(
+                [
+                    {
+                        id: mutedRole.id,
+                        deny: ['SEND_MESSAGES']
+                    }
+                ],
+                'Required to mute users.'
+            );
+        } else {
+            if (channel.parent?.permissionOverwrites !== channel.permissionOverwrites)
+                channel.overwritePermissions(
+                    [
+                        {
+                            id: mutedRole.id,
+                            deny: ['SEND_MESSAGES']
+                        }
+                    ],
+                    'Required to mute users.'
+                );
+        }
+    });
+};
 export const group: SettingsGroup = {
     name: 'Verification',
     identifier: 'verification',
@@ -16,8 +54,7 @@ export const group: SettingsGroup = {
             name: 'Staff Role',
             identifier: 'staffRole',
             description: 'Role given to those who manage verification applications.',
-            valueType: 'role',
-            required: true
+            valueType: 'role'
         },
         {
             name: 'Non Verified Role',
@@ -37,7 +74,8 @@ export const group: SettingsGroup = {
             name: 'Verification Channel',
             identifier: 'verifyChannel',
             description: 'Channel where non-verified users get verified.',
-            valueType: 'textChannel'
+            valueType: 'textChannel',
+            required: true
         },
         {
             name: 'Manual Verification',
@@ -45,13 +83,20 @@ export const group: SettingsGroup = {
             description: 'Whether or not staff have to manually verify new users.',
             valueType: 'boolean',
             default: false,
-            dependencies: ['modVerifyChannel']
+            dependencies: ['modVerifyChannel', 'staffRole']
         },
         {
             name: 'Moderator Verification Channel',
             identifier: 'modVerifyChannel',
             description: 'Channel where moderators accept or deny user verification applications.',
             valueType: 'textChannel'
+        },
+        {
+            name: 'Ping Staff',
+            identifier: 'pingStaff',
+            description: 'Ping staff when a user requests verification. (Manual Verification Only).',
+            valueType: 'boolean',
+            default: false
         },
         {
             name: 'Verification Message',
@@ -74,5 +119,6 @@ export const group: SettingsGroup = {
             valueType: 'string',
             default: 'You have been accepted for verification in {guildName}.'
         }
-    ]
+    ],
+    update: update
 };

@@ -3,8 +3,12 @@ import { Command, AMessage } from '../../interfaces/Client';
 import { getChannel } from '../../util';
 import { getGuildSettings } from '../../database';
 import { uploadHaste, fetchHaste } from '../../util/hastebin';
+import { client } from '../../index';
+import constants from '../../constants/constants';
 
 const callback = async (message: AMessage, args: string[]) => {
+    console.log(message.id);
+
     // * Load Guild Settings
     const guildSettings = message.guild?.id ? await getGuildSettings(message.guild?.id) : null;
     const prefix = guildSettings?.general.prefix || message.client.config.defaultPrefix;
@@ -28,6 +32,7 @@ const callback = async (message: AMessage, args: string[]) => {
         const msg = await channel?.send(embed);
 
         embed
+            .setColor('#2f3136')
             .setTitle('Custom Embed')
             .setDescription(`You can customize this embed by doing the command \`${prefix}embed edit ${msg.channel.toString()} ${msg.id}\``)
             .setFooter(`ID: ${msg.id}`);
@@ -42,8 +47,6 @@ const callback = async (message: AMessage, args: string[]) => {
                 `You can customize the new embed by doing the command \`${prefix}embed edit ${msg.channel.toString()} ${msg.id}\``
             );
         }
-
-        await message.delete({ timeout: 100 });
     } else if (arg1 === 'edit') {
         if (!arg2) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `Please provide a text channel!`);
 
@@ -58,11 +61,15 @@ const callback = async (message: AMessage, args: string[]) => {
 
         if (!msg) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `I couldn't find message with ID \`${arg3}\` in ${channel.toString()}!`);
 
+        if (msg.author.id !== client.user?.id) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `I can't edit a message I didn't send!`);
+
         embed = msg.embeds[0];
 
         if (!msg.embeds.length) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `Message with ID \`${arg3}\` does not have an embed!`);
 
-        const GUI = await message.channel.send('Loading GUI...');
+        const GUI = await message.channel.send(`<a:loading:${constants.emotes.aLoading}>`);
+
+        console.log(GUI.id);
 
         type embedAction =
             | 'setTitle'
@@ -176,7 +183,7 @@ const callback = async (message: AMessage, args: string[]) => {
                 return;
             }
 
-            const inline = await message.client.sendYesNo(message, 'Would you like the field to be inline?');
+            const inline = await message.client.sendYesNo(GUI, message.author, 'Would you like the field to be inline?');
 
             if (inline.canceled) {
                 message.client.editEmbed(GUI, 'Custom Embeds', 'Embed Edit Canceled');
@@ -348,17 +355,12 @@ const callback = async (message: AMessage, args: string[]) => {
         }
         msg.edit(embed);
 
-        message.client.editEmbed(GUI, 'Custom Embeds', 'Embed Edited');
-
-        await message
-            .delete({
-                timeout: 100
-            })
-            .catch(() => null);
-
         await GUI.delete({
             timeout: 5000
         }).catch(() => null);
+        return;
+
+        message.client.editEmbed(GUI, 'Custom Embeds', 'Embed Edited');
     } else if (arg1 === 'copy') {
         if (!arg2) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `Please provide a text channel!`);
 

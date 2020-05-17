@@ -23,7 +23,14 @@ export const group: SettingsGroup = {
             identifier: 'deleteCommands',
             description: 'Delete user commands after the command is complete.',
             valueType: 'boolean',
+            default: false,
             array: false
+        },
+        {
+            name: 'Member Role',
+            identifier: 'memberRole',
+            description: "Role given to members. If verification is enabled, users won't receive this until verified. ",
+            valueType: 'role'
         }
     ],
     update: update

@@ -5,6 +5,7 @@ export interface GuildSettings extends mongoose.Document {
     general: {
         prefix: string;
         deleteCommands: boolean;
+        memberRole: string;
     };
     moderation: {
         enabled: boolean;
@@ -20,9 +21,18 @@ export interface GuildSettings extends mongoose.Document {
         verifyChannel: string;
         manualVerify: boolean;
         modVerifyChannel: string;
+        pingStaff: boolean;
         verifyMessage: string;
         denyMessage: string;
         acceptMessage: string;
+    };
+    welcome: {
+        enabled: boolean;
+        backgroundColor: string;
+        textColor: string;
+        profileColor: string;
+        profileBackground: Buffer;
+        welcomeChannel: string;
     };
 }
 
@@ -30,7 +40,8 @@ const GuildSettingsSchema = new mongoose.Schema({
     guild: String,
     general: {
         prefix: String,
-        deleteCommands: Boolean
+        deleteCommands: Boolean,
+        memberRole: String
     },
     moderation: {
         enabled: Boolean,
@@ -46,9 +57,18 @@ const GuildSettingsSchema = new mongoose.Schema({
         verifyChannel: String,
         manualVerify: Boolean,
         modVerifyChannel: String,
+        pingStaff: Boolean,
         verifyMessage: String,
         denyMessage: String,
         acceptMessage: String
+    },
+    welcome: {
+        enabled: Boolean,
+        welcomeChannel: String,
+        backgroundColor: String,
+        textColor: String,
+        profileColor: String,
+        profileBackground: Buffer
     }
 });
 

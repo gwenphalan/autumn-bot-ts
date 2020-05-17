@@ -4,6 +4,7 @@ import { Infraction, InfractionTypes } from './schemas/Infraction';
 import { Message } from 'discord.js';
 import { GuildSettings } from './schemas/GuildSettings';
 import { UserProfile } from './schemas/UserProfile';
+import { VerifyApp } from './schemas/VerifyApp';
 
 // Connect to MongoDB
 mongoose.connect(config.mongoString, {
@@ -51,6 +52,11 @@ export const getUserProfile = async (userID: string) => {
     return await UserProfile.findOne({ userID: userID });
 };
 
+// Helper function to get a users' profile
+export const getVerifyApp = async (guild: string, messageId: string) => {
+    return await VerifyApp.findOne({ guild: guild, messageId: messageId });
+};
+
 export type profileProperty = 'color' | 'pronouns' | 'gender' | 'age' | 'biography';
 
 // Helper function to update a users' profile
@@ -88,6 +94,15 @@ export const createUserProfile = async (userId: string, color: string, pronouns:
         gender: gender,
         age: age,
         biography: biography
+    });
+    return profile;
+};
+export const createVerifyApp = async (guildId: string, userId: string, messageId: string, messageContent: string) => {
+    const profile = await VerifyApp.create({
+        guild: guildId,
+        messageId: messageId,
+        userId: userId,
+        messageContent: messageContent
     });
     return profile;
 };
