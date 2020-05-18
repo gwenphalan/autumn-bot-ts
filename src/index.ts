@@ -3,9 +3,6 @@ import path from 'path';
 import { config } from '../config';
 import { Client, ClientEventTypes, Command } from './interfaces/Client';
 import { handleError } from './util';
-import dotenv from 'dotenv';
-
-dotenv.config({ path: __dirname + '/.env' });
 
 /* 
     Initiates our client with the following options:
