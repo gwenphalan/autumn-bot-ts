@@ -11,3 +11,5 @@ export interface Config {
     backgroundImage: string;
     imgurID: string;
 }
+
+console.log(config);
