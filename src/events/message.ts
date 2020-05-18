@@ -1,7 +1,9 @@
 import { Client, sendEmbed } from '../interfaces/Client';
-import { TextChannel, MessageEmbed, Message } from 'discord.js';
+import { TextChannel, MessageEmbed, Message, MessageAttachment } from 'discord.js';
 import { client as botClient } from '../index';
 import { createVerifyApp } from '../database';
+import { drawCard } from '../util/canvas';
+import { toCamelCase } from '../util';
 
 export default async (client: Client, message: Message) => {
     // We have partials enabled, so we have to make sure the message is fetched
@@ -12,12 +14,16 @@ export default async (client: Client, message: Message) => {
 
     // Get the settings for the current guild and use the prefix defined there, or use the default prefix if no settings found.
     const guildSettings = message.guild ? await client.database.guildSettings.findOne({ guild: message.guild.id }) : null;
-    const prefix = guildSettings?.general.prefix || client.config.defaultPrefix;
+    const guildPrefix = guildSettings?.general.prefix || client.config.defaultPrefix;
+    const prefixRegex = new RegExp(`^(<@!?${client.user!.id}>|${guildPrefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})\\s*`);
+    const pingRegex = new RegExp(`(<@!?${client.user!.id}>)`);
+    const matched = message.content.match(prefixRegex);
+    const prefix = matched ? matched[0] : null;
 
     const verification = guildSettings?.verification;
 
     // Verification Module
-    if (message.content === `${prefix}verify` || !message.content.startsWith(prefix)) {
+    if (guildSettings && guildSettings.verification.enabled) {
         if (!message.guild || !message.member || !verification?.enabled || message.author.bot) return;
 
         const verifyChannel = message.guild.channels.cache.get(verification.verifyChannel);
@@ -25,51 +31,85 @@ export default async (client: Client, message: Message) => {
         const staffRole = message.guild.roles.cache.get(verification.staffRole);
         const modVerifyChannel = message.guild.channels.cache.get(verification.modVerifyChannel);
 
-        if (!verifyChannel || !nonVerifiedRole || message.channel != verifyChannel || !(verifyChannel instanceof TextChannel)) return;
-        if (!message.member.roles.cache.has(nonVerifiedRole.id)) return;
-        if (!verification.manualVerify) {
-            if (message.content !== `${prefix}verify`) return;
-            return message.member.roles.remove(nonVerifiedRole.id);
+        if (message.channel.id === verifyChannel?.id) {
+            if (!verifyChannel || !nonVerifiedRole || message.channel != verifyChannel || !(verifyChannel instanceof TextChannel)) return;
+
+            if (!message.member.roles.cache.has(nonVerifiedRole.id)) return;
+            if (!verification.manualVerify) {
+                if (message.content !== `${prefix}verify`)
+                    return message.delete({
+                        timeout: 50,
+                        reason: 'User did not send the verification command.'
+                    });
+
+                message.delete({
+                    timeout: 50,
+                    reason: 'User verified.'
+                });
+                message.author.send(
+                    new MessageEmbed()
+                        .setColor('#75F1BD')
+                        .setTitle(`${message.guild.name} Verification`)
+                        .setDescription(verification.acceptMessage || "You've been verified!")
+                );
+                message.member.roles.remove(nonVerifiedRole.id);
+                const welcome = guildSettings.welcome;
+
+                if (!welcome.enabled || !welcome.welcomeChannel) return;
+
+                const welcomeChannel = message.guild.channels.cache.get(welcome.welcomeChannel);
+                if (!welcomeChannel || !(welcomeChannel instanceof TextChannel)) return;
+
+                const imageBuffer = await drawCard(message.guild, message.member);
+
+                const card = new MessageAttachment(imageBuffer, `${toCamelCase(message.member.displayName)}WelcomeCard.png`);
+                await welcomeChannel.send(card);
+                return welcomeChannel.send(message.author.toString()).then(msg => msg.delete({ timeout: 100 }));
+            }
+            if (!verification.manualVerify || !staffRole || !modVerifyChannel || !(modVerifyChannel instanceof TextChannel)) return;
+
+            const application = await modVerifyChannel.send(
+                new MessageEmbed()
+                    .setColor('#2f3136')
+                    .setAuthor('Verification', botClient.user?.displayAvatarURL({ dynamic: true, format: 'png' }))
+                    .setTitle(message.author.tag)
+                    .setThumbnail(message.author.displayAvatarURL({ dynamic: true, format: 'png' }))
+                    .setFooter(`Awaiting Verification By Staff`)
+                    .setDescription(message.content)
+                    .setTimestamp()
+            );
+
+            modVerifyChannel.send(staffRole.toString()).then(msg => msg.delete());
+
+            await message
+                .delete({
+                    timeout: 10,
+                    reason: 'User requested verification.'
+                })
+                .catch(() => null);
+
+            await createVerifyApp(message.guild.id, message.author.id, application.id, message.content);
+
+            await application.react(client.constants.emotes.yes);
+            await application.react(client.constants.emotes.no);
+
+            await verifyChannel
+                .overwritePermissions(
+                    [
+                        {
+                            id: message.author.id,
+                            deny: ['VIEW_CHANNEL']
+                        }
+                    ],
+                    'User requested verification.'
+                )
+                .catch(() => null);
+            return;
         }
-        if (!staffRole || !modVerifyChannel || !(modVerifyChannel instanceof TextChannel)) return;
-
-        const application = await modVerifyChannel.send(
-            new MessageEmbed()
-                .setColor('#2f3136')
-                .setAuthor('Verification', botClient.user?.displayAvatarURL({ dynamic: true, format: 'png' }))
-                .setTitle(message.author.tag)
-                .setThumbnail(message.author.displayAvatarURL({ dynamic: true, format: 'png' }))
-                .setFooter(`Awaiting Verification By Staff`)
-                .setDescription(message.content)
-                .setTimestamp()
-        );
-
-        await message
-            .delete({
-                timeout: 0,
-                reason: 'User requested verification.'
-            })
-            .catch(() => null);
-
-        await createVerifyApp(message.guild.id, message.author.id, application.id, message.content);
-
-        await application.react(client.constants.emotes.yes);
-        await application.react(client.constants.emotes.no);
-
-        await verifyChannel
-            .overwritePermissions(
-                [
-                    {
-                        id: message.author.id,
-                        deny: ['VIEW_CHANNEL']
-                    }
-                ],
-                'User requested verification.'
-            )
-            .catch(() => null);
-        return;
     }
-
+    if (!prefix || !message.content.startsWith(prefix)) return;
+    if (!message.content.replace(prefix, '').length && pingRegex.test(prefix))
+        return client.sendEmbed(message, 'Prefix', undefined, `My prefix is set to \`${guildPrefix}\`\n\nDo \`${guildPrefix}help\` for a list of commands`);
     // Prepare args
     const args = message.content.slice(prefix.length).trim().split(/ +/);
     const commandName = args.shift();

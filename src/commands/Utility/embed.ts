@@ -1,4 +1,4 @@
-import { MessageEmbed, TextChannel } from 'discord.js';
+import { MessageEmbed, TextChannel, EmbedField } from 'discord.js';
 import { Command, AMessage } from '../../interfaces/Client';
 import { getChannel } from '../../util';
 import { getGuildSettings } from '../../database';
@@ -77,6 +77,7 @@ const callback = async (message: AMessage, args: string[]) => {
             | 'setDescription'
             | 'addField'
             | 'removeField'
+            | 'editField'
             | 'setAuthor'
             | 'setFooter'
             | 'setImage'
@@ -89,6 +90,7 @@ const callback = async (message: AMessage, args: string[]) => {
             'setDescription',
             'addField',
             'removeField',
+            'editField',
             'setAuthor',
             'setFooter',
             'setImage',
@@ -226,6 +228,67 @@ const callback = async (message: AMessage, args: string[]) => {
 
                 embed.fields = fields;
             }
+        } else if (action === 'editField') {
+            const options: string[] = [];
+            if (!embed.fields.length)
+                return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `Embed with ID \`${arg3}\` doesn't have any fields to edit!`);
+
+            let index = 0;
+            if (embed.fields.length > 1) {
+                embed.fields.forEach(field => options.push(`\n**Name**: ${field.name}\n**Value**: ${field.value}\n**Inline**: ${field.inline}`));
+                const reply = await message.client.sendOptions(GUI, message.author, 'Which field would you like to edit?', options);
+
+                if (reply.canceled) {
+                    message.client.editEmbed(GUI, 'Custom Embeds', 'Embed Edit Canceled');
+                    await GUI.delete({
+                        timeout: 5000
+                    }).catch(() => null);
+                    return;
+                }
+
+                index = reply.index;
+            }
+
+            const answers = await message.client.sendQuestions(GUI, message.author, [
+                {
+                    question: 'What would you like to set the name to be?\n\nReply `none` if you would like this to remain the same.',
+                    type: 'string',
+                    optional: false
+                },
+                {
+                    question: 'What would you like to set the value to be?\n\nReply `none` if you would like this to remain the same.',
+                    type: 'string',
+                    optional: false
+                }
+            ]);
+            if (answers.canceled || !answers.answers[0]) {
+                message.client.editEmbed(GUI, 'Custom Embeds', 'Embed Edit Canceled');
+                await GUI.delete({
+                    timeout: 5000
+                }).catch(() => null);
+                return;
+            }
+
+            const inline = await message.client.sendYesNo(GUI, message.author, 'Would you like the field to be inline?');
+
+            if (inline.canceled) {
+                message.client.editEmbed(GUI, 'Custom Embeds', 'Embed Edit Canceled');
+                await GUI.delete({
+                    timeout: 5000
+                }).catch(() => null);
+                return;
+            }
+            const oldField = embed.fields[index];
+
+            const [name, value] = answers.answers;
+
+            const field: EmbedField = {
+                name: name !== 'none' ? name : oldField.name,
+                value: value !== 'none' ? value : oldField.value,
+                inline: inline.reply
+            };
+
+            embed.fields[index] = field;
         } else if (action === 'setAuthor') {
             const answers = await message.client.sendQuestions(GUI, message.author, [
                 {
@@ -355,12 +418,12 @@ const callback = async (message: AMessage, args: string[]) => {
         }
         msg.edit(embed);
 
+        message.client.editEmbed(GUI, 'Custom Embeds', 'Embed Edited');
+
         await GUI.delete({
             timeout: 5000
         }).catch(() => null);
         return;
-
-        message.client.editEmbed(GUI, 'Custom Embeds', 'Embed Edited');
     } else if (arg1 === 'copy') {
         if (!arg2) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `Please provide a text channel!`);
 

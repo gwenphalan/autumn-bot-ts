@@ -1,8 +1,0 @@
-export default {
-    token: '', // Your bot token
-    mongoString: '', // Your MongoDB connection string
-    defaultPrefix: '', // The default prefix
-    developers: [''], // Discord User IDs of you and fellow developers. These can use commands that are devOnly
-    infoChannel: '', // Discord Channel ID of a channel, where info should be logged to
-    errorChannel: '' // Discord Channel ID where errors should be logged to
-};

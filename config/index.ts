@@ -9,4 +9,5 @@ export interface Config {
     errorChannel: string;
     accentColor: string;
     backgroundImage: string;
+    imgurID: string;
 }
