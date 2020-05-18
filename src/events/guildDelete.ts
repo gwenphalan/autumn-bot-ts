@@ -13,7 +13,11 @@ export default async (client: Client, guild: Guild) => {
         .setTimestamp()
         .setColor(client.config.accentColor)
         .setTitle(`Bot Kicked From Guild`)
-        .setDescription(` • **ID:** ${guild.id}\n` + ` • **Name:** ${guild.name}\n` + ` • **Owner:** ${guild.owner} (${guild?.owner?.id})\n`);
+        .setDescription(
+            ` • **ID:** ${guild.id}\n` +
+                ` • **Name:** ${guild.name}\n` +
+                ` • **Owner:** ${guild.owner?.user.username}#${guild.owner?.user.discriminator} (${guild?.owner?.id})\n`
+        );
     // Send useful info to the info channel
     infoChannel.send(embed);
     updateActivity();

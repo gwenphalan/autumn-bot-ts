@@ -14,9 +14,9 @@ export default async (client: Client, guild: Guild) => {
         .setColor(client.config.accentColor)
         .setTitle(`Bot Invited To Guild`)
         .setDescription(
-            ` • ID: ${guild.id}\n` +
+            ` • **ID:** ${guild.id}\n` +
                 ` • **Name:** ${guild.name}\n` +
-                ` • **Owner:** ${guild.owner} (${guild?.owner?.id})\n` +
+                ` • **Owner:** ${guild.owner?.user.username}#${guild.owner?.user.discriminator} (${guild?.owner?.id})\n` +
                 ` • **Channels:** ${guild.channels.cache.size}\n` +
                 ` • **Users:** ${guild.members.cache.size}\n`
         );
