@@ -1,6 +1,6 @@
 import { Command, AMessage } from '../../interfaces/Client';
 import { groups } from './settings/index';
-import { EmbedField, TextChannel, Role, GuildMember, VoiceChannel } from 'discord.js';
+import { EmbedField, Role, GuildMember, GuildChannel } from 'discord.js';
 import { sendSetting, parseType } from './settings/util/index';
 import { getGuildSettings, updateGuildSettings } from '../../database/index';
 import Canvas from 'canvas';
@@ -24,7 +24,7 @@ const callback = async (message: AMessage, args: string[]) => {
     if (!args.length) {
         // Compile the names and descriptions of each settings group into an array
         const groupList: string[] = [];
-        groups.forEach(group => groupList.push(`\`${group.name}\` - ${group.description}`));
+        groups.forEach(group => groupList.push(`\`${group.name}\``));
 
         // Send a message embed with the list groups
         return message.client.sendEmbed(message, 'Settings', 'Settings Groups', groupList.join('\n'), undefined, undefined, undefined, {
@@ -39,12 +39,21 @@ const callback = async (message: AMessage, args: string[]) => {
 
         // Compile the identifer and description of each setting for the group into an array.
         const settingList: string[] = [];
-        group.settings.forEach(setting => settingList.push(`\`${setting.identifier}\` - ${setting.description}`));
+        group.settings.forEach(setting => settingList.push(`\`${setting.identifier}\``));
 
         // Send an embed with the list of settings.
-        return message.client.sendEmbed(message, 'Settings', `${group.name} Settings`, settingList.join('\n\n'), undefined, undefined, undefined, {
-            text: `To get more information on a setting do {prefix}settings ${group.name} [setting]`
-        });
+        return message.client.sendEmbed(
+            message,
+            'Settings',
+            `${group.name} Settings`,
+            group.description + '\n\n' + settingList.join('\n'),
+            undefined,
+            undefined,
+            undefined,
+            {
+                text: `To get more information on a setting do {prefix}settings ${group.name} [setting]`
+            }
+        );
     }
 
     // If there is 2 arguments (EXAMPLE: '-settings general prefix')
@@ -61,33 +70,34 @@ const callback = async (message: AMessage, args: string[]) => {
         // Get the value of the setting if there is one.
         let value = guildSettings.get(group.identifier)[setting.identifier];
 
-        if (value && setting.valueType === 'image')
-            // Push an EmbedField with the description of the setting.
-            settingInfo.push({ name: 'Description', value: setting.description, inline: false });
-
         // Push an EmbedField with the value type of the array.
-        settingInfo.push({ name: 'Type', value: setting.valueType, inline: false });
+        settingInfo.push({ name: 'Type', value: setting.valueType, inline: true });
 
         // If there is a value set for the setting and it is a snowflake, convert it to a mention, with the exception of voice channel.
         if (setting.array && value.length) {
             const newValues: string[] = [];
+            console.log(value);
             value.forEach((id: any) => {
                 switch (setting.valueType) {
                     case 'guildMember':
-                        newValues.push('<@!' + id + '>');
+                        newValues.push('• <@!' + id + '>');
                         break;
                     case 'textChannel':
-                        newValues.push('<#' + id + '>');
+                        newValues.push('• <#' + id + '>');
                         break;
                     case 'voiceChannel':
                         const voiceChannel = message.guild?.channels.cache.get(id);
-                        newValues.push(voiceChannel ? '<:voiceChannel:710743569572429844> ' + voiceChannel.name : 'Voice Channel ID: ' + id);
+                        newValues.push('•' + (voiceChannel ? '<:voiceChannel:710743569572429844> ' + voiceChannel.name : 'Voice Channel ID: ' + id));
                         break;
                     case 'role':
-                        newValues.push('<@&' + id + '>');
+                        newValues.push('• <@&' + id + '>');
+                        break;
+                    case 'guildChannel':
+                        const guildChannel = message.guild?.channels.cache.get(id);
+                        newValues.push('• ' + (guildChannel?.toString() || id));
                         break;
                     default:
-                        newValues.push(id);
+                        newValues.push('• ' + id);
                         break;
                 }
             });
@@ -115,13 +125,13 @@ const callback = async (message: AMessage, args: string[]) => {
         }
 
         (setting.array && value.length > 0) || (!setting.array && value)
-            ? settingInfo.push({ name: 'Value', value: setting.array ? value.join('\n') : value.toString(), inline: false })
+            ? settingInfo.push({ name: setting.array ? 'Values' : 'Value', value: setting.array ? value.join('\n') : value.toString(), inline: true })
             : null;
 
-        setting.default?.toString() ? settingInfo.push({ name: 'Default', value: setting.default.toString(), inline: false }) : null;
+        setting.default?.toString() ? settingInfo.push({ name: 'Default', value: setting.default.toString(), inline: true }) : null;
 
         // If the setting can have multiple values, push an EmbedField saying so.
-        setting.array ? settingInfo.push({ name: 'Array', value: setting.array.toString(), inline: false }) : null;
+        setting.array ? settingInfo.push({ name: 'Array', value: setting.array.toString(), inline: true }) : null;
 
         let attachment: Buffer | undefined;
 
@@ -138,7 +148,7 @@ const callback = async (message: AMessage, args: string[]) => {
             message,
             'Settings',
             `${group.name} Settings - \`${setting.name}\``,
-            undefined,
+            setting.description,
             undefined,
             settingInfo,
             undefined,
@@ -158,7 +168,7 @@ const callback = async (message: AMessage, args: string[]) => {
 
         const e = message.attachments.first();
 
-        if (args.length > 3) arg4 = args.slice(3).join('');
+        if (args.length > 3) arg4 = args.slice(3).join(' ');
 
         if (e) arg4 = e.url;
 
@@ -174,7 +184,7 @@ const callback = async (message: AMessage, args: string[]) => {
                 `**Usage**\n\`{prefix}settings [Group] [Setting] [Set | Add | Remove] [Value]\``
             );
 
-        let response: string | Buffer;
+        let response: string;
 
         // Send a message to later be used to load the embed GUI.
         const GUI = await message.channel.send(`<a:loading:${message.client.constants.emotes.aLoading}>`);
@@ -215,9 +225,11 @@ const callback = async (message: AMessage, args: string[]) => {
 
                 // Await the Promised answer.
                 let value = arg4 ? check : response4.answer;
+                let toString1: string | undefined;
 
                 // If the value provided is something that is stored is an ID (TextChannel, Role, GuildMember, VoiceChannel) replace value1 with the id.
-                if (value instanceof TextChannel || value instanceof Role || value instanceof GuildMember || value instanceof VoiceChannel) {
+                if (value instanceof GuildChannel || value instanceof Role || value instanceof GuildMember) {
+                    toString1 = value.toString();
                     value = value.id;
                 }
 
@@ -230,28 +242,8 @@ const callback = async (message: AMessage, args: string[]) => {
 
                 // Update guild settings
                 await updateGuildSettings(message.guild.id, guildSettings);
-
-                let valueString1;
-                switch (setting.valueType) {
-                    case 'guildMember':
-                        valueString1 = '<@!' + value + '>';
-                        break;
-                    case 'textChannel':
-                        valueString1 = '<#' + value + '>';
-                        break;
-                    case 'voiceChannel':
-                        const voiceChannel = typeof value === 'string' ? message.guild?.channels.cache.get(value) : null;
-                        valueString1 = voiceChannel ? '<:voiceChannel:710743569572429844> ' + voiceChannel.name : 'Voice Channel ID: ' + value;
-                        break;
-                    case 'role':
-                        valueString1 = '<@&' + value + '>';
-                        break;
-                    default:
-                        valueString1 = value;
-                        break;
-                }
                 // Confirm to the user the value was changed.
-                response = valueString1;
+                response = toString1 || value;
                 break;
             // If arg3 is 'add'
             case 'add':
@@ -272,8 +264,8 @@ const callback = async (message: AMessage, args: string[]) => {
                     for (let i = 0; i < 4; i++) {
                         if (!valid) {
                             check1 = await parseType(GUI, message, setting.valueType, arg4);
-                            if (check === 'canceled') return message.client.editEmbed(GUI, 'Settings', 'Settings Change Canceled');
-                            if (check !== null) valid = true;
+                            if (check1 === 'canceled') return message.client.editEmbed(GUI, 'Settings', 'Settings Change Canceled');
+                            if (check1 !== null) valid = true;
                         }
                     }
                 } else {
@@ -286,9 +278,11 @@ const callback = async (message: AMessage, args: string[]) => {
 
                 // Await the Promised answer.
                 let value1 = arg4 ? check1 : response1;
+                let toString: string | undefined;
 
                 // If the value provided is something that is stored is an ID (TextChannel, Role, GuildMember, VoiceChannel) replace value1 with the id.
-                if (value1 instanceof TextChannel || value1 instanceof Role || value1 instanceof GuildMember || value1 instanceof VoiceChannel) {
+                if (value1 instanceof GuildChannel || value1 instanceof Role || value1 instanceof GuildMember) {
+                    toString = value1.toString();
                     value1 = value1.id;
                 }
 
@@ -303,28 +297,8 @@ const callback = async (message: AMessage, args: string[]) => {
 
                 // Update the guild settings.
                 await updateGuildSettings(message.guild.id, guildSettings);
-
-                let valueString;
-                switch (setting.valueType) {
-                    case 'guildMember':
-                        valueString = '<@!' + value1 + '>';
-                        break;
-                    case 'textChannel':
-                        valueString = '<#' + value1 + '>';
-                        break;
-                    case 'voiceChannel':
-                        const voiceChannel = typeof value1 === 'string' ? message.guild?.channels.cache.get(value1) : null;
-                        valueString = voiceChannel ? '<:voiceChannel:710743569572429844> ' + voiceChannel.name : 'Voice Channel ID: ' + value1;
-                        break;
-                    case 'role':
-                        valueString = '<@&' + value1 + '>';
-                        break;
-                    default:
-                        valueString = value1.toString();
-                        break;
-                }
                 // Edit the embed confirming the value was added.
-                response = valueString;
+                response = toString || value1;
                 break;
             // If arg3 is 'remove'
             case 'remove':
@@ -336,10 +310,8 @@ const callback = async (message: AMessage, args: string[]) => {
                         'Uh Oh!',
                         `${setting.identifier} is not an array!\n\nTo set the value of this setting, do \`{prefix}\`settings ${group.identifier} ${setting.identifier} Set`
                     );
-
                 // Declare the array value in a constant.
-                const arrayVal1 = guildSettings.get(group.identifier)[setting.identifier];
-
+                const arrayVal1: any[] = guildSettings.get(group.identifier)[setting.identifier];
                 // Return if there are no values to remove from the array.
                 if (!arrayVal1.length)
                     return message.client.sendEmbed(
@@ -349,48 +321,82 @@ const callback = async (message: AMessage, args: string[]) => {
                         `${setting.name} doesn't have any ${setting.valueType}s to remove!\n\nTo add a value to this setting, do \`{prefix}\`settings ${group.identifier} ${setting.identifier} add`
                     );
 
-                // Declare a string of choices for the user to pick from.
-                const choices: string[] = [];
+                let check2: any = null;
+                let response2: any = null;
 
-                // For each value in the array, if the type is a snowflake ID, convert it to a mention, with the exception of Voice Channel.
-                arrayVal1.forEach((value: any) => {
-                    switch (setting.valueType) {
-                        case 'guildMember':
-                            choices.push('<@!' + value + '>');
-                            break;
-                        case 'textChannel':
-                            choices.push('<#' + value + '>');
-                            break;
-                        case 'voiceChannel':
-                            const voiceChannel = message.guild?.channels.cache.get(value);
-                            choices.push(voiceChannel ? '<:voiceChannel:710743569572429844> ' + voiceChannel.name : 'Voice Channel ID: ' + value);
-                            break;
-                        case 'role':
-                            choices.push('<@&' + value + '>');
-                            break;
-                        default:
-                            choices.push(value);
-                            break;
+                if (arg4) {
+                    let valid = false;
+                    for (let i = 0; i < 4; i++) {
+                        if (!valid) {
+                            check2 = await parseType(GUI, message, setting.valueType, arg4);
+                            if (check2 === 'canceled') return message.client.editEmbed(GUI, 'Settings', 'Settings Change Canceled');
+                            if (check2 !== null) valid = true;
+                        }
                     }
-                });
 
-                // Send the list of choices to the user.
-                const response2 = await message.client.sendOptions(
-                    GUI,
-                    message.author,
-                    `Which ${setting.valueType} would you like to remove from ${setting.identifier}?`,
-                    choices
-                );
-                // Return if the user canceled.
-                if (response2.canceled) return message.client.editEmbed(GUI, 'Settings', 'Settings Change Canceled');
+                    // Await the Promised answer.
+                    let value1 = arg4 ? check2 : response2;
+                    let toString: string | undefined;
 
-                // Delete the chosen value from the original array.
-                delete arrayVal1[response2.index];
+                    // If the value provided is something that is stored is an ID (TextChannel, Role, GuildMember, VoiceChannel) replace value1 with the id.
+                    if (value1 instanceof GuildChannel || value1 instanceof Role || value1 instanceof GuildMember) {
+                        toString = value1.toString();
+                        value1 = value1.id;
+                    }
+
+                    if (!arrayVal1.find(settingValue => settingValue === value1))
+                        return message.client.editEmbed(GUI, 'Settings', 'Uh Oh!', `I couldn't find ${toString} in ${setting.name}`);
+
+                    delete arrayVal1[arrayVal1.indexOf(value1)];
+                } else {
+                    // Declare a string of choices for the user to pick from.
+                    const choices: string[] = [];
+
+                    // For each value in the array, if the type is a snowflake ID, convert it to a mention, with the exception of Voice Channel.
+                    arrayVal1.forEach((value: any) => {
+                        switch (setting.valueType) {
+                            case 'guildMember':
+                                choices.push('<@!' + value + '>');
+                                break;
+                            case 'textChannel':
+                                choices.push('<#' + value + '>');
+                                break;
+                            case 'voiceChannel':
+                                const voiceChannel = message.guild?.channels.cache.get(value);
+                                choices.push(voiceChannel ? '<:voiceChannel:710743569572429844> ' + voiceChannel.name : 'Voice Channel ID: ' + value);
+                                break;
+                            case 'role':
+                                choices.push('<@&' + value + '>');
+                                break;
+                            case 'guildChannel':
+                                const guildChannel = message.guild?.channels.cache.get(value);
+                                choices.push(guildChannel?.toString() || value);
+                                break;
+                            default:
+                                choices.push(value);
+                                break;
+                        }
+                    });
+                    // Send the list of choices to the user.
+                    const response4 = await message.client.sendOptions(
+                        GUI,
+                        message.author,
+                        `Which ${setting.valueType} would you like to remove from ${setting.identifier}?`,
+                        choices
+                    );
+                    // Return if the user canceled.
+                    if (response4.canceled) return message.client.editEmbed(GUI, 'Settings', 'Settings Change Canceled');
+
+                    response2 = response4.choice;
+
+                    // Delete the chosen value from the original array.
+                    delete arrayVal1[response4.index];
+                }
 
                 // Update the guild settings.
                 await updateGuildSettings(message.guild.id, guildSettings);
                 // Confirm the value was removed.
-                response = response2.choice ? response2.choice : '';
+                response = response2 || check2;
                 break;
             default:
                 response = '';
@@ -418,25 +424,24 @@ const callback = async (message: AMessage, args: string[]) => {
 
         const responseArray: string[] = [];
 
-        let attachment: Buffer | undefined;
-
-        if (typeof response === 'string') {
-            switch (arg3) {
-                case 'set':
-                    responseArray.push(`Set **${setting.name}** to **${response}**`);
-                    break;
-                case 'add':
-                    responseArray.push(`Added **${response}** to **${setting.name}**`);
-                    break;
-                case 'remove':
-                    responseArray.push(`Removed **${response}** from **${setting.name}**`);
-                    break;
-                default:
-                    break;
-            }
-            responseArray.push(response);
+        let attachment: Buffer | string | undefined;
+        switch (arg3) {
+            case 'set':
+                if (setting.valueType === 'image') responseArray.push(`Set **${setting.name}**`);
+                if (setting.valueType !== 'image') responseArray.push(`Set **${setting.name}** to **${response.toString()}**`);
+                break;
+            case 'add':
+                if (setting.valueType === 'image') responseArray.push(`Added to **${setting.name}**`);
+                if (setting.valueType !== 'image') responseArray.push(`Added **${response.toString()}** to **${setting.name}**`);
+                break;
+            case 'remove':
+                if (setting.valueType === 'image') responseArray.push(`Removed from **${setting.name}**`);
+                if (setting.valueType !== 'image') responseArray.push(`Removed **${response.toString()}** from **${setting.name}**`);
+                break;
+            default:
+                break;
         }
-        if (setting.valueType === 'color' && typeof response === 'string') {
+        if (setting.valueType === 'color') {
             const canvas = Canvas.createCanvas(700, 300);
             const ctx = canvas.getContext('2d');
 
@@ -449,20 +454,7 @@ const callback = async (message: AMessage, args: string[]) => {
             attachment = labeled;
         }
 
-        if (response instanceof Buffer) {
-            const image = await Canvas.loadImage(response);
-
-            const canvas = Canvas.createCanvas(image.width * (500 / image.height), 500);
-            const ctx = canvas.getContext('2d');
-
-            ctx.drawImage(image, 0, 0, image.width * (500 / image.height), 500);
-
-            const buffer = canvas.toBuffer();
-
-            const labeled = await labelImage(buffer, `Updated ${setting.name}`, 30, 'Poppins Regular', 15);
-
-            attachment = labeled;
-        }
+        if (setting.valueType === 'image') attachment = response;
 
         required.length
             ? responseArray.push(

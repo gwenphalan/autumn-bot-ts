@@ -159,27 +159,38 @@ export const labelImage = async (src: string | Buffer, label: string, fontSize: 
 
     const canvas = Canvas.createCanvas(image.width, image.height);
     const ctx = canvas.getContext('2d');
-    roundRect(ctx, 0, 0, canvas.width, canvas.height, 25, false, false);
-    ctx.clip();
+    ctx.strokeStyle = '#FFF';
+    ctx.fillStyle = '#FFF';
 
     ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+    const b = applyText(canvas, label, font, fontSize, canvas.width);
+    ctx.font = b.font;
 
-    ctx.font = `${fontSize}pt "${font}"`;
+    ctx.font = b.font;
 
-    ctx.shadowColor = '#000';
-    ctx.shadowBlur = 10;
+    ctx.shadowColor = '#545454';
+    ctx.shadowBlur = 7;
 
     ctx.strokeStyle = '#FFF';
     ctx.fillStyle = '#FFF';
-    roundRect(ctx, canvas.width - ctx.measureText(label).width - a, -canvas.height + fontSize + a, canvas.width, canvas.height, 25, true, true);
+    roundRect(
+        ctx,
+        (canvas.width - ctx.measureText(label).width + a) / 2,
+        -canvas.height + b.size + a,
+        ctx.measureText(label).width + a,
+        canvas.height,
+        25,
+        true,
+        true
+    );
 
     ctx.shadowBlur = 0;
 
     ctx.strokeStyle = '#000';
 
-    ctx.font = `${fontSize}pt "${font}"`;
+    ctx.textAlign = 'center';
     ctx.fillStyle = '#000';
-    ctx.fillText(label, canvas.width - ctx.measureText(label).width - a / 2, fontSize + a / 2, ctx.measureText(label).width);
+    ctx.fillText(label, canvas.width / 2 + a, b.size + a / 2, ctx.measureText(label).width);
 
     return canvas.toBuffer();
 };

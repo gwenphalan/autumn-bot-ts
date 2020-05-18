@@ -31,7 +31,7 @@ export interface GuildSettings extends mongoose.Document {
         backgroundColor: string;
         textColor: string;
         profileColor: string;
-        profileBackground: Buffer;
+        profileBackground: string;
         welcomeChannel: string;
     };
 }
@@ -68,7 +68,7 @@ const GuildSettingsSchema = new mongoose.Schema({
         backgroundColor: String,
         textColor: String,
         profileColor: String,
-        profileBackground: Buffer
+        profileBackground: String
     }
 });
 

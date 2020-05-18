@@ -4,6 +4,7 @@ import { valueType } from '../../../../interfaces/SettingsGroup';
 import { TextChannel, VoiceChannel, GuildMember, MessageReaction, MessageEmbed } from 'discord.js';
 import Color from 'color';
 import Canvas from 'canvas';
+import { uploadImgur } from '../../../../util/imgur';
 
 export const sendSetting = async (GUI: AMessage | BaseMessage, message: AMessage | BaseMessage, setting: string, valueType: valueType, array?: boolean) => {
     let canceled = false;
@@ -131,7 +132,11 @@ export const parseType = async (GUI: AMessage | BaseMessage, message: AMessage |
             const ctx = canvas.getContext('2d');
 
             ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-            return canvas.toBuffer();
+
+            const buffer = canvas.toBuffer();
+
+            const link = await uploadImgur(buffer);
+            return link;
         case 'string':
             return str || null;
         case 'url':
@@ -153,6 +158,10 @@ export const parseType = async (GUI: AMessage | BaseMessage, message: AMessage |
             const voiceChannel = await getVoiceChannel(GUI, message, str);
             if (voiceChannel === 'canceled') return 'canceled';
             return voiceChannel ? voiceChannel : null;
+        case 'guildChannel':
+            const channel = await getGuildChannel(GUI, message, str);
+            if (channel === 'canceled') return 'canceled';
+            return channel ? channel : null;
         case 'boolean':
             const bool = str.match(/(true|false)/gi);
             return bool ? bool[0] === 'true' : null;
@@ -268,6 +277,40 @@ const getTextChannel = async (GUI: AMessage | BaseMessage, message: AMessage | B
         return null;
     }
     if (!(channel instanceof TextChannel)) return null;
+    return channel;
+};
+
+const getGuildChannel = async (GUI: AMessage | BaseMessage, message: AMessage | BaseMessage, input: string) => {
+    if (!message.guild) throw new Error('getGuildChannel was used in a DmChannel.');
+
+    const channels = message.guild.channels.cache;
+
+    const result = channels.filter(channelFilterInexact(input));
+
+    let channel = result.first() ? result.first() : null;
+
+    if (result.size > 1) {
+        const channelsFound: string[] = [];
+
+        result.each((channel: GuildChannel) => channelsFound.push(`**${channel.name}** - ${channel.parent?.name} (${channel.id})`));
+
+        const reply = await sendOptions(GUI, message.author, 'Multiple Channels Found', channelsFound);
+
+        const idRegex = /\d+/g;
+
+        if (reply.canceled || reply.choice === '') return 'canceled';
+
+        const idMatch = reply.choice?.match(idRegex);
+
+        const id = idMatch ? idMatch[0] : null;
+
+        const x = id ? message.guild.channels.cache.get(id) : null;
+
+        channel = x ? x : null;
+    } else if (!result.size) {
+        return null;
+    }
+    if (!channel) return null;
     return channel;
 };
 

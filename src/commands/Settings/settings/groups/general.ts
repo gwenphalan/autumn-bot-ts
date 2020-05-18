@@ -8,7 +8,7 @@ const update = async (_message: BaseMessage) => {
 export const group: SettingsGroup = {
     name: 'General',
     identifier: 'general',
-    description: 'General settings',
+    description: 'Control the general behavior of the bot.',
     settings: [
         {
             name: 'Prefix',

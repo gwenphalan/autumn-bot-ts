@@ -3,6 +3,7 @@ import { MessageReaction, User, TextChannel, MessageEmbed, MessageAttachment } f
 import { getVerifyApp } from '../database';
 import { client as botClient } from '../index';
 import { drawCard } from '../util/canvas';
+import { toCamelCase } from '../util';
 
 export default async (client: Client, reaction: MessageReaction, user: User) => {
     if (user.bot) return;
@@ -60,7 +61,7 @@ export default async (client: Client, reaction: MessageReaction, user: User) => 
         if (reaction.emoji.id === client.constants.emotes.yes) {
             await message.edit(
                 new MessageEmbed()
-                    .setColor('#45bb8a')
+                    .setColor('#75F1BD')
                     .setAuthor('Verification', botClient.user?.displayAvatarURL({ dynamic: true, format: 'png' }))
                     .setTitle(member.user.tag)
                     .setThumbnail(member.user.displayAvatarURL({ dynamic: true, format: 'png' }))
@@ -68,6 +69,12 @@ export default async (client: Client, reaction: MessageReaction, user: User) => 
                     .setDescription(application.messageContent)
                     .setTimestamp()
             );
+
+            if (guildSettings.general.memberRole) {
+                const memberRole = message.guild.roles.cache.get(guildSettings.general.memberRole);
+
+                if (memberRole) member.roles.add(memberRole);
+            }
 
             await message.reactions.removeAll();
 
@@ -78,6 +85,13 @@ export default async (client: Client, reaction: MessageReaction, user: User) => 
                 ?.delete()
                 .catch(() => null);
 
+            member.send(
+                new MessageEmbed()
+                    .setColor('#75F1BD')
+                    .setTitle(`${message.guild.name} Verification`)
+                    .setDescription(verification.acceptMessage || "You've been verified!")
+            );
+
             const welcome = guildSettings.welcome;
 
             if (!welcome.enabled || !welcome.welcomeChannel) return;
@@ -87,13 +101,13 @@ export default async (client: Client, reaction: MessageReaction, user: User) => 
 
             const imageBuffer = await drawCard(message.guild, member);
 
-            const card = new MessageAttachment(imageBuffer, `${member.id}_welcome_card.png`);
-
-            return welcomeChannel.send(card);
+            const card = new MessageAttachment(imageBuffer, `${toCamelCase(member.displayName)}WelcomeCard.png`);
+            await welcomeChannel.send(card);
+            return welcomeChannel.send(member.toString()).then(msg => msg.delete({ timeout: 100 }));
         } else if (reaction.emoji.id === client.constants.emotes.no) {
             message.edit(
                 new MessageEmbed()
-                    .setColor('#ef4949')
+                    .setColor('#DB6260')
                     .setAuthor('Verification', botClient.user?.displayAvatarURL({ dynamic: true, format: 'png' }))
                     .setTitle(member.user.tag)
                     .setThumbnail(member.user.displayAvatarURL({ dynamic: true, format: 'png' }))
@@ -104,10 +118,17 @@ export default async (client: Client, reaction: MessageReaction, user: User) => 
 
             message.reactions.removeAll();
 
-            return verifyChannel.permissionOverwrites
+            verifyChannel.permissionOverwrites
                 .get(application.userId)
-                ?.delete()
+                ?.delete('User denied verification.')
                 .catch(() => null);
+
+            return member.send(
+                new MessageEmbed()
+                    .setColor('#DB6260')
+                    .setTitle(`${message.guild.name} Verification`)
+                    .setDescription(verification.verifyMessage || "You've been denied verification.\n\nContact staff to find out why.")
+            );
         }
         return;
     }

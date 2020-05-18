@@ -14,7 +14,7 @@ export const group: SettingsGroup = {
             name: 'Enabled',
             identifier: 'enabled',
             description: 'Whether or not welcome cards are enabled',
-            valueType: 'string',
+            valueType: 'boolean',
             default: false
         },
         {

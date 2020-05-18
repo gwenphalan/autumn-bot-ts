@@ -1,6 +1,7 @@
 import { Client } from '../interfaces/Client';
 import { GuildMember, TextChannel, MessageAttachment } from 'discord.js';
 import { drawCard } from '../util/canvas';
+import { toCamelCase } from '../util';
 
 export default async (client: Client, member: GuildMember) => {
     const guild = member.guild;
@@ -17,6 +18,23 @@ export default async (client: Client, member: GuildMember) => {
         if (!verifyChannel || !nonVerifiedRole || !(verifyChannel instanceof TextChannel)) return;
 
         member.roles.add(nonVerifiedRole);
+    }
+
+    if (guildSettings.general.memberRole) {
+        const verification = guildSettings.verification;
+        const verifyChannel = guild.channels.cache.get(verification.verifyChannel);
+        const nonVerifiedRole = guild.roles.cache.get(verification.nonVerifiedRole);
+        const staffRole = guild.roles.cache.get(verification.staffRole);
+        const modVerifyChannel = guild.channels.cache.get(verification.modVerifyChannel);
+
+        if (verifyChannel && nonVerifiedRole && verifyChannel instanceof TextChannel) return;
+        if (staffRole && modVerifyChannel && modVerifyChannel instanceof TextChannel) return;
+
+        const memberRole = guild.roles.cache.get(guildSettings.general.memberRole);
+
+        if (!memberRole) return;
+
+        member.roles.add(memberRole);
     }
 
     const welcome = guildSettings.welcome;
@@ -36,7 +54,7 @@ export default async (client: Client, member: GuildMember) => {
 
         const imageBuffer = await drawCard(guild, member);
 
-        const card = new MessageAttachment(imageBuffer, `${member.id}_welcome_card.png`);
+        const card = new MessageAttachment(imageBuffer, `${toCamelCase(member.displayName)}WelcomeCard.png`);
 
         await welcomeChannel.send(card);
         return welcomeChannel.send(member.toString()).then(msg => msg.delete({ timeout: 100 }));
