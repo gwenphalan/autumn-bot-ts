@@ -26,9 +26,15 @@ const update = async (message: AMessage) => {
     verifyChannel.send(
         new MessageEmbed()
             .setTitle('Verification')
-            .setDescription(verification.verifyMessage || `Type \`${guildSettings.general.prefix}verify\` to be verified.`)
+            .setDescription(verification.verifyMessage || `Type \`${guildSettings.general.prefix || config.defaultPrefix}verify\` to be verified.`)
             .setColor(config.accentColor)
-            .setAuthor(message.guild.name, message.guild.iconURL() || undefined)
+            .setAuthor(
+                message.guild.name,
+                message.guild.iconURL({
+                    dynamic: true,
+                    format: 'png'
+                }) || undefined
+            )
     );
 
     channels.forEach(channel => {
