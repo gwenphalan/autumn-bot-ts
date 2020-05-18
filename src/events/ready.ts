@@ -3,6 +3,7 @@ import { TextChannel, MessageEmbed } from 'discord.js';
 import { updateActivity } from '../index';
 
 export default async (client: Client) => {
+    console.log(process.env);
     // Log useful info to the console
     console.log(`Connected to Discord as ${client.user!.tag} - ${client.user!.id}`);
     console.log(`Serving ${client.guilds.cache.size} guilds and ${client.channels.cache.size} channels.`);
