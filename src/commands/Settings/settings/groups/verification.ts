@@ -39,52 +39,46 @@ const update = async (message: AMessage) => {
 
     channels.forEach(channel => {
         if (channel instanceof CategoryChannel && !nonVerifiedChannels.includes(channel.id)) {
-            channel.overwritePermissions(
-                [
-                    {
-                        id: nonVerifiedRole.id,
-                        deny: ['VIEW_CHANNEL']
-                    }
-                ],
-                'Required for verification.'
+            channel.createOverwrite(
+                nonVerifiedRole,
+                {
+                    VIEW_CHANNEL: false
+                },
+                'Required for verification'
             );
         } else {
             if (channel.parent?.permissionOverwrites !== channel.permissionOverwrites && !nonVerifiedChannels.includes(channel.id))
-                channel.overwritePermissions(
-                    [
-                        {
-                            id: nonVerifiedRole.id,
-                            deny: ['VIEW_CHANNEL']
-                        }
-                    ],
-                    'Required to mute users.'
+                channel.createOverwrite(
+                    nonVerifiedRole,
+                    {
+                        VIEW_CHANNEL: false
+                    },
+                    'Required for verification'
                 );
 
             if (nonVerifiedChannels.includes(channel.id)) {
-                channel.overwritePermissions(
-                    [
-                        {
-                            id: nonVerifiedRole.id,
-                            allow: ['VIEW_CHANNEL']
-                        }
-                    ],
+                channel.createOverwrite(
+                    nonVerifiedRole,
+                    {
+                        VIEW_CHANNEL: true
+                    },
                     'Channel in list of non verified channels.'
                 );
             }
         }
     });
-
-    verifyChannel.overwritePermissions(
-        [
-            {
-                id: nonVerifiedRole.id,
-                allow: ['VIEW_CHANNEL']
-            },
-            {
-                id: message.guild.roles.everyone.id,
-                deny: ['VIEW_CHANNEL']
-            }
-        ],
+    verifyChannel.createOverwrite(
+        nonVerifiedRole,
+        {
+            VIEW_CHANNEL: true
+        },
+        'Required for verification.'
+    );
+    verifyChannel.createOverwrite(
+        message.guild.roles.everyone,
+        {
+            VIEW_CHANNEL: false
+        },
         'Required for verification.'
     );
 
@@ -92,17 +86,18 @@ const update = async (message: AMessage) => {
 
     if (!staffRole || !modVerifyChannel || !(modVerifyChannel instanceof TextChannel)) return;
 
-    modVerifyChannel.overwritePermissions(
-        [
-            {
-                id: staffRole.id,
-                allow: ['VIEW_CHANNEL']
-            },
-            {
-                id: message.guild.roles.everyone.id,
-                deny: ['VIEW_CHANNEL']
-            }
-        ],
+    modVerifyChannel.createOverwrite(
+        staffRole,
+        {
+            VIEW_CHANNEL: true
+        },
+        'Required for Manual Verification.'
+    );
+    modVerifyChannel.createOverwrite(
+        message.guild.roles.everyone,
+        {
+            VIEW_CHANNEL: false
+        },
         'Required for Manual Verification.'
     );
 };
