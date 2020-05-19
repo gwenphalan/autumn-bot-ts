@@ -16,35 +16,29 @@ export default async (client: Client, channel: GuildChannel) => {
         if (!verification.enabled || !verifyChannel || !nonVerifiedRole || !(verifyChannel instanceof TextChannel)) return;
 
         if (channel instanceof CategoryChannel && !nonVerifiedChannels.includes(channel.id)) {
-            channel.overwritePermissions(
-                [
-                    {
-                        id: nonVerifiedRole.id,
-                        deny: ['VIEW_CHANNEL']
-                    }
-                ],
+            channel.createOverwrite(
+                nonVerifiedRole,
+                {
+                    VIEW_CHANNEL: false
+                },
                 'Required for verification.'
             );
         } else {
             if (channel.parent?.permissionOverwrites !== channel.permissionOverwrites && !nonVerifiedChannels.includes(channel.id))
-                channel.overwritePermissions(
-                    [
-                        {
-                            id: nonVerifiedRole.id,
-                            deny: ['VIEW_CHANNEL']
-                        }
-                    ],
-                    'Required to mute users.'
+                channel.createOverwrite(
+                    nonVerifiedRole,
+                    {
+                        VIEW_CHANNEL: false
+                    },
+                    'Required for verification.'
                 );
 
             if (nonVerifiedChannels.includes(channel.id)) {
-                channel.overwritePermissions(
-                    [
-                        {
-                            id: nonVerifiedRole.id,
-                            allow: ['VIEW_CHANNEL']
-                        }
-                    ],
+                channel.createOverwrite(
+                    nonVerifiedRole,
+                    {
+                        VIEW_CHANNEL: true
+                    },
                     'Channel in list of non verified channels.'
                 );
             }
