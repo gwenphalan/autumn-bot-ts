@@ -21,9 +21,9 @@ const update = async (message: AMessage) => {
 
     if (!verification.enabled || !verifyChannel || !nonVerifiedRole || !(verifyChannel instanceof TextChannel)) return;
 
-    verifyChannel.bulkDelete(100);
+    await verifyChannel.bulkDelete(100);
 
-    verifyChannel.send(
+    await verifyChannel.send(
         new MessageEmbed()
             .setTitle('Verification')
             .setDescription(verification.verifyMessage || `Type \`${guildSettings.general.prefix || config.defaultPrefix}verify\` to be verified.`)
