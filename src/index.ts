@@ -14,7 +14,7 @@ export const client = new Client({
     disableMentions: 'everyone',
     presence: {
         activity: {
-            name: `${config.defaultPrefix}help`,
+            name: `Bot Loading...`,
             type: 'LISTENING',
             url: 'https://www.twitch.tv/.'
         }
