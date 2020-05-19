@@ -65,7 +65,7 @@ export default async (client: Client, reaction: MessageReaction, user: User) => 
                     .setAuthor('Verification', botClient.user?.displayAvatarURL({ dynamic: true, format: 'png' }))
                     .setTitle(member.user.tag)
                     .setThumbnail(member.user.displayAvatarURL({ dynamic: true, format: 'png' }))
-                    .setFooter(`Accepted By ${user.username}#${user.discriminator}`, member.user.displayAvatarURL({ dynamic: true, format: 'png' }))
+                    .setFooter(`Accepted By ${user.username}#${user.discriminator}`, user.displayAvatarURL({ dynamic: true, format: 'png' }))
                     .setDescription(application.messageContent)
                     .setTimestamp()
             );
