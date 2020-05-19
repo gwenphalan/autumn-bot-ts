@@ -32,8 +32,8 @@ export interface Command {
     devOnly: boolean; // Whether this command should only be usable by developers
     guildOnly: boolean; // Whether this command should only be usable on a guild
     NSFW: boolean;
-    userPermissions: '' | PermissionString;
-    botPermissions: '' | PermissionString;
+    userPermissions: PermissionString[];
+    botPermissions: PermissionString[];
     callback(message: BaseMessage, args: string[]): Promise<void | BaseMessage>; // The command function
 }
 

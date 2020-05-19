@@ -28,7 +28,7 @@ export const command: Command = {
     devOnly: true,
     guildOnly: true,
     NSFW: false,
-    userPermissions: '',
-    botPermissions: 'ATTACH_FILES',
+    userPermissions: [],
+    botPermissions: ['ATTACH_FILES', 'SEND_MESSAGES'],
     callback: callback
 };

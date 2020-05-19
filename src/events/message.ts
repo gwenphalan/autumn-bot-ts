@@ -1,9 +1,9 @@
 import { Client, sendEmbed } from '../interfaces/Client';
-import { TextChannel, MessageEmbed, Message, MessageAttachment } from 'discord.js';
+import { TextChannel, MessageEmbed, Message, MessageAttachment, PermissionString } from 'discord.js';
 import { client as botClient } from '../index';
 import { createVerifyApp } from '../database';
 import { drawCard } from '../util/canvas';
-import { toCamelCase } from '../util';
+import { toCamelCase, missingPermissions, nicerPermissions } from '../util';
 
 export default async (client: Client, message: Message) => {
     // We have partials enabled, so we have to make sure the message is fetched
@@ -128,24 +128,33 @@ export default async (client: Client, message: Message) => {
         return message.channel.send(
             `This command requires ${command.requiresArgs} arguments and you only provided ${args.length}.\nPlease use the command like this: \`${prefix}${command.name} ${command.usage}\``
         );
-    if (message.member && message.channel.type === 'text') {
-        if (command.userPermissions && !message.channel.permissionsFor(message.member)?.has(command.userPermissions))
-            return sendEmbed(
-                message,
-                'Commands',
-                'Oh No!',
-                `You need to have the \`${command.userPermissions}\` permission to run \`${prefix}${command.name}\``
-            );
-        if (command.botPermissions && !message.channel.permissionsFor(message.member)?.has(command.botPermissions))
-            return sendEmbed(message, 'Commands', 'Oh No!', `I need to have the \`${command.userPermissions}\` permission to run \`${prefix}${command.name}\``);
-    }
+
+    if (command.botPermissions && missingPermissions(message, command.botPermissions, 'self'))
+        return sendEmbed(
+            message,
+            'Commands',
+            'Oh No!',
+            `I require the following permissions to use this command: \`${missingPermissions(message, command.botPermissions, 'self')!
+                .map((perm: PermissionString) => nicerPermissions(perm))
+                .join('`, `')}\``
+        );
+
+    if (command.userPermissions && missingPermissions(message, command.userPermissions))
+        return sendEmbed(
+            message,
+            'Commands',
+            'Oh No!',
+            `You require the following permissions to use this command: \`${missingPermissions(message, command.userPermissions)!
+                .map((perm: PermissionString) => nicerPermissions(perm))
+                .join('`, `')}\``
+        );
     // Execute the command and handle any potential errors
     return command
         .callback(message, args)
         .then(async () => {
             const updatedSettings = message.guild ? await client.database.guildSettings.findOne({ guild: message.guild.id }) : null;
 
-            if (updatedSettings && updatedSettings.general.deleteCommands) message.delete({ timeout: 10 }).catch(err => console.log(err));
+            if (updatedSettings && updatedSettings.general.deleteCommands) message.delete({ timeout: 10 }).catch(() => null);
         })
         .catch(err => {
             const oops = new MessageEmbed()

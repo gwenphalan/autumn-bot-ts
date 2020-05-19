@@ -1,6 +1,6 @@
 import nodeFetch, { RequestInfo, RequestInit } from 'node-fetch';
 import { Client, AMessage } from '../interfaces/Client';
-import { TextChannel, MessageEmbed, GuildMember, GuildChannel, Message as BaseMessage } from 'discord.js';
+import { TextChannel, MessageEmbed, GuildMember, GuildChannel, Message as BaseMessage, PermissionString, Message } from 'discord.js';
 import { inspect } from 'util';
 import { client } from '../index';
 import constants from '../constants/constants';
@@ -58,6 +58,21 @@ export const toCamelCase = (str: string) => {
     }
 
     return result;
+};
+
+export const missingPermissions = (message: Message, permissions: PermissionString[], member?: GuildMember | 'self') => {
+    if (message.channel.type === 'dm') return;
+    const targetMember = member === 'self' ? message.guild!.me! : member || message.member!;
+    const allPermissions = message.channel.permissionsFor(targetMember) || targetMember.permissions;
+    const missing = permissions.filter(p => !allPermissions?.has(p));
+    return missing.length ? missing : undefined;
+};
+
+export const nicerPermissions = (perm: PermissionString) => {
+    return perm
+        .split('_')
+        .map(word => word.charAt(0) + word.slice(1).toLowerCase())
+        .join(' ');
 };
 
 export const replace = (str: string, obj: { [prop: string]: string }) => {

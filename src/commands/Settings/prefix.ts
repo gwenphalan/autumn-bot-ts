@@ -30,7 +30,7 @@ export const command: Command = {
     devOnly: true,
     guildOnly: true,
     NSFW: false,
-    userPermissions: 'MANAGE_GUILD',
-    botPermissions: '',
+    userPermissions: ['MANAGE_GUILD'],
+    botPermissions: [],
     callback: callback
 };

@@ -239,7 +239,7 @@ export const command: Command = {
     devOnly: false,
     guildOnly: true,
     NSFW: false,
-    userPermissions: '',
-    botPermissions: '',
+    userPermissions: [],
+    botPermissions: ['SEND_MESSAGES'],
     callback: callback
 };

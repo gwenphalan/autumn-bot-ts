@@ -486,7 +486,7 @@ export const command: Command = {
     devOnly: false,
     guildOnly: true,
     NSFW: false,
-    userPermissions: 'MANAGE_MESSAGES',
-    botPermissions: 'EMBED_LINKS',
+    userPermissions: ['MANAGE_MESSAGES'],
+    botPermissions: ['EMBED_LINKS'],
     callback: callback
 };

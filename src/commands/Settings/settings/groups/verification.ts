@@ -1,7 +1,8 @@
 import { SettingsGroup } from '../../../../interfaces/SettingsGroup';
 import { AMessage } from '../../../../interfaces/Client';
-import { CategoryChannel, TextChannel, MessageEmbed } from 'discord.js';
+import { CategoryChannel, TextChannel, MessageEmbed, Collection } from 'discord.js';
 import { config } from '../../../../../config';
+import { client as botClient } from '../../../../index';
 
 const update = async (message: AMessage) => {
     if (!message.guild) return;
@@ -21,7 +22,12 @@ const update = async (message: AMessage) => {
 
     if (!verification.enabled || !verifyChannel || !nonVerifiedRole || !(verifyChannel instanceof TextChannel)) return;
 
-    await verifyChannel.bulkDelete(100);
+    let messages = (await verifyChannel.messages.fetch({ limit: 50 }).catch(() => null)) as Collection<string, AMessage>;
+    if (messages) {
+        messages = messages.filter(m => m.author.id === botClient.user?.id);
+
+        await verifyChannel.bulkDelete(messages, true).catch(() => null);
+    }
 
     await verifyChannel.send(
         new MessageEmbed()
@@ -136,14 +142,14 @@ export const group: SettingsGroup = {
         {
             name: 'Verification Channel',
             identifier: 'verifyChannel',
-            description: 'Channel where non-verified users get verified.',
+            description: 'Channel where users go through verification. Whether it be through typing `{prefix}verify` or going through Manual Verification.',
             valueType: 'textChannel',
             required: true
         },
         {
             name: 'Manual Verification',
             identifier: 'manualVerify',
-            description: 'Whether or not staff have to manually verify new users.',
+            description: "Staff must manually accept or deny user's verification application. Does not require users to type `-verify`",
             valueType: 'boolean',
             default: false,
             dependencies: ['modVerifyChannel', 'staffRole']
