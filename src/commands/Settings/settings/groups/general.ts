@@ -13,7 +13,7 @@ export const group: SettingsGroup = {
         {
             name: 'Prefix',
             identifier: 'prefix',
-            description: 'Command prefix',
+            description: 'Prefix indicating a message is a command.',
             valueType: 'string',
             default: '{defaultPrefix}',
             array: false
@@ -29,7 +29,7 @@ export const group: SettingsGroup = {
         {
             name: 'Member Role',
             identifier: 'memberRole',
-            description: "Role given to members. If verification is enabled, users won't receive this until verified. ",
+            description: "Role given to members. If verification is enabled, users won't receive this until verified.",
             valueType: 'role'
         }
     ],

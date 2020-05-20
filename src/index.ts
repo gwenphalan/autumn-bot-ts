@@ -3,13 +3,14 @@ import path from 'path';
 import { config } from '../config';
 import { Client, ClientEventTypes, Command } from './interfaces/Client';
 import { handleError } from './util';
-
+import DBL from 'dblapi.js';
 /* 
     Initiates our client with the following options:
     - @everyone, @here and @role pings are DISABLES
     - Bot is listening to <prefix>help
     - Partials are enabled for messages and reactions. This allows for reaction roles
  */
+
 export const client = new Client({
     disableMentions: 'everyone',
     presence: {
@@ -28,6 +29,14 @@ export const updateActivity = async () => {
         url: 'https://www.twitch.tv/.'
     });
 };
+
+export const dbl = config.dblToken ? new DBL(config.dblToken, client) : null;
+
+client.on('ready', () => {
+    setInterval(() => {
+        dbl ? dbl.postStats(client.guilds.cache.size) : null;
+    }, 1800000);
+});
 
 const listenerPath = path.join(__dirname, './events'),
     commandPath = path.join(__dirname, './commands');

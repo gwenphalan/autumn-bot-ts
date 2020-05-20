@@ -18,7 +18,7 @@
     "Create basic command structure": {
         "prefix": "commandStructure",
         "body": [
-            "import { Command, MyMessage } from '../../interfaces/Client';\nimport { getGuildSettings } from '../../database';\n\nconst callback = async (message: MyMessage, args: string[]) => {\nconst guildSettings = message.guild?.id ? await getGuildSettings(message.guild?.id) : null;\nconst prefix = guildSettings?.prefix || message.client.config.defaultPrefix;\n};\n\nexport const command: Command = {\nname: '',\ncategory: '',\naliases: [],\ndescription: '',\nusage: '',\nrequiresArgs: 0,\ndevOnly: false,\nguildOnly: false,\nuserPermissions: '',\nbotPermissions: '',\ncallback: callback\n};"
+            "import { Command, AMessage } from '../../interfaces/Client';\nimport { getGuildSettings } from '../../database';\n\nconst callback = async (message: AMessage, args: string[]) => {\nconst guildSettings = message.guild?.id ? await getGuildSettings(message.guild?.id) : null;\nconst prefix = guildSettings?.general.prefix || message.client.config.defaultPrefix;\n};\n\nexport const command: Command = {\nname: '',\ncategory: '',\naliases: [],\ndescription: '',\nusage: '',\nrequiresArgs: 0,\ndevOnly: false,\nguildOnly: false,\nNSFW: false,\nuserPermissions: [],\nbotPermissions: [],\ncallback: callback\n};"
         ],
         "description": "This will automatically insert the basic command structure"
     },
