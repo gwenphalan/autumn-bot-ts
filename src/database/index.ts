@@ -5,6 +5,7 @@ import { Message } from 'discord.js';
 import { GuildSettings } from './schemas/GuildSettings';
 import { UserProfile } from './schemas/UserProfile';
 import { VerifyApp } from './schemas/VerifyApp';
+import { ReactionRole } from './schemas/ReactionRoles';
 
 // Connect to MongoDB
 mongoose.connect(config.mongoString, {
@@ -57,6 +58,15 @@ export const getVerifyApp = async (guild: string, messageId: string) => {
     return await VerifyApp.findOne({ guild: guild, messageId: messageId });
 };
 
+// Helper function to get a users' profile
+export const getReactionRole = async (guild: string, messageId: string, reaction: Reaction) => {
+    return await ReactionRole.findOne({ guild: guild, messageId: messageId, reaction: reaction });
+};
+
+export const getReactionRoles = async (guild: string, messageId: string) => {
+    return await ReactionRole.find({ guild: guild, messageId: messageId });
+};
+
 export type profileProperty = 'color' | 'pronouns' | 'gender' | 'age' | 'biography';
 
 // Helper function to update a users' profile
@@ -97,6 +107,7 @@ export const createUserProfile = async (userId: string, color: string, pronouns:
     });
     return profile;
 };
+
 export const createVerifyApp = async (guildId: string, userId: string, messageId: string, messageContent: string) => {
     const profile = await VerifyApp.create({
         guild: guildId,
@@ -105,6 +116,21 @@ export const createVerifyApp = async (guildId: string, userId: string, messageId
         messageContent: messageContent
     });
     return profile;
+};
+
+interface Reaction {
+    name: string;
+    id: string | null;
+}
+
+export const createReactionRole = async (guildId: string, messageId: string, reaction: Reaction, roleId: string) => {
+    const reactionRole = await ReactionRole.create({
+        guild: guildId,
+        messageId: messageId,
+        reaction: reaction,
+        roleId: roleId
+    });
+    return reactionRole;
 };
 
 // Helper function to create modlog entries

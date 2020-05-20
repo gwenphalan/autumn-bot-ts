@@ -165,6 +165,9 @@ export const parseType = async (GUI: AMessage | BaseMessage, message: AMessage |
         case 'boolean':
             const bool = str.match(/(true|false)/gi);
             return bool ? bool[0] === 'true' : null;
+        case 'snowflake':
+            const snowflake = str.match(/\d{17,19}/gi);
+            return snowflake ? snowflake[0] : null;
         default:
             return null;
     }
@@ -227,7 +230,7 @@ const getMember = async (GUI: AMessage | BaseMessage, message: AMessage | BaseMe
 
         result.each((member: GuildMember) => membersFound.push(member.toString()));
 
-        const reply = await sendOptions(GUI, message.author, 'Multiple Members Found', membersFound);
+        const reply = await sendOptions(GUI, message, 'Multiple Members Found', membersFound);
 
         const idRegex = /\d+/g;
 
@@ -260,7 +263,7 @@ const getTextChannel = async (GUI: AMessage | BaseMessage, message: AMessage | B
 
         result.each((channel: GuildChannel) => channelsFound.push(`**${channel.name}** - ${channel.parent?.name} (${channel.id})`));
 
-        const reply = await sendOptions(GUI, message.author, 'Multiple Channels Found', channelsFound);
+        const reply = await sendOptions(GUI, message, 'Multiple Channels Found', channelsFound);
 
         const idRegex = /\d+/g;
 
@@ -294,7 +297,7 @@ const getGuildChannel = async (GUI: AMessage | BaseMessage, message: AMessage | 
 
         result.each((channel: GuildChannel) => channelsFound.push(`**${channel.name}** - ${channel.parent?.name} (${channel.id})`));
 
-        const reply = await sendOptions(GUI, message.author, 'Multiple Channels Found', channelsFound);
+        const reply = await sendOptions(GUI, message, 'Multiple Channels Found', channelsFound);
 
         const idRegex = /\d+/g;
 
@@ -328,7 +331,7 @@ const getVoiceChannel = async (GUI: AMessage | BaseMessage, message: AMessage | 
 
         result.each((channel: GuildChannel) => channelsFound.push(`**${channel.name}** - ${channel.parent?.name} (${channel.id})`));
 
-        const reply = await sendOptions(GUI, message.author, 'Multiple Channels Found', channelsFound);
+        const reply = await sendOptions(GUI, message, 'Multiple Channels Found', channelsFound);
 
         const idRegex = /\d+/g;
 
@@ -365,7 +368,7 @@ const getRole = async (GUI: AMessage | BaseMessage, message: AMessage | BaseMess
 
         result.each((role: Role) => rolesFound.push(role.toString()));
 
-        const reply = await sendOptions(GUI, message.author, 'Multiple Roles Found', rolesFound);
+        const reply = await sendOptions(GUI, message, 'Multiple Roles Found', rolesFound);
 
         const idRegex = /\d+/g;
 

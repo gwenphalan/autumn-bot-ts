@@ -7,8 +7,6 @@ import { client } from '../../index';
 import constants from '../../constants/constants';
 
 const callback = async (message: AMessage, args: string[]) => {
-    console.log(message.id);
-
     // * Load Guild Settings
     const guildSettings = message.guild?.id ? await getGuildSettings(message.guild?.id) : null;
     const prefix = guildSettings?.general.prefix || message.client.config.defaultPrefix;
@@ -69,8 +67,6 @@ const callback = async (message: AMessage, args: string[]) => {
 
         const GUI = await message.channel.send(`<a:loading:${constants.emotes.aLoading}>`);
 
-        console.log(GUI.id);
-
         type embedAction =
             | 'setTitle'
             | 'setURL'
@@ -98,7 +94,7 @@ const callback = async (message: AMessage, args: string[]) => {
             'setColor'
         ];
 
-        const answer = await message.client.sendOptions(GUI, message.author, 'Which action would you like to perform on the embed?', embedActions);
+        const answer = await message.client.sendOptions(GUI, message, 'Which action would you like to perform on the embed?', embedActions);
 
         if (answer.canceled || !answer.choice) {
             message.client.editEmbed(GUI, 'Custom Embeds', 'Embed Edit Canceled');
@@ -111,7 +107,7 @@ const callback = async (message: AMessage, args: string[]) => {
         const action = answer.choice;
 
         if (action === 'setTitle') {
-            const title = await message.client.sendQuestions(GUI, message.author, [
+            const title = await message.client.sendQuestions(GUI, message, [
                 {
                     question: 'What would you like to set the title to?',
                     type: 'string',
@@ -129,7 +125,7 @@ const callback = async (message: AMessage, args: string[]) => {
 
             embed.setTitle(title.answers[0] !== 'none' ? title.answers[0] : '');
         } else if (action === 'setURL') {
-            const url = await message.client.sendQuestions(GUI, message.author, [
+            const url = await message.client.sendQuestions(GUI, message, [
                 {
                     question: 'What would you like to set the URL to?',
                     type: 'url',
@@ -147,7 +143,7 @@ const callback = async (message: AMessage, args: string[]) => {
 
             embed.setURL(url.answers[0] !== 'none' ? url.answers[0] : '');
         } else if (action === 'setDescription') {
-            const desc = await message.client.sendQuestions(GUI, message.author, [
+            const desc = await message.client.sendQuestions(GUI, message, [
                 {
                     question: 'What would you like to set the description to?',
                     type: 'string',
@@ -165,7 +161,7 @@ const callback = async (message: AMessage, args: string[]) => {
 
             embed.setDescription(desc.answers[0] !== 'none' ? desc.answers[0] : '');
         } else if (action === 'addField') {
-            const answers = await message.client.sendQuestions(GUI, message.author, [
+            const answers = await message.client.sendQuestions(GUI, message, [
                 {
                     question: 'What would you like to set the name to be?',
                     type: 'string',
@@ -206,7 +202,7 @@ const callback = async (message: AMessage, args: string[]) => {
                 embed.fields = [];
             } else {
                 embed.fields.forEach(field => options.push(`\n**Name**: ${field.name}\n**Value**: ${field.value}\n**Inline**: ${field.inline}`));
-                const reply = await message.client.sendOptions(GUI, message.author, 'Which field would you like to remove?', options);
+                const reply = await message.client.sendOptions(GUI, message, 'Which field would you like to remove?', options);
 
                 const { canceled, index } = reply;
 
@@ -236,7 +232,7 @@ const callback = async (message: AMessage, args: string[]) => {
             let index = 0;
             if (embed.fields.length > 1) {
                 embed.fields.forEach(field => options.push(`\n**Name**: ${field.name}\n**Value**: ${field.value}\n**Inline**: ${field.inline}`));
-                const reply = await message.client.sendOptions(GUI, message.author, 'Which field would you like to edit?', options);
+                const reply = await message.client.sendOptions(GUI, message, 'Which field would you like to edit?', options);
 
                 if (reply.canceled) {
                     message.client.editEmbed(GUI, 'Custom Embeds', 'Embed Edit Canceled');
@@ -249,7 +245,7 @@ const callback = async (message: AMessage, args: string[]) => {
                 index = reply.index;
             }
 
-            const answers = await message.client.sendQuestions(GUI, message.author, [
+            const answers = await message.client.sendQuestions(GUI, message, [
                 {
                     question: 'What would you like to set the name to be?\n\nReply `none` if you would like this to remain the same.',
                     type: 'string',
@@ -290,7 +286,7 @@ const callback = async (message: AMessage, args: string[]) => {
 
             embed.fields[index] = field;
         } else if (action === 'setAuthor') {
-            const answers = await message.client.sendQuestions(GUI, message.author, [
+            const answers = await message.client.sendQuestions(GUI, message, [
                 {
                     question: "What would you like the author's name to be?",
                     type: 'string',
@@ -298,7 +294,7 @@ const callback = async (message: AMessage, args: string[]) => {
                 },
                 {
                     question: "What would you like the author's avatar to be?",
-                    type: 'imageUrl',
+                    type: 'image',
                     optional: true
                 },
                 {
@@ -319,7 +315,7 @@ const callback = async (message: AMessage, args: string[]) => {
 
             embed.setAuthor(name, avatar !== 'none' ? avatar : undefined, link !== 'none' ? link : undefined);
         } else if (action === 'setFooter') {
-            const answers = await message.client.sendQuestions(GUI, message.author, [
+            const answers = await message.client.sendQuestions(GUI, message, [
                 {
                     question: 'What would you like the footer to say?',
                     type: 'string',
@@ -327,7 +323,7 @@ const callback = async (message: AMessage, args: string[]) => {
                 },
                 {
                     question: 'What would you like the icon to be?',
-                    type: 'imageUrl',
+                    type: 'image',
                     optional: true
                 }
             ]);
@@ -347,10 +343,10 @@ const callback = async (message: AMessage, args: string[]) => {
                 embed.setFooter(name, avatar !== 'none' ? avatar : undefined);
             }
         } else if (action === 'setImage') {
-            const answers = await message.client.sendQuestions(GUI, message.author, [
+            const answers = await message.client.sendQuestions(GUI, message, [
                 {
                     question: 'What would you like the image to be?',
-                    type: 'imageUrl',
+                    type: 'image',
                     optional: true
                 }
             ]);
@@ -370,10 +366,10 @@ const callback = async (message: AMessage, args: string[]) => {
                 embed.setImage(image);
             }
         } else if (action === 'setThumbnail') {
-            const answers = await message.client.sendQuestions(GUI, message.author, [
+            const answers = await message.client.sendQuestions(GUI, message, [
                 {
                     question: 'What would you like the thumbnail to be?',
-                    type: 'imageUrl',
+                    type: 'image',
                     optional: true
                 }
             ]);
@@ -393,10 +389,10 @@ const callback = async (message: AMessage, args: string[]) => {
                 embed.setThumbnail(image);
             }
         } else if (action === 'setColor') {
-            const answers = await message.client.sendQuestions(GUI, message.author, [
+            const answers = await message.client.sendQuestions(GUI, message, [
                 {
                     question: 'What would you like the color to be?',
-                    type: 'hexColor',
+                    type: 'color',
                     optional: true
                 }
             ]);

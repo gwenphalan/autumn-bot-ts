@@ -16,6 +16,7 @@ export default async (client: Client, member: GuildMember) => {
         const nonVerifiedRole = guild.roles.cache.get(verification.nonVerifiedRole);
 
         if (!verifyChannel || !nonVerifiedRole || !(verifyChannel instanceof TextChannel)) return;
+        if (member.user.bot) return;
 
         member.roles.add(nonVerifiedRole);
     }
@@ -27,8 +28,8 @@ export default async (client: Client, member: GuildMember) => {
         const staffRole = guild.roles.cache.get(verification.staffRole);
         const modVerifyChannel = guild.channels.cache.get(verification.modVerifyChannel);
 
-        if (verifyChannel && nonVerifiedRole && verifyChannel instanceof TextChannel) return;
-        if (staffRole && modVerifyChannel && modVerifyChannel instanceof TextChannel) return;
+        if (verifyChannel && nonVerifiedRole && verifyChannel instanceof TextChannel && !member.user.bot) return;
+        if (staffRole && modVerifyChannel && modVerifyChannel instanceof TextChannel && !member.user.bot) return;
 
         const memberRole = guild.roles.cache.get(guildSettings.general.memberRole);
 

@@ -107,7 +107,7 @@ export const getChannel = async (message: AMessage | BaseMessage, args: string[]
 
         const GUI = await message.channel.send(new MessageEmbed());
 
-        const reply = await client.sendOptions(GUI, message.author, 'Multiple Channels Found', channelsFound);
+        const reply = await client.sendOptions(GUI, message, 'Multiple Channels Found', channelsFound);
 
         await GUI.delete({
             timeout: 100
@@ -158,7 +158,7 @@ export const getMember = async (message: AMessage | BaseMessage, args: string[],
 
         const GUI = await message.channel.send(new MessageEmbed());
 
-        const reply = await client.sendOptions(GUI, message.author, 'Multiple Members Found', membersFound);
+        const reply = await client.sendOptions(GUI, message, 'Multiple Members Found', membersFound);
 
         await GUI.delete({
             timeout: 100
@@ -179,6 +179,14 @@ export const getMember = async (message: AMessage | BaseMessage, args: string[],
     return null;
 };
 
+export const fetchNorris = async () => {
+    const result = await fetch(`https://api.chucknorris.io/jokes/random`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'text/plain' },
+        redirect: 'follow'
+    });
+    return result;
+};
 export type format = 'string' | 'hexColor' | 'number' | 'url' | 'imageUrl';
 
 export const linkRegex = /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/gi;

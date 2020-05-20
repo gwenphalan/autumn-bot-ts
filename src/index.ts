@@ -20,7 +20,7 @@ export const client = new Client({
             url: 'https://www.twitch.tv/.'
         }
     },
-    partials: ['MESSAGE', 'REACTION']
+    partials: ['MESSAGE', 'REACTION', 'CHANNEL']
 });
 
 export const updateActivity = async () => {

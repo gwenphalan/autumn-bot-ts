@@ -380,7 +380,7 @@ const callback = async (message: AMessage, args: string[]) => {
                     // Send the list of choices to the user.
                     const response4 = await message.client.sendOptions(
                         GUI,
-                        message.author,
+                        message,
                         `Which ${setting.valueType} would you like to remove from ${setting.identifier}?`,
                         choices
                     );

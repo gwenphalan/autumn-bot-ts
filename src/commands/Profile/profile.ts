@@ -2,7 +2,7 @@ import { Command, AMessage } from '../../interfaces/Client';
 import { getMember } from '../../util';
 import { getUserProfile, createUserProfile, updateUserProfile, getGuildSettings, profileProperty } from '../../database';
 import { client } from '../../index';
-type type = 'string' | 'hexColor' | 'number';
+import { valueType } from '../../interfaces/SettingsGroup';
 
 //* Command Code
 
@@ -101,7 +101,7 @@ const callback = async (message: AMessage, args: string[]) => {
         const begin = await message.client.sendConfirm(GUI, message.author, 'Are you sure you want to create a profile?');
 
         if (begin) {
-            const x = await message.client.sendQuestions(GUI, message.author, [
+            const x = await message.client.sendQuestions(GUI, message, [
                 {
                     question: '`biography`\n\nTell me about yourself!',
                     type: 'string',
@@ -124,7 +124,7 @@ const callback = async (message: AMessage, args: string[]) => {
                 },
                 {
                     question: '`color`\n\nWhat color do you want your profile to be?',
-                    type: 'hexColor',
+                    type: 'color',
                     optional: true
                 }
             ]);
@@ -158,7 +158,7 @@ const callback = async (message: AMessage, args: string[]) => {
     } else if (action?.toLowerCase() === 'edit') {
         const GUI = await message.channel.send('Loading GUI...');
 
-        const reply = await message.client.sendOptions(GUI, message.author, 'Which property of your profile would you like to edit?', [
+        const reply = await message.client.sendOptions(GUI, message, 'Which property of your profile would you like to edit?', [
             'color',
             'biography',
             'age',
@@ -171,12 +171,12 @@ const callback = async (message: AMessage, args: string[]) => {
             return;
         }
 
-        let type: type;
+        let type: valueType;
         let property: profileProperty;
 
         switch (reply.choice) {
             case 'color':
-                type = 'hexColor';
+                type = 'color';
                 property = 'color';
                 break;
             case 'biograpy':
@@ -201,7 +201,7 @@ const callback = async (message: AMessage, args: string[]) => {
                 break;
         }
 
-        const answer = await message.client.sendQuestions(GUI, message.author, [
+        const answer = await message.client.sendQuestions(GUI, message, [
             {
                 question: `What would you like to set ${reply.choice} to?`,
                 optional: true,

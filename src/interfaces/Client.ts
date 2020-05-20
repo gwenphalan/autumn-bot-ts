@@ -1,11 +1,23 @@
-import { Client as DClient, Collection, Message as BaseMessage, PermissionString, MessageEmbed, MessageReaction, User, MessageAttachment } from 'discord.js';
+import {
+    Client as DClient,
+    Collection,
+    Message as BaseMessage,
+    PermissionString,
+    MessageEmbed,
+    MessageReaction,
+    User,
+    MessageAttachment,
+    GuildEmoji,
+    ReactionEmoji
+} from 'discord.js';
 import { config } from '../../config';
 import { database } from '../database';
 import { client } from '../index';
-import { format, parseType, replace } from '../util';
+import { replace } from '../util';
 import { getGuildSettings } from '../database';
 import { valueType } from '../interfaces/SettingsGroup';
 import constants from '../constants/constants';
+import { parseType } from '../commands/Settings/settings/util/index';
 
 // Our custom client adding new properties to the Discord Client
 export class Client extends DClient {
@@ -19,6 +31,7 @@ export class Client extends DClient {
     sendQuestions = sendQuestions;
     sendYesNo = sendYesNo;
     editEmbed = editEmbed;
+    getEmoji = getEmoji;
     settings = getGuildSettings;
 }
 
@@ -197,10 +210,18 @@ export const sendEmbed = async (
     return await message.channel.send(embedPermission ? embed : text);
 };
 
-export const sendOptions = async (message: AMessage | BaseMessage, user: User, question: string, options: string[]) => {
-    let choice;
+interface OptionReply {
+    choice: string | null;
+    canceled: boolean;
+    index: number;
+}
+
+export const sendOptions = async (GUI: AMessage | BaseMessage, message: AMessage | BaseMessage, question: string, options: string[]): Promise<OptionReply> => {
+    let choice: string | null = null;
     let canceled = false;
     let choiceIndex = 0;
+
+    let response = '';
 
     let choiceString = '';
     let invalid = false;
@@ -216,38 +237,59 @@ export const sendOptions = async (message: AMessage | BaseMessage, user: User, q
                 canceled: canceled,
                 index: 0
             };
-        } else if (invalid && choice && !parseType('number', choice)) {
-            const retry = await tryAgain(message, user, choice, 'number');
+        } else if (invalid && response) {
+            const retry = await tryAgain(GUI, message.author, response, 'number');
 
             if (retry) {
-                choice = '';
+                response = '';
+                invalid = false;
             } else {
-                choice = '';
+                response = '';
                 canceled = true;
             }
         } else if (choice) {
             break;
         } else {
             await editEmbed(
-                message,
+                GUI,
                 'Options',
                 `${question}`,
                 `Choose one of the options by replying with the number of the option.\n\n${choiceString}\nReply with \`cancel\` to cancel.`
             );
 
             const filter = (msg: AMessage) => {
-                return msg.author.id === user.id;
+                return msg.author.id === message.author.id;
             };
 
             const value = (await message.channel.awaitMessages(filter, { max: 1, time: 60000 })).first();
 
-            await message.edit(`<a:loading:${constants.emotes.aLoading}>`);
+            await GUI.edit(`<a:loading:${constants.emotes.aLoading}>`);
 
             const reply = value?.content ? value.content : 'cancel';
+
+            response = reply;
 
             if (reply === 'cancel') {
                 choice = '';
                 canceled = true;
+            }
+
+            choice = await parseType(GUI, message, 'number', reply);
+
+            if (!canceled) {
+                if (choice === 'canceled') {
+                    choice = null;
+                    canceled = true;
+                }
+
+                if (!choice) {
+                    invalid = true;
+                }
+            }
+
+            if (!invalid && !canceled && choice) {
+                choiceIndex = parseInt(choice);
+                choice = options[choiceIndex];
             }
 
             if (value) {
@@ -257,17 +299,6 @@ export const sendOptions = async (message: AMessage | BaseMessage, user: User, q
                     })
                     .catch(() => null);
             }
-
-            if (!parseType('number', reply)) {
-                invalid = true;
-                choice = reply;
-            } else {
-                const index = parseType('number', reply) ? parseInt(reply) : 0;
-                choiceIndex = index;
-
-                choice = options[index];
-                break;
-            }
         }
     }
     return {
@@ -275,6 +306,33 @@ export const sendOptions = async (message: AMessage | BaseMessage, user: User, q
         canceled: canceled,
         index: choiceIndex
     };
+};
+
+export const getEmoji = async (
+    GUI: AMessage | BaseMessage,
+    message: AMessage | BaseMessage,
+    question: string
+): Promise<GuildEmoji | ReactionEmoji | string> => {
+    await editEmbed(GUI, 'Emoji', `${question}`, `React with your chosen emoji, or react with <:leave:${constants.emotes.leave}> to cancel.`);
+    const filter = (_reaction: MessageReaction, reactionUser: User) => {
+        return reactionUser.id === message.author.id;
+    };
+
+    await GUI.react(constants.emotes.leave);
+
+    const response = await GUI.awaitReactions(filter, { max: 1, time: 60000 });
+
+    GUI.reactions.removeAll();
+
+    await GUI.edit(`<a:loading:${constants.emotes.aLoading}>`);
+
+    const reply = response.first();
+
+    if (!response || !reply) return 'canceled';
+
+    if (reply?.emoji.id === constants.emotes.leave) return 'canceled';
+
+    return reply.emoji;
 };
 
 export const checkPerm = (message: AMessage | BaseMessage, permission: PermissionString) => {
@@ -287,9 +345,9 @@ export const checkPerm = (message: AMessage | BaseMessage, permission: Permissio
     return true;
 };
 
-interface Question {
+export interface Question {
     question: string;
-    type: format;
+    type: valueType;
     optional: boolean;
 }
 
@@ -299,12 +357,14 @@ interface Question {
  * @param user User who is being asked the questions.
  * @param questions Array of Question objects that will be asked.
  */
-export const sendQuestions = async (message: AMessage | BaseMessage, user: User, questions: Question[]) => {
-    const answers: string[] = [];
+export const sendQuestions = async (GUI: AMessage | BaseMessage, message: AMessage | BaseMessage, questions: Question[]) => {
+    const answers: any[] = [];
     let canceled = false;
     for (let i = 0; i < questions.length; i++) {
         const question = questions[i];
         let answer;
+        let invalid = false;
+        let response = '';
         for (let x = 0; x < 3; x++) {
             if (canceled) {
                 answers.push(answer ? answer : '');
@@ -312,44 +372,53 @@ export const sendQuestions = async (message: AMessage | BaseMessage, user: User,
                     answers: answers,
                     canceled: canceled
                 };
-            } else if ((answer && parseType(question.type, answer)) || (question.optional && answer && answer === 'none')) {
-                answer = question.optional && answer && answer === 'none' ? answer : parseType(question.type, answer);
+            } else if ((response && !invalid) || (question.optional && response && response === 'none')) {
                 answers.push(answer ? answer : '');
                 break;
-            } else if (
-                (question.optional && answer && answer !== 'none' && !parseType(question.type, answer)) ||
-                (!question.optional && answer && !parseType(question.type, answer))
-            ) {
-                const retry = await tryAgain(message, user, answer, question.type);
+            } else if ((question.optional && response && response !== 'none' && invalid) || (!question.optional && response && invalid)) {
+                const retry = await tryAgain(GUI, message.author, response, question.type);
 
                 if (retry) {
-                    answer = '';
+                    response = '';
                 } else {
                     canceled = true;
                 }
             } else {
                 await editEmbed(
-                    message,
+                    GUI,
                     'Questions',
                     `${question.question}`,
                     `${question.optional ? '\n\n Reply with `none` if you wish to leave this blank.' : ''}${
-                        question.type === 'hexColor' ? '\n\n • [Adobe Color Picker](https://color.adobe.com/create)' : ''
+                        question.type === 'color' ? '\n\n • [Adobe Color Picker](https://color.adobe.com/create)' : ''
                     }\n\nReply with your answer, or \`cancel\` to cancel.`
                 );
 
                 const filter = (msg: AMessage) => {
-                    return msg.author.id === user.id;
+                    return msg.author.id === message.author.id;
                 };
 
                 const value = (await message.channel.awaitMessages(filter, { max: 1, time: 120000 })).first();
 
-                await message.edit(`<a:loading:${constants.emotes.aLoading}>`);
+                await GUI.edit(`<a:loading:${constants.emotes.aLoading}>`);
 
-                answer = value?.content ? value.content : 'cancel';
+                response = value?.content ? value.content : 'cancel';
 
-                if (answer === 'cancel') {
+                if (response === 'cancel') {
                     answer = '';
                     canceled = true;
+                }
+
+                if (!canceled) {
+                    answer = await parseType(GUI, message, question.type, response);
+
+                    if (answer === 'canceled') {
+                        answer = null;
+                        canceled = true;
+                    }
+
+                    if (!answer) {
+                        invalid = true;
+                    }
                 }
 
                 if (value)
@@ -433,7 +502,7 @@ export const sendYesNo = async (message: AMessage | BaseMessage, user: User, que
         canceled: canceled
     };
 };
-export async function tryAgain(message: AMessage | BaseMessage, user: User, value: string, type: format | valueType) {
+export async function tryAgain(message: AMessage | BaseMessage, user: User, value: string, type: valueType) {
     await editEmbed(
         message,
         'Invalid Response',

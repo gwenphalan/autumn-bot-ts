@@ -5,13 +5,13 @@ export type valueType =
     | 'guildChannel'
     | 'voiceChannel'
     | 'string'
-    | 'role'
     | 'guildMember'
     | 'boolean'
     | 'number'
     | 'color'
     | 'url'
-    | 'image';
+    | 'image'
+    | 'snowflake';
 
 interface Setting {
     name: string;

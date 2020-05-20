@@ -1,5 +1,5 @@
 import { Command, AMessage } from '../../interfaces/Client';
-import { drawCard, labelImage, drawExampleCard } from '../../util/canvas';
+import { drawCard, drawExampleCard } from '../../util/canvas';
 import { MessageAttachment } from 'discord.js';
 import { getMember } from '../../util';
 
@@ -11,9 +11,7 @@ const callback = async (message: AMessage, args: string[]) => {
 
     const buffer = member ? await drawCard(message.guild, member) : await drawExampleCard(message.guild);
 
-    const label = await labelImage(buffer, 'Example Card', 20, 'Poppins Light', 15);
-
-    const attachment = new MessageAttachment(label, `${member ? member.id : 'example'}_welcome.png`);
+    const attachment = new MessageAttachment(buffer, `${member ? member.id : 'example'}_welcome.png`);
 
     message.channel.send(attachment);
 };
