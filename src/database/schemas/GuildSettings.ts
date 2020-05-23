@@ -9,8 +9,8 @@ export interface GuildSettings extends mongoose.Document {
     };
     moderation: {
         enabled: boolean;
-        staffRole: string;
         modLog: string;
+        warnExpire: number;
         mutedRole: string;
     };
     verification: {
@@ -45,8 +45,8 @@ const GuildSettingsSchema = new mongoose.Schema({
     },
     moderation: {
         enabled: Boolean,
-        staffRole: String,
         modLog: String,
+        warnExpire: Number,
         mutedRole: String
     },
     verification: {

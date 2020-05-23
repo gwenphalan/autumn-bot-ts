@@ -94,13 +94,11 @@ export default async (client: Client, message: Message) => {
             await application.react(client.constants.emotes.no);
 
             await verifyChannel
-                .overwritePermissions(
-                    [
-                        {
-                            id: message.author.id,
-                            deny: ['VIEW_CHANNEL']
-                        }
-                    ],
+                .updateOverwrite(
+                    message.author,
+                    {
+                        VIEW_CHANNEL: false
+                    },
                     'User requested verification.'
                 )
                 .catch(() => null);

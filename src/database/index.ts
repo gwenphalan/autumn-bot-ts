@@ -35,6 +35,7 @@ export const getGuildSettings = async (guildId: string) => {
 };
 
 export const updateGuildSettings = async (guildId: string, settings: GuildSettings) => {
+    console.log(settings);
     await GuildSettings.updateOne({ guild: guildId }, settings);
 };
 

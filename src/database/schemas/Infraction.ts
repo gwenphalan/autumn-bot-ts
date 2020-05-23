@@ -1,11 +1,11 @@
 import mongoose from 'mongoose';
 
-export type InfractionTypes = 'warn' | 'mute' | 'unmute' | 'kick' | 'ban';
+export type InfractionTypes = 'warn' | 'mute' | 'kick' | 'ban';
 
 export interface Infraction extends mongoose.Document {
     guild: string; // The id of the guild
     user: string; // The id of the user
-    infractionType: string; // The type of infraction (see line 3)
+    infractionType: InfractionTypes; // The type of infraction (see line 3)
     timestamp: number; // The timestamp of the infraction
     endTimestamp?: number; // The timestamp of when this infraction ends, used to time tempmute
     needsTiming?: boolean; // Whether this needs timing (see above)

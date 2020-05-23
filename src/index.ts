@@ -4,6 +4,8 @@ import { config } from '../config';
 import { Client, ClientEventTypes, Command } from './interfaces/Client';
 import { handleError } from './util';
 import DBL from 'dblapi.js';
+import { CronJob } from 'cron';
+
 /* 
     Initiates our client with the following options:
     - @everyone, @here and @role pings are DISABLES
@@ -39,7 +41,8 @@ client.on('ready', () => {
 });
 
 const listenerPath = path.join(__dirname, './events'),
-    commandPath = path.join(__dirname, './commands');
+    commandPath = path.join(__dirname, './commands'),
+    taskPath = path.join(__dirname, './tasks');
 
 // Imports your listeners from the events folder and forwards all Client-Events to those files
 fs.readdirSync(listenerPath).forEach(file => {
@@ -56,6 +59,15 @@ fs.readdirSync(commandPath).forEach(async folder => {
         client.commands.set(command.name, command);
     }
 });
+
+export const startTasks = () => {
+    // Imports your tasks from the tasks folder and starts them
+    fs.readdirSync(taskPath).forEach(file => {
+        const task: CronJob = require(path.join(taskPath, file)).task;
+        task.start();
+        console.log(`Started Task: ${file}`);
+    });
+};
 
 // Error Logging
 process.on('uncaughtException', error => handleError(client, error));

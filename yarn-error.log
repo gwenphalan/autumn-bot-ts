@@ -1,5 +1,5 @@
 Arguments: 
-  /home/gwen/.nvm/versions/node/v13.6.0/bin/node /home/gwen/.nvm/versions/node/v13.6.0/bin/yarn add @types/dbl-api
+  /home/gwen/.nvm/versions/node/v13.6.0/bin/node /home/gwen/.nvm/versions/node/v13.6.0/bin/yarn add @types/timestring
 
 PATH: 
   /home/gwen/.nvm/versions/node/v13.6.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
@@ -14,7 +14,7 @@ Platform:
   linux x64
 
 Trace: 
-  Error: https://registry.yarnpkg.com/@types%2fdbl-api: Not found
+  Error: https://registry.yarnpkg.com/@types%2ftimestring: Not found
       at Request.params.callback [as _callback] (/home/gwen/.nvm/versions/node/v13.6.0/lib/node_modules/yarn/lib/cli.js:66987:18)
       at Request.self.callback (/home/gwen/.nvm/versions/node/v13.6.0/lib/node_modules/yarn/lib/cli.js:140748:22)
       at Request.emit (events.js:321:20)
@@ -56,6 +56,7 @@ npm manifest:
       },
       "dependencies": {
           "@types/color": "^3.0.1",
+          "@types/cron": "^1.7.2",
           "@types/mongoose": "^5.7.12",
           "@types/node": "^13.13.1",
           "@types/node-fetch": "^2.5.6",
@@ -63,6 +64,7 @@ npm manifest:
           "@types/ws": "^7.2.4",
           "canvas": "^2.6.1",
           "color": "^3.1.2",
+          "cron": "^1.8.2",
           "dblapi.js": "^2.4.0",
           "discord.js": "^12.2.0",
           "dotenv": "^8.2.0",
@@ -71,7 +73,9 @@ npm manifest:
           "nekos.life": "^2.0.7",
           "node-fetch": "^2.6.0",
           "pm2": "^4.4.0",
+          "pretty-ms": "^7.0.0",
           "query-string": "^6.12.1",
+          "timestring": "^6.0.0",
           "tinycolor2": "^1.4.1",
           "typescript": "^3.8.3"
       },
@@ -259,6 +263,14 @@ Lockfile:
     integrity sha512-oeUWVaAwI+xINDUx+3F2vJkl/vVB03VChFF/Gl3iQCdbcakjuoJyMOba+3BXRtnBhxZ7uBYqQBi9EpLnvSoztA==
     dependencies:
       "@types/color-convert" "*"
+  
+  "@types/cron@^1.7.2":
+    version "1.7.2"
+    resolved "https://registry.yarnpkg.com/@types/cron/-/cron-1.7.2.tgz#e9fb420da616920dae82d13adfca53282ffaab6e"
+    integrity sha512-AEpNLRcsVSc5AdseJKNHpz0d4e8+ow+abTaC0fKDbAU86rF1evoFF0oC2fV9FdqtfVXkG2LKshpLTJCFOpyvTg==
+    dependencies:
+      "@types/node" "*"
+      moment ">=2.14.0"
   
   "@types/eslint-visitor-keys@^1.0.0":
     version "1.0.0"
@@ -887,7 +899,7 @@ Lockfile:
       path-type "^4.0.0"
       yaml "^1.7.2"
   
-  cron@1.8.2:
+  cron@1.8.2, cron@^1.8.2:
     version "1.8.2"
     resolved "https://registry.yarnpkg.com/cron/-/cron-1.8.2.tgz#4ac5e3c55ba8c163d84f3407bde94632da8370ce"
     integrity sha512-Gk2c4y6xKEO8FSAUTklqtfSr7oTq0CiPQeLBG5Fl0qoXpZyMcj1SG59YL+hqq04bu6/IuEA7lMkYDAplQNKkyg==
@@ -2182,6 +2194,11 @@ Lockfile:
     resolved "https://registry.yarnpkg.com/moment/-/moment-2.25.3.tgz#252ff41319cf41e47761a1a88cab30edfe9808c0"
     integrity sha512-PuYv0PHxZvzc15Sp8ybUCoQ+xpyPWvjOuK72a5ovzp2LI32rJXOiIfyoFoYvG3s6EwwrdkMyWuRiEHSZRLJNdg==
   
+  moment@>=2.14.0:
+    version "2.26.0"
+    resolved "https://registry.yarnpkg.com/moment/-/moment-2.26.0.tgz#5e1f82c6bafca6e83e808b30c8705eed0dcbd39a"
+    integrity sha512-oIixUO+OamkUkwjhAVE18rAMfRJNsNe/Stid/gwHSOfHrOtw9EhAY2AHvdKZ/k/MggcYELFCJz/Sn2pL8b8JMw==
+  
   mongodb@3.5.6:
     version "3.5.6"
     resolved "https://registry.yarnpkg.com/mongodb/-/mongodb-3.5.6.tgz#a1be2d9796c8a8a5b0e6bcbc6baaaa406bd5c0d5"
@@ -2590,6 +2607,11 @@ Lockfile:
       json-parse-better-errors "^1.0.1"
       lines-and-columns "^1.1.6"
   
+  parse-ms@^2.1.0:
+    version "2.1.0"
+    resolved "https://registry.yarnpkg.com/parse-ms/-/parse-ms-2.1.0.tgz#348565a753d4391fa524029956b172cb7753097d"
+    integrity sha512-kHt7kzLoS9VBZfUsiKjv43mr91ea+U05EyKkEtqp7vNbHxmaVuEqN7XxeEVnGrMtYOAxGrDElSi96K7EgO1zCA==
+  
   path-exists@^3.0.0:
     version "3.0.0"
     resolved "https://registry.yarnpkg.com/path-exists/-/path-exists-3.0.0.tgz#ce0ebeaa5f78cb18925ea7d810d7b59b010fd515"
@@ -2750,6 +2772,13 @@ Lockfile:
     version "2.0.5"
     resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.0.5.tgz#d6d56282455243f2f92cc1716692c08aa31522d4"
     integrity sha512-7PtVymN48hGcO4fGjybyBSIWDsLU4H4XlvOHfq91pz9kkGlonzwTfYkaIEwiRg/dAJF9YlbsduBAgtYLi+8cFg==
+  
+  pretty-ms@^7.0.0:
+    version "7.0.0"
+    resolved "https://registry.yarnpkg.com/pretty-ms/-/pretty-ms-7.0.0.tgz#45781273110caf35f55cab21a8a9bd403a233dc0"
+    integrity sha512-J3aPWiC5e9ZeZFuSeBraGxSkGMOvulSWsxDByOcbD1Pr75YL3LSNIKIb52WXbCLE1sS5s4inBBbryjF4Y05Ceg==
+    dependencies:
+      parse-ms "^2.1.0"
   
   prism-media@^1.2.0:
     version "1.2.1"
@@ -3446,6 +3475,11 @@ Lockfile:
     version "2.1.2"
     resolved "https://registry.yarnpkg.com/thunkify/-/thunkify-2.1.2.tgz#faa0e9d230c51acc95ca13a361ac05ca7e04553d"
     integrity sha1-+qDp0jDFGsyVyhOjYawFyn4EVT0=
+  
+  timestring@^6.0.0:
+    version "6.0.0"
+    resolved "https://registry.yarnpkg.com/timestring/-/timestring-6.0.0.tgz#b0c7c331981ecf2066ce88bcfb8ee3ae32e7a0f6"
+    integrity sha512-wMctrWD2HZZLuIlchlkE2dfXJh7J2KDI9Dwl+2abPYg0mswQHfOAyQW3jJg1pY5VfttSINZuKcXoB3FGypVklA==
   
   tinycolor2@^1.4.1:
     version "1.4.1"

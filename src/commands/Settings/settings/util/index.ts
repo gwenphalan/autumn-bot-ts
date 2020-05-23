@@ -5,6 +5,7 @@ import { TextChannel, VoiceChannel, GuildMember, MessageReaction, MessageEmbed }
 import Color from 'color';
 import Canvas from 'canvas';
 import { uploadImgur } from '../../../../util/imgur';
+import timestring from 'timestring';
 
 export const sendSetting = async (GUI: AMessage | BaseMessage, message: AMessage | BaseMessage, setting: string, valueType: valueType, array?: boolean) => {
     let canceled = false;
@@ -168,6 +169,13 @@ export const parseType = async (GUI: AMessage | BaseMessage, message: AMessage |
         case 'snowflake':
             const snowflake = str.match(/\d{17,19}/gi);
             return snowflake ? snowflake[0] : null;
+        case 'timeLength':
+            try {
+                const time = timestring(str, 'ms');
+                return time;
+            } catch (err) {
+                return null;
+            }
         default:
             return null;
     }

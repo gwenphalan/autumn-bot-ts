@@ -1,6 +1,6 @@
 import nodeFetch, { RequestInfo, RequestInit } from 'node-fetch';
 import { Client, AMessage } from '../interfaces/Client';
-import { TextChannel, MessageEmbed, GuildMember, GuildChannel, Message as BaseMessage, PermissionString, Message } from 'discord.js';
+import { TextChannel, MessageEmbed, GuildMember, GuildChannel, Message as BaseMessage, PermissionString, Message, Guild, CategoryChannel } from 'discord.js';
 import { inspect } from 'util';
 import { client } from '../index';
 import constants from '../constants/constants';
@@ -177,6 +177,41 @@ export const getMember = async (message: AMessage | BaseMessage, args: string[],
         return null;
     }
     return null;
+};
+
+export const createMutedRole = async (guild: Guild) => {
+    const channels = guild.channels.cache;
+
+    const mutedRole = await guild.roles.create({
+        data: {
+            name: 'Muted',
+            color: '#4d4d4d'
+        },
+        reason: 'Required to Mute Users'
+    });
+
+    channels.forEach(channel => {
+        if (channel instanceof CategoryChannel) {
+            channel.createOverwrite(
+                mutedRole,
+                {
+                    SEND_MESSAGES: false
+                },
+                'Required to mute users.'
+            );
+        } else {
+            if (channel.parent?.permissionOverwrites !== channel.permissionOverwrites)
+                channel.createOverwrite(
+                    mutedRole,
+                    {
+                        SEND_MESSAGES: false
+                    },
+                    'Required to mute users.'
+                );
+        }
+    });
+
+    return mutedRole;
 };
 
 export const fetchNorris = async () => {

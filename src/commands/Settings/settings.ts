@@ -236,12 +236,25 @@ const callback = async (message: AMessage, args: string[]) => {
                 // Set the setting to the value given by the user.
                 guildSettings.get(group.identifier)[setting.identifier] = value;
 
+                const settings = guildSettings;
+
+                console.log(value);
+
+                console.log(guildSettings.get(group.identifier)[setting.identifier]);
+
                 /**
                  * * NOTE: I only create a custom method do update the guild settings because for some reason doing guildSettings.save() didn't work.
                  */
 
+                console.log(guildSettings);
+                console.log(settings);
+
                 // Update guild settings
-                await updateGuildSettings(message.guild.id, guildSettings);
+                await updateGuildSettings(message.guild.id, settings);
+
+                const a = await getGuildSettings(message.guild.id);
+
+                console.log(a);
                 // Confirm to the user the value was changed.
                 response = toString1 || value;
                 break;

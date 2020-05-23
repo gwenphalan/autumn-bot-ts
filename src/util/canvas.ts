@@ -5,6 +5,7 @@ import { config } from '../../config';
 import Color from 'color';
 import { getGuildSettings } from '../database';
 import { words } from '../constants/words';
+//import { style1 } from './autumnforest';
 Canvas.registerFont(path.join(__dirname, '../../../assets/fonts/Poppins-Regular.ttf'), { family: 'Poppins', style: 'Regular', weight: '400' });
 Canvas.registerFont(path.join(__dirname, '../../../assets/fonts/Poppins-Thin.ttf'), { family: 'Poppins', style: 'Thin', weight: '100' });
 Canvas.registerFont(path.join(__dirname, '../../../assets/fonts/Poppins-Bold.ttf'), { family: 'Poppins', style: 'Bold', weight: '700' });
@@ -22,6 +23,26 @@ const loadDefaultBackgroundImage = async () => {
 loadDefaultBackgroundImage();
 
 export const drawCard = async (guild: Guild, member: GuildMember) => {
+    /*const guildSettings = await getGuildSettings(guild.id);
+
+    const welcome = guildSettings.welcome;
+
+    const backgroundImage = welcome.profileBackground;
+    const backgroundColor = welcome.backgroundColor;
+    const profileColor = welcome.profileColor;
+    const textColor = welcome.textColor;
+
+    const buff = await style1(
+        guild.name,
+        member.displayName,
+        member.user.displayAvatarURL({ dynamic: true, format: 'png' }),
+        backgroundImage,
+        profileColor,
+        backgroundColor,
+        textColor
+    );
+
+    return buff;*/
     const t = 5; // * X Offset of profile picture
     const i = 180; // * Profile Picture Size
     const v = 30; // * Margin between text and pfp/side of image

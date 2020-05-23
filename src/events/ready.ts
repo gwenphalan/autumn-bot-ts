@@ -1,6 +1,6 @@
 import { Client } from '../interfaces/Client';
 import { TextChannel, MessageEmbed } from 'discord.js';
-import { updateActivity } from '../index';
+import { updateActivity, startTasks } from '../index';
 
 export default async (client: Client) => {
     // Log useful info to the console
@@ -25,4 +25,5 @@ export default async (client: Client) => {
     // Send useful info to the info channel
     infoChannel.send(embed);
     updateActivity();
+    startTasks();
 };

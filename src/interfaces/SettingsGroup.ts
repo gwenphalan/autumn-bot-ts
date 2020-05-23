@@ -11,7 +11,8 @@ export type valueType =
     | 'color'
     | 'url'
     | 'image'
-    | 'snowflake';
+    | 'snowflake'
+    | 'timeLength';
 
 interface Setting {
     name: string;

@@ -1,9 +1,22 @@
 import { Command, AMessage } from '../../interfaces/Client';
-import { drawCard, drawExampleCard } from '../../util/canvas';
 import { MessageAttachment } from 'discord.js';
 import { getMember } from '../../util';
+//import { style1 } from '../../util/autumnforest';
+import { drawCard, drawExampleCard } from '../../util/canvas';
 
 const callback = async (message: AMessage, args: string[]) => {
+    /*if (!message.guild || !message.member) return;
+    const a = await getMember(message, args);
+
+    const member = a ? a : null;
+
+    const buffer = member
+        ? await style1(message.guild.name, member.displayName, member.user.displayAvatarURL({ dynamic: false, format: 'png' }))
+        : await style1();
+
+    const attachment = new MessageAttachment(buffer, `${member ? member.id : 'example'}_welcome.png`);
+
+    message.channel.send(attachment);*/
     if (!message.guild || !message.member) return;
     const a = await getMember(message, args);
 
