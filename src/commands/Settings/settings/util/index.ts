@@ -358,7 +358,10 @@ const getVoiceChannel = async (GUI: AMessage | BaseMessage, message: AMessage | 
     if (!(channel instanceof VoiceChannel)) return null;
     return channel;
 };
-const roleFilterInexact = (search: string) => (role: Role) => search.toLowerCase().includes(role.id) || role.name.toLowerCase().includes(search);
+const roleFilterInexact = (search: string) => (role: Role) =>
+    search.toLowerCase().includes(role.id) ||
+    role.name.toLowerCase().includes(search.toLowerCase()) ||
+    role.toString().toLowerCase().includes(search.toLowerCase());
 
 const getRole = async (GUI: AMessage | BaseMessage, message: AMessage | BaseMessage, input: string) => {
     if (!message.guild) throw new Error('getMember was used in a DmChannel.');

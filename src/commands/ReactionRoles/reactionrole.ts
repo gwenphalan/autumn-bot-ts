@@ -54,7 +54,9 @@ const callback = async (message: AMessage, _args: string[]) => {
 
     const role = answer2.answers[0];
 
-    if (!(role instanceof Role)) return message.client.editEmbed(GUI, 'Uh Oh!', `${channel} is not a role!`);
+    console.log(role);
+
+    if (!(role instanceof Role)) return message.client.editEmbed(GUI, 'Uh Oh!', `${role} is not a role!`);
 
     GUI.edit(`<a:loading:${constants.emotes.aLoading}>`);
 
