@@ -17,6 +17,7 @@ const callback = async (message: AMessage, args: string[]) => {
     const attachment = new MessageAttachment(buffer, `${member ? member.id : 'example'}_welcome.png`);
 
     message.channel.send(attachment);*/
+
     if (!message.guild || !message.member) return;
     const a = await getMember(message, args);
 

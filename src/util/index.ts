@@ -1,6 +1,17 @@
 import nodeFetch, { RequestInfo, RequestInit } from 'node-fetch';
 import { Client, AMessage } from '../interfaces/Client';
-import { TextChannel, MessageEmbed, GuildMember, GuildChannel, Message as BaseMessage, PermissionString, Message, Guild, CategoryChannel } from 'discord.js';
+import {
+    TextChannel,
+    MessageEmbed,
+    GuildMember,
+    GuildChannel,
+    Message as BaseMessage,
+    PermissionString,
+    Message,
+    Guild,
+    CategoryChannel,
+    User
+} from 'discord.js';
 import { inspect } from 'util';
 import { client } from '../index';
 import constants from '../constants/constants';
@@ -173,6 +184,59 @@ export const getMember = async (message: AMessage | BaseMessage, args: string[],
         const id = idMatch ? idMatch[0] : null;
 
         return id ? message.guild.members.cache.get(id) : null;
+    } else if (!result.size) {
+        return null;
+    }
+    return null;
+};
+
+interface Ban {
+    reason: string;
+    user: User;
+}
+
+const bannedMemberFilterInexact = (search: string) => (ban: Ban) =>
+    ban.user.username.toLowerCase().includes(search.toLowerCase()) ||
+    ban.user.tag.toLowerCase().includes(search.toLowerCase()) ||
+    search.toLowerCase().includes(ban.user.id);
+
+export const getBannedMember = async (message: AMessage | BaseMessage, args: string[], spot?: number) => {
+    if (!message.guild) throw new Error('getMember was used in a DmChannel.');
+
+    if (!args[0]) return null;
+
+    const input = spot || spot === 0 ? args[spot].toLowerCase() : args.join(' ').toLowerCase();
+
+    const bans = await message.guild.fetchBans();
+
+    const result = bans.filter(bannedMemberFilterInexact(input));
+
+    const member = result.first();
+
+    if (result.size === 1) return member?.user;
+
+    if (result.size > 1) {
+        const membersFound: string[] = [];
+
+        result.each((ban: Ban) => membersFound.push(ban.user.toString()));
+
+        const GUI = await message.channel.send(new MessageEmbed());
+
+        const reply = await client.sendOptions(GUI, message, 'Multiple Members Found', membersFound);
+
+        await GUI.delete({
+            timeout: 100
+        });
+
+        const idRegex = /\d+/g;
+
+        if (reply.canceled || reply.choice === '') return null;
+
+        const idMatch = reply.choice?.match(idRegex);
+
+        const id = idMatch ? idMatch[0] : null;
+
+        return id ? bans.get(id)?.user : null;
     } else if (!result.size) {
         return null;
     }
