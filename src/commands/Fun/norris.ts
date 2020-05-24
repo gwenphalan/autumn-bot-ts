@@ -4,7 +4,7 @@ import { fetchNorris } from '../../util';
 const callback = async (message: AMessage, _args: string[]) => {
     const joke = await fetchNorris();
 
-    message.client.sendEmbed(message, 'Chuck Norris', 'Chuck Norris', joke.value, joke.icon_url);
+    message.client.sendEmbed(message, 'Chuck Norris', 'Chuck Norris', joke.value);
 };
 
 export const command: Command = {
