@@ -1,15 +1,12 @@
 import { Client } from '../interfaces/Client';
 import { TextChannel, MessageEmbed } from 'discord.js';
 import { updateActivity, startTasks } from '../index';
-import { getGuildSettings } from '../database';
 
 export default async (client: Client) => {
     // Log useful info to the console
     console.log(`Connected to Discord as ${client.user!.tag} - ${client.user!.id}`);
     console.log(`Serving ${client.guilds.cache.size} guilds and ${client.channels.cache.size} channels.`);
     console.log(`Default prefix: ${client.config.defaultPrefix}`);
-
-    await Promise.all(client.guilds.cache.map(g => getGuildSettings(g.id)));
 
     // Get the info channel
     const infoChannel = client.channels.cache.get(client.config.infoChannel) || (await client.channels.fetch(client.config.infoChannel));
