@@ -6,6 +6,8 @@ import { handleError } from './util';
 import DBL from 'dblapi.js';
 import { CronJob } from 'cron';
 
+// import net from 'net';
+
 /* 
     Initiates our client with the following options:
     - @everyone, @here and @role pings are DISABLES
@@ -78,3 +80,16 @@ process.on('unhandledRejection', error => {
 });
 
 client.login(client.config.token);
+
+// const server = net.createServer(c => {
+//     console.log('Client Connected.');
+//     c.on('end', () => {
+//         console.log('Client Disconnected');
+//     });
+//     c.write('hello\r\n');
+//     c.pipe(c);
+// });
+
+// server.listen(8124, () => {
+//     console.log('Server Bound');
+// });

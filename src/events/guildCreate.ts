@@ -11,6 +11,26 @@ export default async (client: Client, guild: Guild) => {
 
     await getGuildSettings(guild.id);
 
+    const channels = guild.channels.cache;
+
+    const available = channels.filter(c => (client.user ? c.permissionsFor(client.user)?.has('SEND_MESSAGES') || false : false) && c instanceof TextChannel);
+
+    const channel = available.first();
+
+    if (client.user ? channel?.permissionsFor(client.user)?.has('EMBED_LINKS') : null) {
+        if (channel instanceof TextChannel)
+            channel.send(
+                new MessageEmbed()
+                    .setAuthor(client.user?.username, client.user?.displayAvatarURL({ dynamic: true, format: 'png' }))
+                    .setTimestamp()
+                    .setColor(client.config.accentColor)
+                    .setTitle('Thanks for inviting me!')
+                    .setDescription(
+                        `If you need any help setting up the bot, feel free to join our [support server](https://discord.gg/DfByvyN)!\n\nDo \`${client.config.defaultPrefix}settings\` to set up the bot. You can also do \`${client.config.defaultPrefix}prefix\` to change the bot prefix.`
+                    )
+            );
+    }
+
     const embed = new MessageEmbed()
         .setAuthor('Bot Information', client.user?.displayAvatarURL({ dynamic: true, format: 'png' }))
         .setTimestamp()
