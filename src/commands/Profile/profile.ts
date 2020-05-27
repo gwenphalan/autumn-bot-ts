@@ -24,15 +24,15 @@ const callback = async (message: AMessage, args: string[]) => {
 
         if (Profile) {
             const fields = [];
-            Profile.age ? fields.push({ name: 'Age', value: Profile.age, inline: true }) : null;
-            Profile.gender ? fields.push({ name: 'Gender', value: Profile.gender, inline: true }) : null;
-            Profile.pronouns ? fields.push({ name: 'Pronouns', value: Profile.pronouns, inline: true }) : null;
+            Profile.age !== '' ? fields.push({ name: 'Age', value: Profile.age, inline: true }) : null;
+            Profile.gender !== '' ? fields.push({ name: 'Gender', value: Profile.gender, inline: true }) : null;
+            Profile.pronouns !== '' ? fields.push({ name: 'Pronouns', value: Profile.pronouns, inline: true }) : null;
 
             message.client.sendEmbed(
                 message,
                 'Profiles',
                 `${user.user.username}#${user.user.discriminator}`,
-                Profile.biography ? `${Profile.biography}` : undefined,
+                Profile.biography !== '' ? `${Profile.biography}` : undefined,
                 user.user.displayAvatarURL({
                     dynamic: true,
                     format: 'png'
@@ -57,15 +57,15 @@ const callback = async (message: AMessage, args: string[]) => {
 
         if (Profile) {
             const fields = [];
-            Profile.age ? fields.push({ name: 'Age', value: Profile.age, inline: true }) : null;
-            Profile.gender ? fields.push({ name: 'Gender', value: Profile.gender, inline: true }) : null;
-            Profile.pronouns ? fields.push({ name: 'Pronouns', value: Profile.pronouns, inline: true }) : null;
+            Profile.age !== '' ? fields.push({ name: 'Age', value: Profile.age, inline: true }) : null;
+            Profile.gender !== '' ? fields.push({ name: 'Gender', value: Profile.gender, inline: true }) : null;
+            Profile.pronouns !== '' ? fields.push({ name: 'Pronouns', value: Profile.pronouns, inline: true }) : null;
 
             message.client.sendEmbed(
                 message,
                 'Profiles',
                 `${message.author.username}#${message.author.discriminator}`,
-                Profile.biography ? `${Profile.biography}` : undefined,
+                Profile.biography !== '' ? `${Profile.biography}` : undefined,
                 message.author.displayAvatarURL({
                     dynamic: true,
                     format: 'png'
