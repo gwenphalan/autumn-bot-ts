@@ -1,17 +1,15 @@
 import { SettingsGroup } from '../../../../interfaces/SettingsGroup';
-import { AMessage } from '../../../../interfaces/Client';
-import { CategoryChannel } from 'discord.js';
+import { CategoryChannel, Guild } from 'discord.js';
 import { createMutedRole } from '../../../../util';
-import { updateGuildSettings } from '../../../../database';
+import { updateGuildSettings, getGuildSettings } from '../../../../database';
 
-const update = async (message: AMessage) => {
-    if (!message.guild) throw new Error('Settings Group Update Method called in DMs');
-    const guildSettings = await message.client.settings(message.guild.id);
+const update = async (guild: Guild) => {
+    const guildSettings = await getGuildSettings(guild.id);
     if (!guildSettings.moderation.enabled) return;
 
-    const mutedRole = message.guild.roles.cache.get(guildSettings.moderation.mutedRole);
+    const mutedRole = guild.roles.cache.get(guildSettings.moderation.mutedRole);
 
-    const channels = message.guild.channels.cache;
+    const channels = guild.channels.cache;
 
     if (mutedRole) {
         channels.forEach(channel => {
@@ -35,11 +33,11 @@ const update = async (message: AMessage) => {
             }
         });
     } else {
-        const muteRole = await createMutedRole(message.guild);
+        const muteRole = await createMutedRole(guild);
 
         guildSettings.moderation.mutedRole = muteRole.id;
 
-        updateGuildSettings(message.guild.id, guildSettings);
+        updateGuildSettings(guild.id, guildSettings);
     }
 };
 

@@ -1,4 +1,4 @@
-import { Message as BaseMessage } from 'discord.js';
+import { Guild } from 'discord.js';
 export type valueType =
     | 'role'
     | 'textChannel'
@@ -30,5 +30,5 @@ export interface SettingsGroup {
     identifier: string;
     description: string;
     settings: Setting[];
-    update(message: BaseMessage): Promise<void | BaseMessage>;
+    update(guild: Guild): Promise<void>;
 }

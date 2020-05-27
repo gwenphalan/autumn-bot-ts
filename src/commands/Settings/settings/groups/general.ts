@@ -1,7 +1,7 @@
 import { SettingsGroup } from '../../../../interfaces/SettingsGroup';
-import { Message as BaseMessage } from 'discord.js';
+import { Guild } from 'discord.js';
 
-const update = async (_message: BaseMessage) => {
+const update = async (_guild: Guild) => {
     return;
 };
 

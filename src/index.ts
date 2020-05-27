@@ -6,7 +6,8 @@ import { handleError } from './util';
 import DBL from 'dblapi.js';
 import { CronJob } from 'cron';
 
-// import net from 'net';
+import net from 'net';
+import { updateGuild } from './commands/Settings/settings/';
 
 /* 
     Initiates our client with the following options:
@@ -81,15 +82,17 @@ process.on('unhandledRejection', error => {
 
 client.login(client.config.token);
 
-// const server = net.createServer(c => {
-//     console.log('Client Connected.');
-//     c.on('end', () => {
-//         console.log('Client Disconnected');
-//     });
-//     c.write('hello\r\n');
-//     c.pipe(c);
-// });
+export const server = net.createServer(socket => {
+    socket.on('data', async data => {
+        const a = await updateGuild(data);
 
-// server.listen(8124, () => {
-//     console.log('Server Bound');
-// });
+        if (a === 'Success') {
+            socket.write('Success');
+            socket.pipe(socket);
+        }
+    });
+});
+
+server.listen(8124, () => {
+    console.log(`Websocket Listening On Port 8124`);
+});

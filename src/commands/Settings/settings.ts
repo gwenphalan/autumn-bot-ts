@@ -499,7 +499,7 @@ const callback = async (message: AMessage, args: string[]) => {
         );
 
         // Return and call the update method for the group.
-        return await group.update(message);
+        return await group.update(message.guild);
     }
 };
 

@@ -1,23 +1,23 @@
 import { SettingsGroup } from '../../../../interfaces/SettingsGroup';
 import { AMessage } from '../../../../interfaces/Client';
-import { CategoryChannel, TextChannel, MessageEmbed, Collection } from 'discord.js';
+import { CategoryChannel, TextChannel, MessageEmbed, Collection, Guild } from 'discord.js';
 import { config } from '../../../../../config';
 import { client as botClient } from '../../../../index';
+import { getGuildSettings } from '../../../../database';
 
-const update = async (message: AMessage) => {
-    if (!message.guild) return;
-    const guildSettings = await message.client.settings(message.guild.id);
+const update = async (guild: Guild) => {
+    if (!guild) return;
+    const guildSettings = await getGuildSettings(guild.id);
     if (!guildSettings) return;
     const verification = guildSettings.verification;
-    if (!message.guild || !message.member || !verification?.enabled || message.author.bot) return;
-    const channels = message.guild.channels.cache;
+    const channels = guild.channels.cache;
 
     if (!verification.verifyChannel || !verification.nonVerifiedRole) return;
 
-    const verifyChannel = message.guild.channels.cache.get(verification.verifyChannel);
-    const nonVerifiedRole = message.guild.roles.cache.get(verification.nonVerifiedRole);
-    const staffRole = message.guild.roles.cache.get(verification.staffRole);
-    const modVerifyChannel = message.guild.channels.cache.get(verification.modVerifyChannel);
+    const verifyChannel = guild.channels.cache.get(verification.verifyChannel);
+    const nonVerifiedRole = guild.roles.cache.get(verification.nonVerifiedRole);
+    const staffRole = guild.roles.cache.get(verification.staffRole);
+    const modVerifyChannel = guild.channels.cache.get(verification.modVerifyChannel);
     const nonVerifiedChannels = verification.nonVerifiedChannels;
 
     if (!verification.enabled || !verifyChannel || !nonVerifiedRole || !(verifyChannel instanceof TextChannel)) return;
@@ -35,8 +35,8 @@ const update = async (message: AMessage) => {
             .setDescription(verification.verifyMessage || `Type \`${guildSettings.general.prefix || config.defaultPrefix}verify\` to be verified.`)
             .setColor(config.accentColor)
             .setAuthor(
-                message.guild.name,
-                message.guild.iconURL({
+                guild.name,
+                guild.iconURL({
                     dynamic: true,
                     format: 'png'
                 }) || undefined
@@ -81,7 +81,7 @@ const update = async (message: AMessage) => {
         'Required for verification.'
     );
     verifyChannel.createOverwrite(
-        message.guild.roles.everyone,
+        guild.roles.everyone,
         {
             VIEW_CHANNEL: false
         },
@@ -100,7 +100,7 @@ const update = async (message: AMessage) => {
         'Required for Manual Verification.'
     );
     modVerifyChannel.createOverwrite(
-        message.guild.roles.everyone,
+        guild.roles.everyone,
         {
             VIEW_CHANNEL: false
         },
