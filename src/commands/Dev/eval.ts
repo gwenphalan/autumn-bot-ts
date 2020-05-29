@@ -13,6 +13,10 @@ const callback = async (message: AMessage, args: string[]) => {
         commands = client.commands,
         database = client.database,
         embed = MessageEmbed;
+    //@ts-ignore
+    const naia = true,
+        adorable = true,
+        ugly = false;
     /* 
         Do some voodoo magic to evaluate the input and send it to your channel
         This supports the await keyword
