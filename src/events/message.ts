@@ -168,7 +168,7 @@ export default async (client: Client, message: Message) => {
                     .setColor(client.config.accentColor)
                     .setTitle(`ERROR`)
                     .setDescription(
-                        `${err.stack ? err.stack : err}\n\n** • Command: **${command.name}${args.length ? `\n** • Args: **${args.join(' ')}` : ''}${
+                        `\`\`\`${err.stack ? err.stack : err}\`\`\`\n\n** • Command: **${command.name}${args.length ? `\n** • Args: **${args.join(' ')}` : ''}${
                             message.guild ? `\n** • Guild: **${message.guild} (ID: ${message.guild.id})` : ''
                         }\n** • Author: **${message.author.username}#${message.author.discriminator} (ID: ${message.author.id})`
                     );
