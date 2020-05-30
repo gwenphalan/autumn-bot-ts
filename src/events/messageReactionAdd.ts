@@ -6,7 +6,8 @@ import { drawCard } from '../util/canvas';
 import { toCamelCase, missingPermissions, nicerPermissions } from '../util';
 import { config } from '../../config';
 
-const verifyPerms: PermissionString[] = ['MANAGE_MESSAGES', 'MANAGE_ROLES', 'MANAGE_CHANNELS', 'ADD_REACTIONS'];
+const verifyBotPerms: PermissionString[] = ['MANAGE_MESSAGES', 'MANAGE_ROLES', 'MANAGE_CHANNELS', 'ADD_REACTIONS'];
+const verifyUserPerms: PermissionString[] = ['MANAGE_ROLES', 'MANAGE_CHANNELS'];
 
 export default async (client: Client, reaction: MessageReaction, user: User) => {
     if (user.bot) return;
@@ -77,15 +78,17 @@ export default async (client: Client, reaction: MessageReaction, user: User) => 
         const staffMember = await message.guild.members.fetch(user.id);
         if (!staffMember || !staffMember.roles.cache.has(staffRole.id)) return;
 
+        if (!staffMember.roles.cache.has(staffRole.id) && missingPermissions(message, verifyUserPerms)) return;
+
         const application = await getVerifyApp(message.guild.id, message.id);
         if (!application) return;
 
-        if (missingPermissions(message, verifyPerms, 'self'))
+        if (missingPermissions(message, verifyBotPerms, 'self'))
             return sendEmbed(
                 message,
                 'Commands',
                 'Oh No!',
-                `I require the following permissions to verify users: \`${missingPermissions(message, verifyPerms, 'self')!
+                `I require the following permissions to verify users: \`${missingPermissions(message, verifyBotPerms, 'self')!
                     .map((perm: PermissionString) => nicerPermissions(perm))
                     .join('`, `')}\``
             );
