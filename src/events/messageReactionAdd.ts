@@ -1,10 +1,12 @@
-import { Client } from '../interfaces/Client';
-import { MessageReaction, User, TextChannel, MessageEmbed, MessageAttachment } from 'discord.js';
+import { Client, sendEmbed } from '../interfaces/Client';
+import { MessageReaction, User, TextChannel, MessageEmbed, MessageAttachment, PermissionString } from 'discord.js';
 import { getVerifyApp, getReactionRole } from '../database';
 import { client as botClient } from '../index';
 import { drawCard } from '../util/canvas';
-import { toCamelCase } from '../util';
+import { toCamelCase, missingPermissions, nicerPermissions } from '../util';
 import { config } from '../../config';
+
+const verifyPerms: PermissionString[] = ['MANAGE_MESSAGES', 'MANAGE_ROLES', 'MANAGE_CHANNELS', 'ADD_REACTIONS'];
 
 export default async (client: Client, reaction: MessageReaction, user: User) => {
     if (user.bot) return;
@@ -77,6 +79,16 @@ export default async (client: Client, reaction: MessageReaction, user: User) => 
 
         const application = await getVerifyApp(message.guild.id, message.id);
         if (!application) return;
+
+        if (missingPermissions(message, verifyPerms, 'self'))
+            return sendEmbed(
+                message,
+                'Commands',
+                'Oh No!',
+                `I require the following permissions to verify users: \`${missingPermissions(message, verifyPerms, 'self')!
+                    .map((perm: PermissionString) => nicerPermissions(perm))
+                    .join('`, `')}\``
+            );
 
         const member = await message.guild.members.fetch(application.userId);
         try {
