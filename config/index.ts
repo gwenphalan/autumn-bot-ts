@@ -10,5 +10,5 @@ export interface Config {
     accentColor: string;
     backgroundImage: string;
     imgurID: string;
-    dblToken: string | undefined;
+    dblToken: string;
 }

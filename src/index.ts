@@ -35,20 +35,16 @@ export const updateActivity = async () => {
     });
 };
 
-export const dbl = config.dblToken ? new DBL(config.dblToken, client) : null;
+export const dbl = new DBL(config.dblToken, client);
 
 client.on('ready', () => {
-    console.log(config.dblToken);
-    console.log(config);
-    console.log(process.env.AUTUMN_DBL_TOKEN);
-
-    if (dbl) {
+    if (dbl && process.env.NODE_ENV !== 'development') {
         console.log('Posting Stats to DBL...');
         dbl.postStats(client.guilds.cache.size).then(() => console.log('Stats Posted To DBL'));
     }
 
     setInterval(() => {
-        if (dbl) {
+        if (dbl && process.env.NODE_ENV !== 'development') {
             console.log('Posting Stats to DBL...');
             dbl.postStats(client.guilds.cache.size).then(() => console.log('Stats Posted To DBL'));
         }
