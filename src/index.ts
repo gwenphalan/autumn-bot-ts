@@ -39,7 +39,8 @@ export const dbl = config.dblToken ? new DBL(config.dblToken, client) : null;
 
 client.on('ready', () => {
     console.log(config.dblToken);
-    console.log(dbl?.token);
+    console.log(config);
+    console.log(process.env.AUTUMN_DBL_TOKEN);
 
     if (dbl) {
         console.log('Posting Stats to DBL...');
