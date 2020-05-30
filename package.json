@@ -6,13 +6,13 @@
     "main": "dist/src/index.js",
     "scripts": {
         "owo": "pm2 start --name AutumnBaby npm -- run dev --watch --ignore-watch dist/*",
-        "prod": "npm run build && export NODE_ENV=production && node .",
-        "dev": "npm run build && export NODE_ENV=development && node .",
-        "production": "npm run build && export NODE_ENV=production && npm run start",
-        "test": "tsc -p tsconfig.test.json && npm run lint",
+        "prod": "yarn build && export NODE_ENV=production && node .",
+        "dev": "yarn build && export NODE_ENV=development && node .",
+        "production": "yarn build && export NODE_ENV=production && yarn start",
+        "test": "tsc -p tsconfig.test.json && yarn lint",
         "lint": "eslint ./src/**/*.ts --fix",
         "clean": "rm -rf dist/*",
-        "reinstall": "npm run cleanCache && npm run deleteModules && npm run deleteLock && npm run installModules",
+        "reinstall": "yarn cleanCache && yarn deleteModules && yarn deleteLock && yarn installModules",
         "build": "tsc",
         "start": "pm2 start --name AutumnBaby npm -- run prod",
         "cleanCache": "npm cache clean --force",
@@ -22,7 +22,7 @@
     },
     "husky": {
         "hooks": {
-            "pre-commit": "precise-commits && npm run lint"
+            "pre-commit": "precise-commits && yarn lint"
         }
     },
     "dependencies": {
