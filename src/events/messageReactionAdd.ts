@@ -79,90 +79,98 @@ export default async (client: Client, reaction: MessageReaction, user: User) => 
         if (!application) return;
 
         const member = await message.guild.members.fetch(application.userId);
+        try {
+            if (!member) {
+                message.edit(
+                    new MessageEmbed()
+                        .setColor('#ef4949')
+                        .setAuthor('Verification', botClient.user?.displayAvatarURL({ dynamic: true, format: 'png' }))
+                        .setDescription('Automatically Denied: User Left')
+                        .setTimestamp()
+                );
 
-        if (!member) {
-            message.edit(
-                new MessageEmbed()
-                    .setColor('#ef4949')
-                    .setAuthor('Verification', botClient.user?.displayAvatarURL({ dynamic: true, format: 'png' }))
-                    .setDescription('Automatically Denied: User Left')
-                    .setTimestamp()
-            );
-
-            return message.reactions.removeAll();
-        }
-
-        if (reaction.emoji.id === client.constants.emotes.yes) {
-            await message.edit(
-                new MessageEmbed()
-                    .setColor('#75F1BD')
-                    .setAuthor('Verification', botClient.user?.displayAvatarURL({ dynamic: true, format: 'png' }))
-                    .setTitle(member.user.tag)
-                    .setThumbnail(member.user.displayAvatarURL({ dynamic: true, format: 'png' }))
-                    .setFooter(`Accepted By ${user.username}#${user.discriminator}`, user.displayAvatarURL({ dynamic: true, format: 'png' }))
-                    .setDescription(application.messageContent)
-                    .setTimestamp()
-            );
-
-            if (guildSettings.general.memberRole) {
-                const memberRole = message.guild.roles.cache.get(guildSettings.general.memberRole);
-
-                if (memberRole) member.roles.add(memberRole);
+                return message.reactions.removeAll();
             }
 
-            await message.reactions.removeAll();
+            if (reaction.emoji.id === client.constants.emotes.yes) {
+                await message.edit(
+                    new MessageEmbed()
+                        .setColor('#75F1BD')
+                        .setAuthor('Verification', botClient.user?.displayAvatarURL({ dynamic: true, format: 'png' }))
+                        .setTitle(member.user.tag)
+                        .setThumbnail(member.user.displayAvatarURL({ dynamic: true, format: 'png' }))
+                        .setFooter(`Accepted By ${user.username}#${user.discriminator}`, user.displayAvatarURL({ dynamic: true, format: 'png' }))
+                        .setDescription(application.messageContent)
+                        .setTimestamp()
+                );
 
-            await member.roles.remove(nonVerifiedRole.id).catch(() => null);
+                if (guildSettings.general.memberRole) {
+                    const memberRole = message.guild.roles.cache.get(guildSettings.general.memberRole);
 
-            await verifyChannel.permissionOverwrites
-                .get(application.userId)
-                ?.delete()
-                .catch(() => null);
+                    if (memberRole) member.roles.add(memberRole);
+                }
 
-            member.send(
-                new MessageEmbed()
-                    .setColor('#75F1BD')
-                    .setTitle(`${message.guild.name} Verification`)
-                    .setDescription(verification.acceptMessage || "You've been verified!")
-            );
+                await message.reactions.removeAll();
 
-            const welcome = guildSettings.welcome;
+                await member.roles.remove(nonVerifiedRole.id).catch(() => null);
 
-            if (!welcome.enabled || !welcome.welcomeChannel) return;
+                await verifyChannel.permissionOverwrites
+                    .get(application.userId)
+                    ?.delete()
+                    .catch(() => null);
 
-            const welcomeChannel = message.guild.channels.cache.get(welcome.welcomeChannel);
-            if (!welcomeChannel || !(welcomeChannel instanceof TextChannel)) return;
+                member.send(
+                    new MessageEmbed()
+                        .setColor('#75F1BD')
+                        .setTitle(`${message.guild.name} Verification`)
+                        .setDescription(verification.acceptMessage || "You've been verified!")
+                );
 
-            const imageBuffer = await drawCard(message.guild, member);
+                const welcome = guildSettings.welcome;
 
-            const card = new MessageAttachment(imageBuffer, `${toCamelCase(member.displayName)}WelcomeCard.png`);
-            await welcomeChannel.send(card);
-            return welcomeChannel.send(member.toString()).then(msg => msg.delete({ timeout: 100 }));
-        } else if (reaction.emoji.id === client.constants.emotes.no) {
-            message.edit(
-                new MessageEmbed()
-                    .setColor('#DB6260')
-                    .setAuthor('Verification', botClient.user?.displayAvatarURL({ dynamic: true, format: 'png' }))
-                    .setTitle(member.user.tag)
-                    .setThumbnail(member.user.displayAvatarURL({ dynamic: true, format: 'png' }))
-                    .setFooter(`Denied By ${user.username}#${user.discriminator}`, user.displayAvatarURL({ dynamic: true, format: 'png' }))
-                    .setDescription(application.messageContent)
-                    .setTimestamp()
-            );
+                if (!welcome.enabled || !welcome.welcomeChannel) return;
 
-            message.reactions.removeAll();
+                const welcomeChannel = message.guild.channels.cache.get(welcome.welcomeChannel);
+                if (!welcomeChannel || !(welcomeChannel instanceof TextChannel)) return;
 
-            verifyChannel.permissionOverwrites
-                .get(application.userId)
-                ?.delete('User denied verification.')
-                .catch(() => null);
+                const imageBuffer = await drawCard(message.guild, member);
 
-            return member.send(
-                new MessageEmbed()
-                    .setColor('#DB6260')
-                    .setTitle(`${message.guild.name} Verification`)
-                    .setDescription(verification.verifyMessage || "You've been denied verification.\n\nContact staff to find out why.")
-            );
+                const card = new MessageAttachment(imageBuffer, `${toCamelCase(member.displayName)}WelcomeCard.png`);
+                await welcomeChannel.send(card);
+                return welcomeChannel.send(member.toString()).then(msg => msg.delete({ timeout: 100 }));
+            } else if (reaction.emoji.id === client.constants.emotes.no) {
+                message.edit(
+                    new MessageEmbed()
+                        .setColor('#DB6260')
+                        .setAuthor('Verification', botClient.user?.displayAvatarURL({ dynamic: true, format: 'png' }))
+                        .setTitle(member.user.tag)
+                        .setThumbnail(member.user.displayAvatarURL({ dynamic: true, format: 'png' }))
+                        .setFooter(`Denied By ${user.username}#${user.discriminator}`, user.displayAvatarURL({ dynamic: true, format: 'png' }))
+                        .setDescription(application.messageContent)
+                        .setTimestamp()
+                );
+
+                message.reactions.removeAll();
+
+                verifyChannel.permissionOverwrites
+                    .get(application.userId)
+                    ?.delete('User denied verification.')
+                    .catch(() => null);
+
+                return member.send(
+                    new MessageEmbed()
+                        .setColor('#DB6260')
+                        .setTitle(`${message.guild.name} Verification`)
+                        .setDescription(verification.verifyMessage || "You've been denied verification.\n\nContact staff to find out why.")
+                );
+            }
+        } catch (err) {
+            const oops = new MessageEmbed()
+                .setTimestamp()
+                .setColor(client.config.accentColor)
+                .setTitle(`Oops! Something went wrong!`)
+                .setDescription("Don't  worry, the developers have been notified and are getting to work on fixing the issue!");
+            message.channel.send(oops);
         }
         return;
     }
