@@ -39,7 +39,10 @@ export const dbl = config.dblToken ? new DBL(config.dblToken, client) : null;
 
 client.on('ready', () => {
     setInterval(() => {
-        dbl ? dbl.postStats(client.guilds.cache.size) : null;
+        if (dbl) {
+            console.log('Posting Stats to DBL...');
+            dbl.postStats(client.guilds.cache.size);
+        }
     }, 1800000);
 });
 
