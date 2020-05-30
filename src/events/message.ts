@@ -167,7 +167,11 @@ export default async (client: Client, message: Message) => {
                     .setTimestamp()
                     .setColor(client.config.accentColor)
                     .setTitle(`ERROR`)
-                    .setDescription(err.stack ? err.stack : err);
+                    .setDescription(
+                        `${err}\n\n • Command: ${command.name}${args.length ? `\n • Args: ${args.join(' ')}` : ''}${
+                            message.guild ? `\n • Guild: ${message.guild}` : ''
+                        }\n • Author: ${message.author}`
+                    );
                 const errorChannel = client.channels.cache.get(client.config.errorChannel);
                 if (!errorChannel || !(errorChannel instanceof TextChannel)) throw new Error('Provided error channel is unreachable or not a text channel.');
                 errorChannel.send(embed);
