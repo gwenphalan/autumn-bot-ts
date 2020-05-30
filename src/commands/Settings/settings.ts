@@ -515,6 +515,6 @@ export const command: Command = {
     guildOnly: true,
     NSFW: false,
     userPermissions: ['MANAGE_GUILD'],
-    botPermissions: ['MANAGE_MESSAGES', 'VIEW_CHANNEL', 'SEND_MESSAGES', 'MANAGE_ROLES'],
+    botPermissions: ['MANAGE_MESSAGES', 'VIEW_CHANNEL', 'SEND_MESSAGES', 'MANAGE_ROLES', 'MANAGE_CHANNELS', 'MANAGE_ROLES'],
     callback: callback
 };
