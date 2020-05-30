@@ -38,10 +38,15 @@ export const updateActivity = async () => {
 export const dbl = config.dblToken ? new DBL(config.dblToken, client) : null;
 
 client.on('ready', () => {
+    if (dbl) {
+        console.log('Posting Stats to DBL...');
+        dbl.postStats(client.guilds.cache.size).then(() => console.log('Stats Posted To DBL'));
+    }
+
     setInterval(() => {
         if (dbl) {
             console.log('Posting Stats to DBL...');
-            dbl.postStats(client.guilds.cache.size);
+            dbl.postStats(client.guilds.cache.size).then(() => console.log('Stats Posted To DBL'));
         }
     }, 1800000);
 });
