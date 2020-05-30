@@ -6,15 +6,12 @@ const callback = async (message: AMessage, args: string[]) => {
     const member = await getMember(message, args, 0);
 
     const hasVoted = member ? await dbl.hasVoted(member.id) : dbl.hasVoted(message.author.id);
-    const votes = await dbl.getVotes();
-
-    console.log(votes);
 
     message.client.sendEmbed(
         message,
         'Vote',
         `${hasVoted ? (member ? `${member.user.username} has` : "You've") : member ? `${member.user.username} hasn't` : "haven't"} voted today!`,
-        `• Total Votes: ${votes.length}\n\nSupport Autumn Bot by voting [here](https://top.gg/bot/672548437346222110/vote)!`
+        `\n\nSupport Autumn Bot by voting [here](https://top.gg/bot/672548437346222110/vote)!`
     );
 };
 
