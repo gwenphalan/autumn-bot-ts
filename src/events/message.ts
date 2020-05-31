@@ -178,7 +178,9 @@ export default async (client: Client, message: Message) => {
                 .setTimestamp()
                 .setColor(client.config.accentColor)
                 .setTitle(`Oops! Something went wrong!`)
-                .setDescription("Don't  worry, the developers have been notified and are getting to work on fixing the issue!");
+                .setDescription(
+                    "Don't  worry, the developers have been notified and are getting to work on fixing the issue!\n\nIn the meantime, please join the [Autumn Bot Support Server](https://discord.gg/DfByvyN)."
+                );
             message.channel.send(oops);
             console.error(err);
             if (err) {
