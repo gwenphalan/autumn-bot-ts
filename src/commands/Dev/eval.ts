@@ -16,7 +16,10 @@ const callback = async (message: AMessage, args: string[]) => {
     //@ts-ignore
     const naia = true,
         adorable = true,
-        ugly = false;
+        ugly = false,
+        gwen = false,
+        cute = true,
+        attractive = true;
     /* 
         Do some voodoo magic to evaluate the input and send it to your channel
         This supports the await keyword
