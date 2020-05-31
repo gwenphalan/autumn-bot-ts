@@ -1,8 +1,9 @@
 import { Command, AMessage } from '../../interfaces/Client';
-import { MessageAttachment } from 'discord.js';
+import { MessageEmbed } from 'discord.js';
+import { config } from '../../../config';
 
 const callback = async (message: AMessage, _args: string[]) => {
-    message.channel.send(new MessageAttachment('https://i.imgur.com/MN2q244.gif'));
+    message.channel.send(new MessageEmbed().setImage('https://i.imgur.com/MN2q244.gif').setColor(config.accentColor));
 };
 
 export const command: Command = {
