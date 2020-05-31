@@ -35,7 +35,7 @@ const callback = async (message: AMessage, args: string[]) => {
 
     const time = guildSettings.moderation.warnExpire || 2592000000;
 
-    const reason = args.slice(2).join(' ');
+    const reason = args.slice(1).join(' ');
 
     const infraction = await createInfraction(message, member.user.id, 'warn', reason || 'No Reason Provided', time);
 
