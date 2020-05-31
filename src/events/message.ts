@@ -133,6 +133,9 @@ export default async (client: Client, message: Message) => {
         '<:PogXD:716762012134146108>'
     ];
 
+    if (message.content.toLowerCase().includes('pog') && message.content.toLowerCase().includes('kek') && (!prefix || !message.content.startsWith(prefix)))
+        return message.channel.send(kek[Math.floor(Math.random() * kek.length)] + '\n' + pog[Math.floor(Math.random() * pog.length)]);
+
     if (message.content.toLowerCase().includes('kek') && (!prefix || !message.content.startsWith(prefix)))
         return message.channel.send(kek[Math.floor(Math.random() * kek.length)]);
 
