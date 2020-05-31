@@ -14,7 +14,7 @@ const callback = async (message: AMessage, _args: string[]) => {
         .setColor(message.client.config.accentColor)
         .setTitle('Autumn Bot Stats')
         .setDescription(
-            `• Uptime: ${uptime}\n• Guilds: ${guilds}\n• Channels: ${channels}\n • Users: ${users}\n\n• Invite: http://autm.fr/autumnbot\n\n• Support Server: http://autm.fr/autumnbotsupport`
+            `**• Uptime: **${uptime}\n**• Guilds: **${guilds}\n**• Channels: **${channels}\n** • Users: **${users}\n\n**• Invite: **http://autm.fr/autumnbot\n\n**• Support Server: **http://autm.fr/autumnbotsupport`
         );
 
     message.channel.send(embed);
