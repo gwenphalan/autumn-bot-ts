@@ -104,7 +104,7 @@ const callback = async (message: AMessage, _args: string[]): Promise<void | Mess
     if (pollType.index === 0) {
         GUI.delete().catch(() => null);
 
-        const msg = await message.client.sendEmbed(message, 'Polls', question, undefined);
+        const msg = await message.client.sendEmbed(message, 'Polls', question, undefined, undefined, undefined, undefined, undefined, true);
 
         await msg.react(message.client.constants.emotes.upvote);
         await msg.react(message.client.constants.emotes.downvote);
@@ -140,7 +140,7 @@ const callback = async (message: AMessage, _args: string[]): Promise<void | Mess
         optsStrings.push(`${num} - ${options[i]}`);
     }
 
-    const msg = await message.client.sendEmbed(message, 'Polls', question, optsStrings.join('\n\n'));
+    const msg = await message.client.sendEmbed(message, 'Polls', question, optsStrings.join('\n\n'), undefined, undefined, undefined, undefined, true);
 
     const e1: string[] = [];
 
