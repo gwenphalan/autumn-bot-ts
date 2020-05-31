@@ -18,14 +18,7 @@ const callback = async (message: AMessage, args: string[]) => {
 
     const result = await neko.sfw.poke();
 
-    message.channel.send(
-        new MessageEmbed()
-            .setDescription(`*${message.author} pokes ${member}*`)
-            .setColor(color)
-            .setImage(result.url)
-            .setAuthor(message.author.username, message.author.displayAvatarURL({ dynamic: true, format: 'png' }))
-            .setTimestamp()
-    );
+    message.channel.send(new MessageEmbed().setDescription(`*${message.author} pokes ${member}*`).setColor(color).setImage(result.url).setTimestamp());
 };
 
 export const command: Command = {

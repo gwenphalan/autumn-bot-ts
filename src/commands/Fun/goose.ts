@@ -11,14 +11,7 @@ const callback = async (message: AMessage, _args: string[]) => {
 
     const result = await neko.sfw.goose();
 
-    message.channel.send(
-        new MessageEmbed()
-            .setDescription(`Goose.`)
-            .setColor(color)
-            .setImage(result.url)
-            .setAuthor(message.author.username, message.author.displayAvatarURL({ dynamic: true, format: 'png' }))
-            .setTimestamp()
-    );
+    message.channel.send(new MessageEmbed().setDescription(`Goose.`).setColor(color).setImage(result.url).setTimestamp());
 };
 
 export const command: Command = {
