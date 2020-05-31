@@ -1,4 +1,7 @@
+import { words } from './words';
+
 export default {
+    words: words,
     emotes: {
         yes: '709981119721766955',
         no: '709981096066023444',

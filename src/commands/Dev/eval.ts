@@ -1,6 +1,6 @@
 import { uploadHaste } from '../../util/hastebin';
 import { Command, Client, AMessage } from '../../interfaces/Client';
-import { MessageEmbed } from 'discord.js';
+import { MessageEmbed, Permissions } from 'discord.js';
 
 const callback = async (message: AMessage, args: string[]) => {
     // Define a bunch of shortcuts which will be usable in your eval code
@@ -13,13 +13,15 @@ const callback = async (message: AMessage, args: string[]) => {
         commands = client.commands,
         database = client.database,
         embed = MessageEmbed;
+
     //@ts-ignore
     const naia = true,
         adorable = true,
         ugly = false,
         gwen = false,
         cute = true,
-        attractive = true;
+        attractive = true,
+        perms = Permissions;
     /* 
         Do some voodoo magic to evaluate the input and send it to your channel
         This supports the await keyword
