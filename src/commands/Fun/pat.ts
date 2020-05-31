@@ -18,7 +18,9 @@ const callback = async (message: AMessage, args: string[]) => {
 
     const result = await neko.sfw.pat();
 
-    message.channel.send(new MessageEmbed().setDescription(`*${message.author} pats ${member}*`).setColor(color).setImage(result.url).setTimestamp());
+    message.channel.send(
+        new MessageEmbed().setDescription(`*${message.member?.displayName} pats ${member.displayName}*`).setColor(color).setImage(result.url).setTimestamp()
+    );
 };
 
 export const command: Command = {

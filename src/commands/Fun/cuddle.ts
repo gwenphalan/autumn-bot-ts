@@ -18,7 +18,9 @@ const callback = async (message: AMessage, args: string[]) => {
 
     const result = await neko.sfw.cuddle();
 
-    message.channel.send(new MessageEmbed().setDescription(`*${message.author} cuddles ${member}*`).setColor(color).setImage(result.url).setTimestamp());
+    message.channel.send(
+        new MessageEmbed().setDescription(`*${message.member?.displayName} cuddles ${member.displayName}*`).setColor(color).setImage(result.url).setTimestamp()
+    );
 };
 
 export const command: Command = {
