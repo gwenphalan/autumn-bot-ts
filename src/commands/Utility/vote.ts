@@ -5,7 +5,7 @@ import { getMember } from '../../util';
 const callback = async (message: AMessage, args: string[]) => {
     const member = await getMember(message, args, 0);
 
-    const hasVoted = member ? await dbl.hasVoted(member.id) : dbl.hasVoted(message.author.id);
+    const hasVoted = member ? await dbl.hasVoted(member.id) : await dbl.hasVoted(message.author.id);
 
     message.client.sendEmbed(
         message,
