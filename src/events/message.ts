@@ -121,7 +121,22 @@ export default async (client: Client, message: Message) => {
         '<a:3KEKW:716736961339064390>'
     ];
 
+    const pog = [
+        '<:PogWeird:716762015116558368>',
+        '<:PogW:716762009051594752>',
+        '<:PogDuck:716762007830921237>',
+        '<:Pog1:716762013023338516>',
+        '<:PogOmega:716762006199468143>',
+        '<:PogE:716762013690363965>',
+        '<:PogUUU:716762011001684010>',
+        '<:Pog:716762007189323887>',
+        '<:PogXD:716762012134146108>'
+    ];
+
     if (message.content.toLowerCase().includes('kek') && (!prefix || !message.content.startsWith(prefix)))
+        return message.channel.send(kek[Math.floor(Math.random() * kek.length)]);
+
+    if (message.content.toLowerCase().includes('pog') && (!prefix || !message.content.startsWith(prefix)))
         return message.channel.send(kek[Math.floor(Math.random() * kek.length)]);
 
     if (!prefix || !message.content.startsWith(prefix)) return;
