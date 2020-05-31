@@ -22,6 +22,10 @@ export default async (client: Client, message: Message) => {
 
     const verification = guildSettings?.verification;
 
+    const kek = ['<:kekwHands:716365354917429359>', '<:sadkek:716365351436288011>', '<:KEKW:716365353852207174>', '<:kekjpg:716365352262696991>'];
+
+    if (message.content === 'kek') return message.channel.send(kek[Math.floor(Math.random() * 4)]);
+
     // Verification Module
     if (guildSettings && guildSettings.verification.enabled) {
         if (!message.guild || !message.member || !verification?.enabled || message.author.bot) return;
