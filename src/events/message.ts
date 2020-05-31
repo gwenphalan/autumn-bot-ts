@@ -137,7 +137,7 @@ export default async (client: Client, message: Message) => {
         return message.channel.send(kek[Math.floor(Math.random() * kek.length)]);
 
     if (message.content.toLowerCase().includes('pog') && (!prefix || !message.content.startsWith(prefix)))
-        return message.channel.send(kek[Math.floor(Math.random() * kek.length)]);
+        return message.channel.send(pog[Math.floor(Math.random() * pog.length)]);
 
     if (!prefix || !message.content.startsWith(prefix)) return;
     if (!message.content.replace(prefix, '').length && pingRegex.test(prefix))
