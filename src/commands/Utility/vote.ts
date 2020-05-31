@@ -10,7 +10,7 @@ const callback = async (message: AMessage, args: string[]) => {
     message.client.sendEmbed(
         message,
         'Vote',
-        `${hasVoted ? (member ? `${member.user.username} has` : "You've") : member ? `${member.user.username} hasn't` : "haven't"} voted today!`,
+        `${hasVoted ? (member ? `${member.user.username} has` : "You've") : member ? `${member.user.username} hasn't` : "You haven't"} voted today!`,
         `\n\nSupport Autumn Bot by voting [here](https://top.gg/bot/672548437346222110/vote)!`
     );
 };
