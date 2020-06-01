@@ -31,7 +31,10 @@ export const database = {
 
 // Helper function to get a guild's settings
 export const getGuildSettings = async (guildId: string) => {
-    return (await GuildSettings.findOne({ guild: guildId })) || (await GuildSettings.create({ guild: guildId }));
+    return (
+        (await GuildSettings.findOne({ guild: guildId })) ||
+        (await GuildSettings.create({ guild: guildId, moderation: { enabled: false }, verification: { enabled: false }, welcome: { enabled: false } }))
+    );
 };
 
 export const updateGuildSettings = async (guildId: string, settings: GuildSettings) => {
