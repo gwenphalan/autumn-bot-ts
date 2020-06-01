@@ -5,6 +5,7 @@ import { client as botClient } from '../index';
 import { drawCard } from '../util/canvas';
 import { toCamelCase, missingPermissions, nicerPermissions } from '../util';
 import { config } from '../../config';
+import { VerifyApp } from '../database/schemas/VerifyApp';
 
 const verifyBotPerms: PermissionString[] = ['MANAGE_MESSAGES', 'MANAGE_ROLES', 'MANAGE_CHANNELS', 'ADD_REACTIONS'];
 const verifyUserPerms: PermissionString[] = ['MANAGE_ROLES', 'MANAGE_CHANNELS'];
@@ -82,6 +83,8 @@ export default async (client: Client, reaction: MessageReaction, user: User) => 
 
         const application = await getVerifyApp(message.guild.id, message.id);
         if (!application) return;
+
+        await VerifyApp.deleteOne({ guild: message.guild.id, messageId: message.id });
 
         if (missingPermissions(message, verifyBotPerms, 'self'))
             return sendEmbed(
