@@ -18,6 +18,7 @@ import { getGuildSettings } from '../database';
 import { valueType } from '../interfaces/SettingsGroup';
 import constants from '../constants/constants';
 import { parseType } from '../commands/Settings/settings/util/index';
+import { PromptManager } from '../helpers/PromptManager';
 
 // Our custom client adding new properties to the Discord Client
 export class Client extends DClient {
@@ -33,6 +34,7 @@ export class Client extends DClient {
     editEmbed = editEmbed;
     getEmoji = getEmoji;
     settings = getGuildSettings;
+    PromptManager = PromptManager;
 }
 
 export interface Command {
