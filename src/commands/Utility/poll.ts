@@ -164,6 +164,6 @@ export const command: Command = {
     guildOnly: false,
     NSFW: false,
     userPermissions: ['MANAGE_MESSAGES', 'ADD_REACTIONS'],
-    botPermissions: ['ADD_REACTIONS', 'SEND_MESSAGES', 'EMBED_LINKS'],
+    botPermissions: ['ADD_REACTIONS', 'SEND_MESSAGES', 'EMBED_LINKS', 'MANAGE_MESSAGES', 'ADD_REACTIONS'],
     callback: callback
 };

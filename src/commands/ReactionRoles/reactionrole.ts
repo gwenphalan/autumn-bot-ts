@@ -83,6 +83,6 @@ export const command: Command = {
     guildOnly: true,
     NSFW: false,
     userPermissions: ['MANAGE_ROLES'],
-    botPermissions: ['MANAGE_ROLES', 'ADD_REACTIONS'],
+    botPermissions: ['MANAGE_ROLES', 'ADD_REACTIONS', 'EMBED_LINKS'],
     callback: callback
 };

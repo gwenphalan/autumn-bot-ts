@@ -240,6 +240,6 @@ export const command: Command = {
     guildOnly: true,
     NSFW: false,
     userPermissions: [],
-    botPermissions: ['SEND_MESSAGES'],
+    botPermissions: ['SEND_MESSAGES', 'MANAGE_MESSAGES', 'ADD_REACTIONS', 'USE_EXTERNAL_EMOJIS', 'EMBED_LINKS'],
     callback: callback
 };

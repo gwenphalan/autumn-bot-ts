@@ -94,10 +94,8 @@ export const server = net.createServer(socket => {
     socket.on('data', async data => {
         const a = await updateGuild(data);
 
-        if (a === 'Success') {
-            socket.write('Success');
-            socket.pipe(socket);
-        }
+        socket.write(JSON.stringify(a));
+        socket.pipe(socket);
     });
 });
 

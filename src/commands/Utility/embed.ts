@@ -483,6 +483,6 @@ export const command: Command = {
     guildOnly: true,
     NSFW: false,
     userPermissions: ['MANAGE_MESSAGES'],
-    botPermissions: ['EMBED_LINKS'],
+    botPermissions: ['EMBED_LINKS', 'MANAGE_MESSAGES', 'ADD_REACTIONS'],
     callback: callback
 };

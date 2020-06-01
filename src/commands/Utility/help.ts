@@ -74,6 +74,6 @@ export const command: Command = {
     guildOnly: false,
     NSFW: false,
     userPermissions: [],
-    botPermissions: [],
+    botPermissions: ['EMBED_LINKS'],
     callback: callback
 };
