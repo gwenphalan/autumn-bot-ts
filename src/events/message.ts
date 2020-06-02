@@ -191,7 +191,7 @@ export default async (client: Client, message: Message) => {
         .callback(message, args, prompt)
         .then(async () => {
             const updatedSettings = message.guild ? await client.database.guildSettings.findOne({ guild: message.guild.id }) : null;
-            if (updatedSettings && updatedSettings.general.deleteCommands) message.delete({ timeout: 10 }).catch(() => null);
+            if (updatedSettings && updatedSettings.general.deleteCommands) await message.delete({ timeout: 10 }).catch(() => null);
             prompt.delete();
         })
         .catch(err => {

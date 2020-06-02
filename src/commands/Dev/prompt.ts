@@ -57,7 +57,7 @@ export const command: Command = {
     description: 'Gives a series of sample prompts',
     usage: '',
     requiresArgs: 0,
-    devOnly: false,
+    devOnly: true,
     guildOnly: true,
     NSFW: false,
     userPermissions: [],
