@@ -5,7 +5,7 @@ import { TextChannel, MessageEmbed } from 'discord.js';
 import { client } from '../..';
 import prettyMs from 'pretty-ms';
 import timestring from 'timestring';
-import { PromptManager } from '../../helpers/PromptManager';
+import { PromptManager } from '../../interfaces/helpers/PromptManager';
 
 const callback = async (message: AMessage, args: string[], prompt: PromptManager) => {
     if (!message.guild || !message.member) return;

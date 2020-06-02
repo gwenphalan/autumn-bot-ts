@@ -5,7 +5,7 @@ import { client } from '../index';
 import { replace } from '../util';
 import { getGuildSettings } from '../database';
 import constants from '../constants/constants';
-import { PromptManager } from '../helpers/PromptManager';
+import { PromptManager } from './helpers/PromptManager';
 
 // Our custom client adding new properties to the Discord Client
 export class Client extends DClient {

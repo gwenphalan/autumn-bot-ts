@@ -1,6 +1,6 @@
 import { AMessage } from '../../../../interfaces/Client';
 import { valueType } from '../../../../interfaces/SettingsGroup';
-import { PromptManager } from '../../../../helpers/PromptManager';
+import { PromptManager } from '../../../../interfaces/helpers/PromptManager';
 
 export const sendSetting = async (message: AMessage, setting: string, valueType: valueType, prompt: PromptManager, array?: boolean) => {
     if (valueType === 'boolean')

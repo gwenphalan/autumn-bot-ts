@@ -1,7 +1,7 @@
 import color from 'tinycolor2';
-import { AMessage } from '../interfaces/Client';
+import { AMessage } from '../Client';
 import Canvas from 'canvas';
-import { uploadImgur } from '../util/imgur';
+import { uploadImgur } from '../../util/imgur';
 import { PromptManager } from './PromptManager';
 import { GuildMember, Guild, TextChannel, NewsChannel, GuildChannel, Role, VoiceChannel, CategoryChannel, User } from 'discord.js';
 import timestring from 'timestring';

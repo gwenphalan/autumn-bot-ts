@@ -1,7 +1,7 @@
 import { Command, AMessage } from '../../interfaces/Client';
 import { MessageAttachment } from 'discord.js';
 import { drawCard, drawExampleCard } from '../../util/canvas';
-import { PromptManager } from '../../helpers/PromptManager';
+import { PromptManager } from '../../interfaces/helpers/PromptManager';
 
 const callback = async (message: AMessage, args: string[], prompt: PromptManager) => {
     if (!message.guild || !message.member) return;

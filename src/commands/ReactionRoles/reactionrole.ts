@@ -1,7 +1,7 @@
 import { Command, AMessage } from '../../interfaces/Client';
 import constants from '../../constants/constants';
 import { createReactionRole } from '../../database';
-import { PromptManager } from '../../helpers/PromptManager';
+import { PromptManager } from '../../interfaces/helpers/PromptManager';
 //import { createReactionRole } from '../../database';
 
 const callback = async (message: AMessage, _args: string[], prompt: PromptManager) => {

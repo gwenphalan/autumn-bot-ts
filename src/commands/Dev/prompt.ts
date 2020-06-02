@@ -1,5 +1,5 @@
 import { Command, AMessage } from '../../interfaces/Client';
-import { PromptManager } from '../../helpers/PromptManager';
+import { PromptManager } from '../../interfaces/helpers/PromptManager';
 
 const callback = async (message: AMessage, _args: string[], prompt: PromptManager) => {
     const string = await prompt.string(`String`);

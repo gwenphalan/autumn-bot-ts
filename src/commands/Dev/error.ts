@@ -1,6 +1,6 @@
 import { Message } from 'discord.js';
 import { Command } from '../../interfaces/Client';
-import { PromptManager } from '../../helpers/PromptManager';
+import { PromptManager } from '../../interfaces/helpers/PromptManager';
 
 const callback = async (_message: Message, args: string[], _prompt: PromptManager) => {
     const error = args.join(' ');

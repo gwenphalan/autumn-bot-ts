@@ -1,4 +1,4 @@
-import { AMessage, Client } from '../interfaces/Client';
+import { AMessage, Client } from '../Client';
 import {
     TextChannel,
     DMChannel,

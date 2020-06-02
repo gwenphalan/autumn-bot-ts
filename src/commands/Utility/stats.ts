@@ -2,7 +2,7 @@ import { Command, AMessage } from '../../interfaces/Client';
 import prettyMs from 'pretty-ms';
 // import { dbl } from '../..';
 import { MessageEmbed } from 'discord.js';
-import { PromptManager } from '../../helpers/PromptManager';
+import { PromptManager } from '../../interfaces/helpers/PromptManager';
 
 const callback = async (message: AMessage, _args: string[], _prompt: PromptManager) => {
     const uptime = prettyMs(process.uptime() * 1000);

@@ -5,7 +5,7 @@ import { getGuildSettings, updateGuildSettings } from '../../database/index';
 import Canvas from 'canvas';
 import { labelImage, drawExampleCard } from '../../util/canvas';
 import { parseType, sendSetting } from './settings/util';
-import { PromptManager } from '../../helpers/PromptManager';
+import { PromptManager } from '../../interfaces/helpers/PromptManager';
 
 const callback = async (message: AMessage, args: string[], prompt: PromptManager) => {
     // Declare arguments as variables
@@ -437,15 +437,15 @@ const callback = async (message: AMessage, args: string[], prompt: PromptManager
         switch (arg3) {
             case 'set':
                 if (setting.valueType === 'image') responseArray.push(`Set **${setting.name}**`);
-                if (setting.valueType !== 'image') responseArray.push(`Set **${setting.name}** to **${response.toString()}**`);
+                if (setting.valueType !== 'image') responseArray.push(`Set **${setting.name}** to **${response}**`);
                 break;
             case 'add':
                 if (setting.valueType === 'image') responseArray.push(`Added to **${setting.name}**`);
-                if (setting.valueType !== 'image') responseArray.push(`Added **${response.toString()}** to **${setting.name}**`);
+                if (setting.valueType !== 'image') responseArray.push(`Added **${response}** to **${setting.name}**`);
                 break;
             case 'remove':
                 if (setting.valueType === 'image') responseArray.push(`Removed from **${setting.name}**`);
-                if (setting.valueType !== 'image') responseArray.push(`Removed **${response.toString()}** from **${setting.name}**`);
+                if (setting.valueType !== 'image') responseArray.push(`Removed **${response}** from **${setting.name}**`);
                 break;
             default:
                 break;

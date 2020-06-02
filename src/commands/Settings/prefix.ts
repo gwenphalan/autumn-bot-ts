@@ -1,6 +1,6 @@
 import { Command, AMessage } from '../../interfaces/Client';
 import { getGuildSettings } from '../../database';
-import { PromptManager } from '../../helpers/PromptManager';
+import { PromptManager } from '../../interfaces/helpers/PromptManager';
 
 const callback = async (message: AMessage, args: string[], _prompt: PromptManager) => {
     if (!message.guild) return;

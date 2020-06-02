@@ -1,7 +1,7 @@
 import { Command, AMessage } from '../../interfaces/Client';
 import { getUserProfile, createUserProfile, updateUserProfile, getGuildSettings, profileProperty } from '../../database';
 import { client } from '../../index';
-import { PromptManager } from '../../helpers/PromptManager';
+import { PromptManager } from '../../interfaces/helpers/PromptManager';
 
 //* Command Code
 

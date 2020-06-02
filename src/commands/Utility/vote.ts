@@ -1,6 +1,6 @@
 import { Command, AMessage } from '../../interfaces/Client';
 import { dbl } from '../../';
-import { PromptManager } from '../../helpers/PromptManager';
+import { PromptManager } from '../../interfaces/helpers/PromptManager';
 import { GuildMember } from 'discord.js';
 
 const callback = async (message: AMessage, args: string[], prompt: PromptManager) => {

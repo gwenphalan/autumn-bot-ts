@@ -124,27 +124,3 @@ export const fetchNorris = async () => {
     });
     return result;
 };
-export type format = 'string' | 'hexColor' | 'number' | 'url' | 'imageUrl';
-
-export const linkRegex = /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/gi;
-
-export const parseType = (type: format, str: string) => {
-    switch (type) {
-        case 'number':
-            const number = str.match(/\d+/);
-            return number ? number[0] : null;
-        case 'hexColor':
-            const hexColor = str.match(/#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})/);
-            return hexColor ? hexColor[0] : null;
-        case 'imageUrl':
-            const imageUrl = str.match(/https?\:\/\/.*\..*.(gif|png|web(p|m)|jpe?g)/gi);
-            return imageUrl ? imageUrl[0] : null;
-        case 'string':
-            return str || null;
-        case 'url':
-            const url = str.match(linkRegex);
-            return url ? url[0] : null;
-        default:
-            return null;
-    }
-};
