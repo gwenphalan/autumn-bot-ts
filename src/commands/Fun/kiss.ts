@@ -1,10 +1,10 @@
 import { Command, AMessage } from '../../interfaces/Client';
 import { neko } from '../../neko/';
-import { getMember } from '../../util';
 import { MessageEmbed } from 'discord.js';
 import Color from 'color';
+import { PromptManager } from '../../helpers/PromptManager';
 
-const callback = async (message: AMessage, args: string[]) => {
+const callback = async (message: AMessage, args: string[], prompt: PromptManager) => {
     if (!message.guild) return;
 
     const hue = Math.floor(Math.random() * 360);
@@ -12,8 +12,7 @@ const callback = async (message: AMessage, args: string[]) => {
 
     const color = Color(pastel).hex();
 
-    const member = await getMember(message, args, 0);
-
+    const member = await prompt.parse.member(message.guild, args.join(' '));
     if (!member) return;
 
     const result = await neko.sfw.kiss();
@@ -26,6 +25,7 @@ const callback = async (message: AMessage, args: string[]) => {
 export const command: Command = {
     name: 'kiss',
     category: 'Fun',
+    module: 'Fun',
     aliases: [],
     description: 'Kisses the targeted user.',
     usage: '<user>',

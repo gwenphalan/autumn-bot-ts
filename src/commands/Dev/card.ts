@@ -1,25 +1,11 @@
 import { Command, AMessage } from '../../interfaces/Client';
 import { MessageAttachment } from 'discord.js';
-import { getMember } from '../../util';
-//import { style1 } from '../../util/autumnforest';
 import { drawCard, drawExampleCard } from '../../util/canvas';
+import { PromptManager } from '../../helpers/PromptManager';
 
-const callback = async (message: AMessage, args: string[]) => {
-    /*if (!message.guild || !message.member) return;
-    const a = await getMember(message, args);
-
-    const member = a ? a : null;
-
-    const buffer = member
-        ? await style1(message.guild.name, member.displayName, member.user.displayAvatarURL({ dynamic: false, format: 'png' }))
-        : await style1();
-
-    const attachment = new MessageAttachment(buffer, `${member ? member.id : 'example'}_welcome.png`);
-
-    message.channel.send(attachment);*/
-
+const callback = async (message: AMessage, args: string[], prompt: PromptManager) => {
     if (!message.guild || !message.member) return;
-    const a = await getMember(message, args);
+    const a = await prompt.parse.member(message.guild, args.join(' '));
 
     const member = a ? a : null;
 
@@ -33,6 +19,7 @@ const callback = async (message: AMessage, args: string[]) => {
 export const command: Command = {
     name: 'card',
     category: 'Dev',
+    module: 'Dev',
     aliases: ['c'],
     description: 'Sends an example welcome card.',
     usage: '',

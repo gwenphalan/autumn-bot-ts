@@ -77,25 +77,7 @@ export type profileProperty = 'color' | 'pronouns' | 'gender' | 'age' | 'biograp
 export const updateUserProfile = async (userId: string, property: profileProperty, value: string) => {
     const entry = await UserProfile.findOne({ userID: userId });
     if (!entry) return;
-    switch (property) {
-        case 'color':
-            entry.color = value;
-            break;
-        case 'pronouns':
-            entry.pronouns = value;
-            break;
-        case 'gender':
-            entry.gender = value;
-            break;
-        case 'age':
-            entry.age = value;
-            break;
-        case 'biography':
-            entry.biography = value;
-            break;
-        default:
-            break;
-    }
+    entry[property] = value !== 'none' ? value : undefined;
     entry.save();
 };
 

@@ -1,12 +1,13 @@
 import { Command, AMessage } from '../../interfaces/Client';
 import { getGuildSettings, createInfraction, updateGuildSettings } from '../../database';
-import { getMember, createMutedRole } from '../../util';
+import { createMutedRole } from '../../util';
 import { TextChannel, MessageEmbed } from 'discord.js';
 import { client } from '../..';
 import prettyMs from 'pretty-ms';
 import timestring from 'timestring';
+import { PromptManager } from '../../helpers/PromptManager';
 
-const callback = async (message: AMessage, args: string[]) => {
+const callback = async (message: AMessage, args: string[], prompt: PromptManager) => {
     if (!message.guild || !message.member) return;
 
     const guildSettings = message.guild?.id ? await getGuildSettings(message.guild.id) : null;
@@ -29,7 +30,7 @@ const callback = async (message: AMessage, args: string[]) => {
 
     if (!arg2) return message.client.sendEmbed(message, 'Moderation', 'Missing Arguments: `Time`', 'Command Usage:\n`{prefix}mute <User> <Time> [Reason]');
 
-    const member = await getMember(message, args, 0);
+    const member = await prompt.parse.member(message.guild, args[0]);
 
     if (!member) return message.client.sendEmbed(message, 'Moderation', 'Uh Oh!', `I couldn't find the user ${arg1}!`);
 
@@ -105,6 +106,7 @@ const callback = async (message: AMessage, args: string[]) => {
 export const command: Command = {
     name: 'tempmute',
     category: 'Moderation',
+    module: 'Moderation',
     aliases: [],
     description: 'Mutes the specified user from the server.',
     usage: '<User> <Time> [Reason]',

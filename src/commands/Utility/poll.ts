@@ -1,9 +1,10 @@
-import { Command, AMessage, Question } from '../../interfaces/Client';
+import { Command, AMessage } from '../../interfaces/Client';
 import { Message } from 'discord.js';
+import { PromptManager } from '../../helpers/PromptManager';
 
 //const numEmojis = ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣'];
 
-const callback = async (message: AMessage, _args: string[]): Promise<void | Message> => {
+const callback = async (message: AMessage, _args: string[], prompt: PromptManager): Promise<void | Message> => {
     const e = message.client.constants.emotes;
 
     const letEmojis = [
@@ -64,89 +65,45 @@ const callback = async (message: AMessage, _args: string[]): Promise<void | Mess
         e.letterTealZ
     ];
 
-    const GUI = await message.channel.send(`<a:loading:${message.client.constants.emotes.aLoading}>`);
+    const pollType = await prompt.options('What kind of poll would you like to make?', ['Yes / No', 'Multiple Options']);
+    if (!pollType) return;
 
-    const pollType = await message.client.sendOptions(GUI, message, 'What kind of poll would you like to make?', ['yes / no', 'multiple options']);
+    const question = await prompt.string('What topic/question would you like to poll?');
 
-    if (pollType.canceled) {
-        message.client.editEmbed(GUI, 'Polls', 'Poll Canceled');
-        await GUI.delete({
-            timeout: 5000
-        }).catch(() => null);
-        return message;
-    }
-
-    const questions: Question[] = [{ question: 'What topic/question would you like to poll?', type: 'string', optional: false }];
-
-    if (pollType.index === 1) questions.push({ question: 'How many options would you like to have? (Max: 20)', type: 'number', optional: false });
-
-    const res = await message.client.sendQuestions(GUI, message, questions);
-
-    if (res.canceled) {
-        message.client.editEmbed(GUI, 'Polls', 'Poll Canceled');
-        await GUI.delete({
-            timeout: 5000
-        }).catch(() => null);
-        return message;
-    }
-
-    const question = res.answers[0];
-    const amount = res.answers[1];
-
-    if (amount > 20 || amount === 0) {
-        message.client.editEmbed(GUI, 'Uh Oh!', 'Polls can only have 1-20 options!');
-        await GUI.delete({
-            timeout: 5000
-        }).catch(() => null);
-        return message;
-    }
+    if (!question) return;
 
     if (pollType.index === 0) {
-        GUI.delete().catch(() => null);
+        prompt.delete();
 
         const msg = await message.client.sendEmbed(message, 'Polls', question, undefined, undefined, undefined, undefined, undefined, true);
 
         await msg.react(message.client.constants.emotes.upvote);
         await msg.react(message.client.constants.emotes.downvote);
+
         return message;
     }
 
-    const opts: Question[] = [];
+    const amount = await prompt.number('What topic/question would you like to poll?');
+    if (typeof amount !== 'number') return;
+
+    if (amount > 20 || amount === 0) return prompt.error('Polls can only have 1-20 options!');
+
+    const options: string[] = [];
 
     for (let i = 0; i < amount; i++) {
         const a = i + 1;
-        opts.push({ question: `What would you like option number #${a} to be?`, type: 'string', optional: false });
+
+        const opt = await prompt.string(`What would you like question #${a} to be?`);
+        if (!opt) return;
+
+        options.push(opt);
     }
 
-    const res1 = await message.client.sendQuestions(GUI, message, opts);
-
-    GUI.delete().catch(() => null);
-
-    if (res1.canceled) {
-        message.client.editEmbed(GUI, 'Polls', 'Poll Canceled');
-        await GUI.delete({
-            timeout: 5000
-        }).catch(() => null);
-        return message;
-    }
-
-    const options = res1.answers;
-
-    const optsStrings: string[] = [];
-
-    for (let i = 0; i < options.length; i++) {
-        const num = letEmojis[i];
-
-        optsStrings.push(`${num} - ${options[i]}`);
-    }
+    const optsStrings = options.map((opt, i) => `${letEmojis[i]} - ${opt}`);
 
     const msg = await message.client.sendEmbed(message, 'Polls', question, optsStrings.join('\n\n'), undefined, undefined, undefined, undefined, true);
 
-    const e1: string[] = [];
-
-    for (let i = 0; i < options.length; i++) {
-        e1.push(letEmojiIds[i]);
-    }
+    const e1 = options.map((_opt, i) => letEmojiIds[i]);
 
     await Promise.all(e1.map(a => msg.react(a).catch(() => null)));
 
@@ -156,6 +113,7 @@ const callback = async (message: AMessage, _args: string[]): Promise<void | Mess
 export const command: Command = {
     name: 'poll',
     category: 'Utility',
+    module: 'Polls',
     aliases: ['p'],
     description: 'Creates a poll and reacts to it with the corresponding emojis.',
     usage: '',

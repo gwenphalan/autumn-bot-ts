@@ -2,8 +2,9 @@ import { Command, AMessage } from '../../interfaces/Client';
 import { getGuildSettings } from '../../database';
 import { TextChannel, MessageEmbed } from 'discord.js';
 import { client } from '../..';
+import { PromptManager } from '../../helpers/PromptManager';
 
-const callback = async (message: AMessage, args: string[]) => {
+const callback = async (message: AMessage, args: string[], _prompt: PromptManager) => {
     if (!message.guild) return;
 
     const guildSettings = await getGuildSettings(message.guild.id);
@@ -67,6 +68,7 @@ const callback = async (message: AMessage, args: string[]) => {
 export const command: Command = {
     name: 'clear',
     category: 'Moderation',
+    module: 'Moderation',
     aliases: [],
     description: 'Clears up to 100 messages from a channel.',
     usage: '<amount (MAX: 100)> [Reason]',

@@ -2,8 +2,9 @@ import { Command, AMessage } from '../../interfaces/Client';
 import { neko } from '../../neko';
 import Color from 'color';
 import { MessageEmbed } from 'discord.js';
+import { PromptManager } from '../../helpers/PromptManager';
 
-const callback = async (message: AMessage, _args: string[]) => {
+const callback = async (message: AMessage, _args: string[], _prompt: PromptManager) => {
     const hue = Math.floor(Math.random() * 360);
     const pastel = 'hsl(' + hue + ', 100%, 80%)';
 
@@ -17,6 +18,7 @@ const callback = async (message: AMessage, _args: string[]) => {
 export const command: Command = {
     name: 'goose',
     category: 'Fun',
+    module: 'Fun',
     aliases: [],
     description: 'Goose.',
     usage: '',

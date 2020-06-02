@@ -1,7 +1,8 @@
 import { Message } from 'discord.js';
 import { Command } from '../../interfaces/Client';
+import { PromptManager } from '../../helpers/PromptManager';
 
-const callback = async (_message: Message, args: string[]) => {
+const callback = async (_message: Message, args: string[], _prompt: PromptManager) => {
     const error = args.join(' ');
 
     throw new Error(error || 'Intentional Error');
@@ -10,6 +11,7 @@ const callback = async (_message: Message, args: string[]) => {
 export const command: Command = {
     name: 'error',
     category: 'Dev',
+    module: 'Dev',
     aliases: [],
     description: 'Intentionally Throws An Error',
     usage: '[Error]',

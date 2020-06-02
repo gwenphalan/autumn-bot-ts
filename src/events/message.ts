@@ -1,9 +1,10 @@
-import { Client, sendEmbed } from '../interfaces/Client';
+import { Client, sendEmbed, AMessage } from '../interfaces/Client';
 import { TextChannel, MessageEmbed, Message, MessageAttachment, PermissionString } from 'discord.js';
 import { client as botClient } from '../index';
 import { createVerifyApp } from '../database';
 import { drawCard } from '../util/canvas';
 import { toCamelCase, missingPermissions, nicerPermissions } from '../util';
+import { PromptManager } from '../helpers/PromptManager';
 
 export default async (client: Client, message: Message) => {
     // We have partials enabled, so we have to make sure the message is fetched
@@ -183,13 +184,15 @@ export default async (client: Client, message: Message) => {
                 .map((perm: PermissionString) => nicerPermissions(perm))
                 .join('`, `')}\``
         );
+
+    const prompt = new PromptManager(message as AMessage, command.module);
     // Execute the command and handle any potential errors
     return command
-        .callback(message, args)
+        .callback(message, args, prompt)
         .then(async () => {
             const updatedSettings = message.guild ? await client.database.guildSettings.findOne({ guild: message.guild.id }) : null;
-
-            if (updatedSettings && updatedSettings.general.deleteCommands) message.delete({ timeout: 10 }).catch(() => null);
+            if (updatedSettings && updatedSettings.general.deleteCommands) message.delete({ timeout: 100 }).catch(() => null);
+            prompt.delete();
         })
         .catch(err => {
             const oops = new MessageEmbed()
@@ -215,5 +218,6 @@ export default async (client: Client, message: Message) => {
                 if (!errorChannel || !(errorChannel instanceof TextChannel)) throw new Error('Provided error channel is unreachable or not a text channel.');
                 errorChannel.send(embed);
             }
+            prompt.delete();
         });
 };

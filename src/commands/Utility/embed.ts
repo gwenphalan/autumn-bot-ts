@@ -1,15 +1,16 @@
 import { MessageEmbed, TextChannel, EmbedField } from 'discord.js';
 import { Command, AMessage } from '../../interfaces/Client';
-import { getChannel } from '../../util';
 import { getGuildSettings } from '../../database';
 import { uploadHaste, fetchHaste } from '../../util/hastebin';
 import { client } from '../../index';
-import constants from '../../constants/constants';
+import { PromptManager } from '../../helpers/PromptManager';
 
-const callback = async (message: AMessage, args: string[]) => {
+const callback = async (message: AMessage, args: string[], prompt: PromptManager) => {
     // * Load Guild Settings
     const guildSettings = message.guild?.id ? await getGuildSettings(message.guild?.id) : null;
     const prefix = guildSettings?.general.prefix || message.client.config.defaultPrefix;
+
+    if (!message.guild) return;
 
     let embed = new MessageEmbed();
 
@@ -19,7 +20,7 @@ const callback = async (message: AMessage, args: string[]) => {
         let channel;
 
         if (arg2) {
-            channel = await getChannel(message, args, 'text', 1);
+            channel = await prompt.parse.textChannel(message.guild, arg2);
         } else {
             channel = message.channel;
         }
@@ -48,7 +49,7 @@ const callback = async (message: AMessage, args: string[]) => {
     } else if (arg1 === 'edit') {
         if (!arg2) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `Please provide a text channel!`);
 
-        const channel = await getChannel(message, args, 'text', 1);
+        const channel = await prompt.parse.textChannel(message.guild, arg2);
 
         if (!channel) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `I couldn't find \`${arg2}\`! Please provide a valid text channel!`);
         if (!(channel instanceof TextChannel)) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `\`${arg2}\` is not a text channel!`);
@@ -64,8 +65,6 @@ const callback = async (message: AMessage, args: string[]) => {
         embed = msg.embeds[0];
 
         if (!msg.embeds.length) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `Message with ID \`${arg3}\` does not have an embed!`);
-
-        const GUI = await message.channel.send(`<a:loading:${constants.emotes.aLoading}>`);
 
         type embedAction =
             | 'setTitle'
@@ -94,129 +93,44 @@ const callback = async (message: AMessage, args: string[]) => {
             'setColor'
         ];
 
-        const answer = await message.client.sendOptions(GUI, message, 'Which action would you like to perform on the embed?', embedActions);
-
-        if (answer.canceled || !answer.choice) {
-            message.client.editEmbed(GUI, 'Custom Embeds', 'Embed Edit Canceled');
-            await GUI.delete({
-                timeout: 5000
-            }).catch(() => null);
-            return;
-        }
+        const answer = await prompt.options('Which action would you like to perform on the embed?', embedActions);
+        if (!answer) return;
 
         const action = answer.choice;
 
         if (action === 'setTitle') {
-            const title = await message.client.sendQuestions(GUI, message, [
-                {
-                    question: 'What would you like to set the title to?',
-                    type: 'string',
-                    optional: true
-                }
-            ]);
-
-            if (title.canceled || !title.answers[0]) {
-                message.client.editEmbed(GUI, 'Custom Embeds', 'Embed Edit Canceled');
-                await GUI.delete({
-                    timeout: 5000
-                }).catch(() => null);
-                return;
-            }
-
-            embed.setTitle(title.answers[0] !== 'none' ? title.answers[0] : '');
+            const title = await prompt.string('What would you like to set the title to?', true);
+            if (!title) return;
+            embed.setTitle(title !== 'none' ? title : '');
         } else if (action === 'setURL') {
-            const url = await message.client.sendQuestions(GUI, message, [
-                {
-                    question: 'What would you like to set the URL to?',
-                    type: 'url',
-                    optional: true
-                }
-            ]);
-
-            if (url.canceled || !url.answers[0]) {
-                message.client.editEmbed(GUI, 'Custom Embeds', 'Embed Edit Canceled');
-                await GUI.delete({
-                    timeout: 5000
-                }).catch(() => null);
-                return;
-            }
-
-            embed.setURL(url.answers[0] !== 'none' ? url.answers[0] : '');
+            const url = await prompt.url('What would you like to set the URL to?', true);
+            if (!url) return;
+            embed.setURL(url !== 'none' ? url : '');
         } else if (action === 'setDescription') {
-            const desc = await message.client.sendQuestions(GUI, message, [
-                {
-                    question: 'What would you like to set the description to?',
-                    type: 'string',
-                    optional: true
-                }
-            ]);
-
-            if (desc.canceled || !desc.answers[0]) {
-                message.client.editEmbed(GUI, 'Custom Embeds', 'Embed Edit Canceled');
-                await GUI.delete({
-                    timeout: 5000
-                }).catch(() => null);
-                return;
-            }
-
-            embed.setDescription(desc.answers[0] !== 'none' ? desc.answers[0] : '');
+            const desc = await prompt.string('What would you like to set the description to?', true);
+            if (!desc) return;
+            embed.setDescription(desc !== 'none' ? desc : '');
         } else if (action === 'addField') {
-            const answers = await message.client.sendQuestions(GUI, message, [
-                {
-                    question: 'What would you like to set the name to be?',
-                    type: 'string',
-                    optional: false
-                },
-                {
-                    question: 'What would you like to set the value to be?',
-                    type: 'string',
-                    optional: false
-                }
-            ]);
-            if (answers.canceled || !answers.answers[0]) {
-                message.client.editEmbed(GUI, 'Custom Embeds', 'Embed Edit Canceled');
-                await GUI.delete({
-                    timeout: 5000
-                }).catch(() => null);
-                return;
-            }
-
-            const inline = await message.client.sendYesNo(GUI, message.author, 'Would you like the field to be inline?');
-
-            if (inline.canceled) {
-                message.client.editEmbed(GUI, 'Custom Embeds', 'Embed Edit Canceled');
-                await GUI.delete({
-                    timeout: 5000
-                }).catch(() => null);
-                return;
-            }
-
-            const [name, value] = answers.answers;
-
-            embed.addField(name, value, inline.reply);
+            const name = await prompt.string('What would you like to set the name to be?');
+            if (!name) return;
+            const value = await prompt.string('What would you like to set the name to be?');
+            if (!value) return;
+            const inline = await prompt.boolean('Would you like the field to be inline?');
+            if (!inline && inline !== false) return;
+            embed.addField(name, value, inline);
         } else if (action === 'removeField') {
             const options: string[] = [];
-            if (!embed.fields.length)
-                return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `Embed with ID \`${arg3}\` doesn't have any fields to remove!`);
+            if (!embed.fields.length) return prompt.error(`Embed with ID \`${arg3}\` doesn't have any fields to remove!`);
             if (embed.fields.length === 1) {
                 embed.fields = [];
             } else {
                 embed.fields.forEach(field => options.push(`\n**Name**: ${field.name}\n**Value**: ${field.value}\n**Inline**: ${field.inline}`));
-                const reply = await message.client.sendOptions(GUI, message, 'Which field would you like to remove?', options);
-
-                const { canceled, index } = reply;
-
-                if (canceled) {
-                    message.client.editEmbed(GUI, 'Custom Embeds', 'Embed Edit Canceled');
-                    await GUI.delete({
-                        timeout: 5000
-                    }).catch(() => null);
-                    return;
-                }
+                const reply = await prompt.options('Which field would you like to remove?', options);
+                if (!reply) return;
 
                 const fields = embed.fields;
 
-                const a = fields.indexOf(fields[index], 0);
+                const a = fields.indexOf(fields[reply.index], 0);
 
                 if (a > -1) {
                     fields.splice(a, 1);
@@ -232,110 +146,39 @@ const callback = async (message: AMessage, args: string[]) => {
             let index = 0;
             if (embed.fields.length > 1) {
                 embed.fields.forEach(field => options.push(`\n**Name**: ${field.name}\n**Value**: ${field.value}\n**Inline**: ${field.inline}`));
-                const reply = await message.client.sendOptions(GUI, message, 'Which field would you like to edit?', options);
+                const reply = await prompt.options('Which field would you like to edit?', options);
 
-                if (reply.canceled) {
-                    message.client.editEmbed(GUI, 'Custom Embeds', 'Embed Edit Canceled');
-                    await GUI.delete({
-                        timeout: 5000
-                    }).catch(() => null);
-                    return;
-                }
+                if (!reply) return;
 
                 index = reply.index;
             }
-
-            const answers = await message.client.sendQuestions(GUI, message, [
-                {
-                    question: 'What would you like to set the name to be?\n\nReply `none` if you would like this to remain the same.',
-                    type: 'string',
-                    optional: false
-                },
-                {
-                    question: 'What would you like to set the value to be?\n\nReply `none` if you would like this to remain the same.',
-                    type: 'string',
-                    optional: false
-                }
-            ]);
-            if (answers.canceled || !answers.answers[0]) {
-                message.client.editEmbed(GUI, 'Custom Embeds', 'Embed Edit Canceled');
-                await GUI.delete({
-                    timeout: 5000
-                }).catch(() => null);
-                return;
-            }
-
-            const inline = await message.client.sendYesNo(GUI, message.author, 'Would you like the field to be inline?');
-
-            if (inline.canceled) {
-                message.client.editEmbed(GUI, 'Custom Embeds', 'Embed Edit Canceled');
-                await GUI.delete({
-                    timeout: 5000
-                }).catch(() => null);
-                return;
-            }
+            const name = await prompt.string('What would you like to set the name to be?', true);
+            if (!name) return;
+            const value = await prompt.string('What would you like to set the name to be?', true);
+            if (!value) return;
+            const inline = await prompt.boolean('Would you like the field to be inline?');
+            if (!inline && inline !== false) return;
             const oldField = embed.fields[index];
-
-            const [name, value] = answers.answers;
-
             const field: EmbedField = {
                 name: name !== 'none' ? name : oldField.name,
                 value: value !== 'none' ? value : oldField.value,
-                inline: inline.reply
+                inline: inline
             };
-
             embed.fields[index] = field;
         } else if (action === 'setAuthor') {
-            const answers = await message.client.sendQuestions(GUI, message, [
-                {
-                    question: "What would you like the author's name to be?",
-                    type: 'string',
-                    optional: false
-                },
-                {
-                    question: "What would you like the author's avatar to be?",
-                    type: 'image',
-                    optional: true
-                },
-                {
-                    question: "What would you like the author's link to be?",
-                    type: 'url',
-                    optional: true
-                }
-            ]);
-            if (answers.canceled || !answers.answers[0]) {
-                message.client.editEmbed(GUI, 'Custom Embeds', 'Embed Edit Canceled');
-                await GUI.delete({
-                    timeout: 5000
-                }).catch(() => null);
-                return;
-            }
-
-            const [name, avatar, link] = answers.answers;
+            const name = await prompt.string("What would you like the author's name to be?");
+            if (!name) return;
+            const avatar = await prompt.image("What would you like the author's avatar to be?", true);
+            if (!avatar) return;
+            const link = await prompt.url("What would you like the author's link to be?", true);
+            if (!link) return;
 
             embed.setAuthor(name, avatar !== 'none' ? avatar : undefined, link !== 'none' ? link : undefined);
         } else if (action === 'setFooter') {
-            const answers = await message.client.sendQuestions(GUI, message, [
-                {
-                    question: 'What would you like the footer to say?',
-                    type: 'string',
-                    optional: true
-                },
-                {
-                    question: 'What would you like the icon to be?',
-                    type: 'image',
-                    optional: true
-                }
-            ]);
-            if (answers.canceled || !answers.answers[0]) {
-                message.client.editEmbed(GUI, 'Custom Embeds', 'Embed Edit Canceled');
-                await GUI.delete({
-                    timeout: 5000
-                }).catch(() => null);
-                return;
-            }
-
-            const [name, avatar] = answers.answers;
+            const name = await prompt.string('What would you like to set the name to be?');
+            if (!name) return;
+            const avatar = await prompt.image('What would you like to set the avatar to be?', true);
+            if (!avatar) return;
 
             if (name === 'none') {
                 delete embed['footer'];
@@ -343,22 +186,8 @@ const callback = async (message: AMessage, args: string[]) => {
                 embed.setFooter(name, avatar !== 'none' ? avatar : undefined);
             }
         } else if (action === 'setImage') {
-            const answers = await message.client.sendQuestions(GUI, message, [
-                {
-                    question: 'What would you like the image to be?',
-                    type: 'image',
-                    optional: true
-                }
-            ]);
-            if (answers.canceled || !answers.answers[0]) {
-                message.client.editEmbed(GUI, 'Custom Embeds', 'Embed Edit Canceled');
-                await GUI.delete({
-                    timeout: 5000
-                }).catch(() => null);
-                return;
-            }
-
-            const image = answers.answers[0];
+            const image = await prompt.image('What would you like the image to be?');
+            if (!image) return;
 
             if (image === 'none') {
                 delete embed['image'];
@@ -366,22 +195,8 @@ const callback = async (message: AMessage, args: string[]) => {
                 embed.setImage(image);
             }
         } else if (action === 'setThumbnail') {
-            const answers = await message.client.sendQuestions(GUI, message, [
-                {
-                    question: 'What would you like the thumbnail to be?',
-                    type: 'image',
-                    optional: true
-                }
-            ]);
-            if (answers.canceled || !answers.answers[0]) {
-                message.client.editEmbed(GUI, 'Custom Embeds', 'Embed Edit Canceled');
-                await GUI.delete({
-                    timeout: 5000
-                }).catch(() => null);
-                return;
-            }
-
-            const [image] = answers.answers;
+            const image = await prompt.image('What would you like the thumbnail to be?');
+            if (!image) return;
 
             if (image === 'none') {
                 delete embed['thumbnail'];
@@ -389,22 +204,8 @@ const callback = async (message: AMessage, args: string[]) => {
                 embed.setThumbnail(image);
             }
         } else if (action === 'setColor') {
-            const answers = await message.client.sendQuestions(GUI, message, [
-                {
-                    question: 'What would you like the color to be?',
-                    type: 'color',
-                    optional: true
-                }
-            ]);
-            if (answers.canceled || !answers.answers[0]) {
-                message.client.editEmbed(GUI, 'Custom Embeds', 'Embed Edit Canceled');
-                await GUI.delete({
-                    timeout: 5000
-                }).catch(() => null);
-                return;
-            }
-
-            const [color] = answers.answers;
+            const color = await prompt.color('What would you like the color to be?');
+            if (!color) return;
 
             if (color === 'none') {
                 embed.setColor('#2f3136');
@@ -414,16 +215,12 @@ const callback = async (message: AMessage, args: string[]) => {
         }
         msg.edit(embed);
 
-        message.client.editEmbed(GUI, 'Custom Embeds', 'Embed Edited');
-
-        await GUI.delete({
-            timeout: 5000
-        }).catch(() => null);
-        return;
+        prompt.sendMsg('Embed Edited');
+        return prompt.delete();
     } else if (arg1 === 'copy') {
         if (!arg2) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `Please provide a text channel!`);
 
-        const channel = await getChannel(message, args, 'text', 1);
+        const channel = await prompt.parse.textChannel(message.guild, arg2);
 
         if (!channel) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `I couldn't find \`${arg2}\`! Please provide a valid text channel!`);
         if (!(channel instanceof TextChannel)) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `\`${arg2}\` is not a text channel!`);
@@ -442,7 +239,7 @@ const callback = async (message: AMessage, args: string[]) => {
     } else if (arg1 === 'paste') {
         if (!arg2) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `Please provide a text channel!`);
 
-        const channel = await getChannel(message, args, 'text', 1);
+        const channel = await prompt.parse.textChannel(message.guild, arg2);
 
         if (!channel) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `I couldn't find \`${arg2}\`! Please provide a valid text channel!`);
         if (!(channel instanceof TextChannel)) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `\`${arg2}\` is not a text channel!`);
@@ -475,6 +272,7 @@ const callback = async (message: AMessage, args: string[]) => {
 export const command: Command = {
     name: 'embed',
     category: 'Utility',
+    module: 'Custom Embeds',
     aliases: [],
     description: 'Create/Edit a Message Embed',
     usage: '<Create | Edit | Copy> <TextChannel> <MessageID | PasteID>',

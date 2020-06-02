@@ -1,16 +1,21 @@
 import { Command, AMessage } from '../../interfaces/Client';
 import { dbl } from '../../';
-import { getMember } from '../../util';
+import { PromptManager } from '../../helpers/PromptManager';
+import { GuildMember } from 'discord.js';
 
-const callback = async (message: AMessage, args: string[]) => {
-    const member = await getMember(message, args, 0);
+const callback = async (message: AMessage, args: string[], prompt: PromptManager) => {
+    let member = message.guild && args[0] ? await prompt.parse.member(message.guild, args[0]) : message.author;
 
-    const hasVoted = member ? await dbl.hasVoted(member.id) : await dbl.hasVoted(message.author.id);
+    if (member instanceof GuildMember) member = member.user;
+
+    if (!member) return;
+
+    const hasVoted = await dbl.hasVoted(member.id);
 
     message.client.sendEmbed(
         message,
         'Vote',
-        `${hasVoted ? (member ? `${member.user.username} has` : "You've") : member ? `${member.user.username} hasn't` : "You haven't"} voted today!`,
+        `${hasVoted ? (member ? `${member.username} has` : "You've") : member ? `${member.username} hasn't` : "You haven't"} voted today!`,
         `\n\nSupport Autumn Bot by voting [here](https://top.gg/bot/672548437346222110/vote)!`
     );
 };
@@ -18,6 +23,7 @@ const callback = async (message: AMessage, args: string[]) => {
 export const command: Command = {
     name: 'vote',
     category: 'Utility',
+    module: 'Vote',
     aliases: ['v'],
     description: "Check to see how many times you've voted for the bot, and if you've voted today..",
     usage: '',

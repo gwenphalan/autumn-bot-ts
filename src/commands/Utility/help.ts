@@ -2,10 +2,11 @@ import { MessageEmbed } from 'discord.js';
 import { Command, Client, AMessage } from '../../interfaces/Client';
 import { client } from '../../index';
 import { config } from '../../../config';
+import { PromptManager } from '../../helpers/PromptManager';
 
 const bot = client;
 
-const callback = async (message: AMessage, args: string[]) => {
+const callback = async (message: AMessage, args: string[], _prompt: PromptManager) => {
     // Get the guild's settings if on a guild and determine the prefix that needs to be used in the help
     const client = message.client as Client;
     const guildSettings = message.guild ? await client.database.guildSettings.findOne({ guild: message.guild.id }) : null;
@@ -66,6 +67,7 @@ const callback = async (message: AMessage, args: string[]) => {
 export const command: Command = {
     name: 'help',
     category: 'Utility',
+    module: 'Help',
     aliases: ['h'],
     description: 'Get a list of all commands or info on a specific command',
     usage: '[command name]',

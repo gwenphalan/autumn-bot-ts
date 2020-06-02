@@ -1,12 +1,13 @@
 import { Command, AMessage } from '../../interfaces/Client';
 import { groups } from './settings/index';
 import { EmbedField, Role, GuildMember, GuildChannel } from 'discord.js';
-import { sendSetting, parseType } from './settings/util/index';
 import { getGuildSettings, updateGuildSettings } from '../../database/index';
 import Canvas from 'canvas';
 import { labelImage, drawExampleCard } from '../../util/canvas';
+import { parseType, sendSetting } from './settings/util';
+import { PromptManager } from '../../helpers/PromptManager';
 
-const callback = async (message: AMessage, args: string[]) => {
+const callback = async (message: AMessage, args: string[], prompt: PromptManager) => {
     // Declare arguments as variables
     const [arg1, arg2, arg3] = args;
 
@@ -204,13 +205,13 @@ const callback = async (message: AMessage, args: string[]) => {
                 let response4: any = null;
 
                 if (arg4) {
-                    check = await parseType(GUI, message, setting.valueType, arg4);
+                    check = await parseType(message, setting.valueType, arg4, prompt);
                     if (check === 'canceled') return message.client.editEmbed(GUI, 'Settings', 'Settings Change Canceled');
                     if (check === null) return message.client.editEmbed(GUI, 'Uh Oh!', `\`${arg4}\` is not a valid ${setting.valueType}!`);
                 } else {
                     try {
                         // Send a setting embed.
-                        response4 = await await sendSetting(GUI, message, setting.identifier, setting.valueType);
+                        response4 = await sendSetting(message, setting.identifier, setting.valueType, prompt);
                     } catch {
                         console.error;
                     }
@@ -276,14 +277,14 @@ const callback = async (message: AMessage, args: string[]) => {
                     let valid = false;
                     for (let i = 0; i < 4; i++) {
                         if (!valid) {
-                            check1 = await parseType(GUI, message, setting.valueType, arg4);
+                            check1 = await parseType(message, setting.valueType, arg4, prompt);
                             if (check1 === 'canceled') return message.client.editEmbed(GUI, 'Settings', 'Settings Change Canceled');
                             if (check1 !== null) valid = true;
                         }
                     }
                 } else {
                     // Send a setting embed.
-                    response1 = await (await sendSetting(GUI, message, setting.identifier, setting.valueType)).answer;
+                    response1 = await (await sendSetting(message, setting.identifier, setting.valueType, prompt)).answer;
 
                     // Return if the user responded 'canceled'
                     if (response1.canceled) return message.client.editEmbed(GUI, 'Settings', 'Settings Change Canceled');
@@ -341,7 +342,7 @@ const callback = async (message: AMessage, args: string[]) => {
                     let valid = false;
                     for (let i = 0; i < 4; i++) {
                         if (!valid) {
-                            check2 = await parseType(GUI, message, setting.valueType, arg4);
+                            check2 = await parseType(message, setting.valueType, arg4, prompt);
                             if (check2 === 'canceled') return message.client.editEmbed(GUI, 'Settings', 'Settings Change Canceled');
                             if (check2 !== null) valid = true;
                         }
@@ -391,14 +392,9 @@ const callback = async (message: AMessage, args: string[]) => {
                         }
                     });
                     // Send the list of choices to the user.
-                    const response4 = await message.client.sendOptions(
-                        GUI,
-                        message,
-                        `Which ${setting.valueType} would you like to remove from ${setting.identifier}?`,
-                        choices
-                    );
+                    const response4 = await prompt.options(`Which ${setting.valueType} would you like to remove from ${setting.identifier}?`, choices);
                     // Return if the user canceled.
-                    if (response4.canceled) return message.client.editEmbed(GUI, 'Settings', 'Settings Change Canceled');
+                    if (!response4) return;
 
                     response2 = response4.choice;
 
@@ -507,6 +503,7 @@ const callback = async (message: AMessage, args: string[]) => {
 export const command: Command = {
     name: 'settings',
     category: 'Administration',
+    module: 'Settings',
     aliases: ['setting', 's'],
     description: 'Change the settings for your server',
     usage: '[Group] [Setting] [Set | Add | Remove]',

@@ -1,6 +1,7 @@
 import { Command, AMessage } from '../../interfaces/Client';
+import { PromptManager } from '../../helpers/PromptManager';
 
-const callback = async (message: AMessage, _args: string[]) => {
+const callback = async (message: AMessage, _args: string[], _prompt: PromptManager) => {
     const msg = await message.channel.send('Pinging...');
     return msg.edit(`Pong! Took ${msg.createdTimestamp - message.createdTimestamp}ms`);
 };
@@ -8,6 +9,7 @@ const callback = async (message: AMessage, _args: string[]) => {
 export const command: Command = {
     name: 'ping',
     category: 'Utility',
+    module: 'Stats',
     aliases: [],
     description: 'Checks the ping',
     usage: '',

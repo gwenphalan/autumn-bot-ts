@@ -1,10 +1,10 @@
 import { Command, AMessage } from '../../interfaces/Client';
 import { getGuildSettings, createInfraction } from '../../database';
-import { getMember } from '../../util';
 import { TextChannel, MessageEmbed } from 'discord.js';
 import { client } from '../..';
+import { PromptManager } from '../../helpers/PromptManager';
 
-const callback = async (message: AMessage, args: string[]) => {
+const callback = async (message: AMessage, args: string[], prompt: PromptManager) => {
     if (!message.guild || !message.member) return;
 
     const guildSettings = message.guild?.id ? await getGuildSettings(message.guild.id) : null;
@@ -25,7 +25,7 @@ const callback = async (message: AMessage, args: string[]) => {
 
     if (!arg1) return message.client.sendEmbed(message, 'Moderation', 'Missing Arguments: `User`', 'Command Usage:\n`{prefix}kick <User> [Reason]`');
 
-    const member = await getMember(message, args, 0);
+    const member = await prompt.parse.member(message.guild, args[0]);
 
     if (!member) return message.client.sendEmbed(message, 'Moderation', 'Uh Oh!', `I couldn't find the user ${arg1}!`);
 
@@ -69,6 +69,7 @@ const callback = async (message: AMessage, args: string[]) => {
 export const command: Command = {
     name: 'ban',
     category: 'Moderation',
+    module: 'Moderation',
     aliases: [],
     description: 'Bans the specified user from the server.',
     usage: '<User> [Reason]',

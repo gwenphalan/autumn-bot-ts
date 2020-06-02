@@ -1,7 +1,8 @@
 import { Command, AMessage } from '../../interfaces/Client';
 import { getGuildSettings } from '../../database';
+import { PromptManager } from '../../helpers/PromptManager';
 
-const callback = async (message: AMessage, args: string[]) => {
+const callback = async (message: AMessage, args: string[], _prompt: PromptManager) => {
     if (!message.guild) return;
     const guildSettings = await getGuildSettings(message.guild.id);
 
@@ -23,6 +24,7 @@ const callback = async (message: AMessage, args: string[]) => {
 export const command: Command = {
     name: 'prefix',
     category: 'Administration',
+    module: 'Settings',
     description: 'Sets the prefix on this guild',
     aliases: [],
     usage: '[prefix]',

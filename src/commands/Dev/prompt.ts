@@ -1,24 +1,63 @@
 import { Command, AMessage } from '../../interfaces/Client';
+import { PromptManager } from '../../helpers/PromptManager';
 
-const callback = async (message: AMessage, _args: string[]) => {
-    const prompt = new message.client.PromptManager(message.client, message.author, message.channel, 'Prompts');
-
-    const string = await prompt.string(`What is your favorite food?`, 1);
+const callback = async (message: AMessage, _args: string[], prompt: PromptManager) => {
+    const string = await prompt.string(`String`);
     if (!string) return;
 
-    prompt.delete();
+    const textChannel = await prompt.textChannel(`Text Channel`);
+    if (!textChannel) return;
 
-    message.client.sendEmbed(message, 'Prompts', "You're all done!", `Food: ${string}`);
+    const voiceChannel = await prompt.voiceChannel(`Voice Channel`);
+    if (!voiceChannel) return;
+
+    const categoryChannel = await prompt.categoryChannel(`Category Channel`);
+    if (!categoryChannel) return;
+
+    const guildChannel = await prompt.guildChannel(`Guild Channel`);
+    if (!guildChannel) return;
+
+    const member = await prompt.member(`Member`);
+    if (!member) return;
+
+    const role = await prompt.role(`Role`);
+    if (!role) return;
+
+    const opts = ['Option 1', 'Option 2', 'Option 3'];
+
+    const options = await prompt.options(`Options`, opts);
+    if (!options) return;
+
+    const color = await prompt.color(`Color`);
+    if (!color) return;
+
+    const emoji = await prompt.emoji(`Emoji`);
+    if (!emoji) return;
+
+    const image = await prompt.image(`Image`);
+    if (!image) return;
+
+    message.client.sendEmbed(
+        message,
+        'Prompts',
+        "You're all done!",
+        `String: ${string}\nTextChannel: ${textChannel}\nVoiceChannel: ${voiceChannel}\nCategoryChannel: ${categoryChannel}\nGuildChannel: ${guildChannel}\nMember: ${member}\nRole: ${role}\nOptions: ${
+            options.choice
+        }\nColor: ${color}\nEmoji: ${emoji.toString()}\nImage: ${image}`
+    );
+
+    prompt.delete();
 };
 
 export const command: Command = {
     name: 'prompt',
     category: 'Dev',
+    module: 'Dev',
     aliases: ['pr'],
     description: 'Gives a series of sample prompts',
     usage: '',
     requiresArgs: 0,
-    devOnly: true,
+    devOnly: false,
     guildOnly: true,
     NSFW: false,
     userPermissions: [],

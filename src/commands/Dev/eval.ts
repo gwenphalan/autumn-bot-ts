@@ -1,8 +1,9 @@
 import { uploadHaste } from '../../util/hastebin';
 import { Command, Client, AMessage } from '../../interfaces/Client';
 import { MessageEmbed, Permissions } from 'discord.js';
+import { PromptManager } from '../../helpers/PromptManager';
 
-const callback = async (message: AMessage, args: string[]) => {
+const callback = async (message: AMessage, args: string[], _prompt: PromptManager) => {
     // Define a bunch of shortcuts which will be usable in your eval code
     const client = message.client as Client;
     //@ts-ignore
@@ -51,6 +52,7 @@ const callback = async (message: AMessage, args: string[]) => {
 export const command: Command = {
     name: 'eval',
     category: 'Dev',
+    module: 'Dev',
     aliases: ['console', 'debug'],
     description: 'Used to run commands from discord',
     usage: '<code>',

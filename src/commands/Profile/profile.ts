@@ -1,18 +1,17 @@
 import { Command, AMessage } from '../../interfaces/Client';
-import { getMember } from '../../util';
 import { getUserProfile, createUserProfile, updateUserProfile, getGuildSettings, profileProperty } from '../../database';
 import { client } from '../../index';
-import { valueType } from '../../interfaces/SettingsGroup';
+import { PromptManager } from '../../helpers/PromptManager';
 
 //* Command Code
 
-const callback = async (message: AMessage, args: string[]) => {
+const callback = async (message: AMessage, args: string[], prompt: PromptManager) => {
     const actions = ['edit', 'create'];
 
     const action = args[0] && actions.includes(args[0].toString()) ? args[0].toLowerCase() : null;
     const requireUser = !action && args[0] ? true : false;
 
-    const user = await getMember(message, args, 0);
+    const user = message.guild && requireUser ? await prompt.parse.member(message.guild, args[0]) : null;
     const guildSettings = message.guild?.id ? await getGuildSettings(message.guild?.id) : null;
 
     if (!user && requireUser) {
@@ -96,132 +95,68 @@ const callback = async (message: AMessage, args: string[]) => {
             );
             return;
         }
-        const GUI = await message.channel.send('Loading GUI...');
 
-        const begin = await message.client.sendConfirm(GUI, message.author, 'Are you sure you want to create a profile?');
+        const bio = await prompt.string('`Biography` - Tell me about yourself!');
+        if (!bio) return;
 
-        if (begin) {
-            const x = await message.client.sendQuestions(GUI, message, [
-                {
-                    question: '`biography`\n\nTell me about yourself!',
-                    type: 'string',
-                    optional: true
-                },
-                {
-                    question: '`age`\n\nHow old are you?',
-                    type: 'number',
-                    optional: true
-                },
-                {
-                    question: '`gender`\n\nWhat is your gender?',
-                    type: 'string',
-                    optional: true
-                },
-                {
-                    question: '`pronouns`\n\nWhat are your pronouns?',
-                    type: 'string',
-                    optional: true
-                },
-                {
-                    question: '`color`\n\nWhat color do you want your profile to be?',
-                    type: 'color',
-                    optional: true
-                }
-            ]);
+        const age = await prompt.number('`Age` - How old are you?');
+        if (!age) return;
 
-            const answers = x.answers;
-            const canceled = x.canceled;
+        const gender = await prompt.string('`Gender` - What is your gender?');
+        if (!gender) return;
 
-            if (canceled) {
-                message.client.sendEmbed(message, 'Profiles', 'Profile Creation Canceled');
-                return;
-            }
+        const pronouns = await prompt.string('`Pronouns` - What are your pronouns?');
+        if (!pronouns) return;
 
-            const profile = {
-                color: answers[4] !== 'none' ? answers[4] : '',
-                pronouns: answers[3] !== 'none' ? answers[3] : '',
-                gender: answers[2] !== 'none' ? answers[2] : '',
-                age: answers[1] !== 'none' ? answers[1] : '',
-                biography: answers[0] !== 'none' ? answers[0] : ''
-            };
+        const color = await prompt.color('`Color` - What color would you like your profile to be?');
+        if (!color) return;
 
-            createUserProfile(message.author.id, profile.color, profile.pronouns, profile.gender, profile.age, profile.biography);
+        createUserProfile(message.author.id, color, pronouns, gender, age.toString(), bio);
 
-            message.client.sendEmbed(
-                message,
-                'Profiles',
-                `Profile Created`,
-                `You can view your new profile with \`${guildSettings?.general.prefix || client.config.defaultPrefix}profile\`.`
-            );
-            return;
-        }
+        message.client.sendEmbed(
+            message,
+            'Profiles',
+            `Profile Created`,
+            `You can view your new profile with \`${guildSettings?.general.prefix || client.config.defaultPrefix}profile\`.`
+        );
+        return prompt.delete();
     } else if (action?.toLowerCase() === 'edit') {
-        const GUI = await message.channel.send('Loading GUI...');
+        const options = await prompt.options('Which property of your profile would you like to edit?', ['color', 'biography', 'age', 'pronouns', 'gender']);
+        if (!options) return;
+        const property: profileProperty = options.choice as profileProperty;
+        let value: string | void;
 
-        const reply = await message.client.sendOptions(GUI, message, 'Which property of your profile would you like to edit?', [
-            'color',
-            'biography',
-            'age',
-            'pronouns',
-            'gender'
-        ]);
-
-        if (reply.canceled || !reply.choice) {
-            message.client.sendEmbed(message, 'Profiles', 'Profile Edit Canceled');
-            return;
-        }
-
-        let type: valueType;
-        let property: profileProperty;
-
-        switch (reply.choice) {
+        switch (options.choice) {
             case 'color':
-                type = 'color';
-                property = 'color';
+                value = await prompt.color(`What would you like to set ${options.choice} to?`, true);
                 break;
-            case 'biograpy':
-                type = 'string';
-                property = 'biography';
+            case 'biography':
+                value = await prompt.string(`What would you like to set ${options.choice} to?`, true);
                 break;
             case 'pronouns':
-                type = 'string';
-                property = 'pronouns';
+                value = await prompt.string(`What would you like to set ${options.choice} to?`, true);
                 break;
             case 'age':
-                type = 'number';
-                property = 'age';
+                value = await prompt.number(`What would you like to set ${options.choice} to?`, true, true);
                 break;
             case 'gender':
-                type = 'string';
-                property = 'gender';
+                value = await prompt.string(`What would you like to set ${options.choice} to?`, true);
                 break;
             default:
-                type = 'string';
-                property = 'biography';
+                value = 'none';
                 break;
         }
 
-        const answer = await message.client.sendQuestions(GUI, message, [
-            {
-                question: `What would you like to set ${reply.choice} to?`,
-                optional: true,
-                type: type
-            }
-        ]);
+        prompt.delete();
 
-        if (answer.canceled || !answer.answers) {
-            message.client.sendEmbed(message, 'Profiles', 'Profile Edit Canceled');
-            return;
-        }
-
-        const value = answer.answers[0];
+        if (!value) return;
 
         updateUserProfile(message.author.id, property, value);
         message.client.sendEmbed(
             message,
             'Profiles',
             `Profile Edited`,
-            `\`${property}\` has been set to \`${value}\`\n\nDo \`${
+            `\`${options.choice}\` has been set to \`${value}\`\n\nDo \`${
                 guildSettings?.general.prefix || client.config.defaultPrefix
             }profile\` to view your changes.`
         );
@@ -232,6 +167,7 @@ const callback = async (message: AMessage, args: string[]) => {
 export const command: Command = {
     name: 'profile',
     category: 'Profile',
+    module: 'Profiles',
     aliases: [],
     description: `View someone's profile or edit your own!`,
     usage: '[User | Edit | Create]',
