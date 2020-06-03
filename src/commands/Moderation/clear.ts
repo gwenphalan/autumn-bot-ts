@@ -4,7 +4,7 @@ import { TextChannel, MessageEmbed } from 'discord.js';
 import { client } from '../..';
 import { PromptManager } from '../../interfaces/helpers/PromptManager';
 
-const callback = async (message: AMessage, args: { amount: number; reason?: string }, _prompt: PromptManager) => {
+const callback = async (message: AMessage, args: { amount: number; reason?: string }, prompt: PromptManager) => {
     if (!message.guild) return;
 
     const guildSettings = await getGuildSettings(message.guild.id);
@@ -14,17 +14,14 @@ const callback = async (message: AMessage, args: { amount: number; reason?: stri
     const moderation = guildSettings.moderation;
 
     if (!moderation.enabled)
-        return message.client.sendEmbed(
-            message,
-            'Moderation',
-            'Uh Oh!',
+        return prompt.error(
             "Moderation isn't enabled on this server! A server administrator can turn it on with `{prefix}settings moderation enabled set true`"
         );
 
     const amount = args.amount;
     const reason = args.reason;
 
-    if (amount > 100) return message.client.sendEmbed(message, 'Moderation', 'Uh Oh!', 'I can only clear 100 messages at a time!');
+    if (amount > 100) return prompt.error('I can only clear 100 messages at a time!');
 
     await message.delete({
         timeout: 100,
@@ -33,7 +30,7 @@ const callback = async (message: AMessage, args: { amount: number; reason?: stri
 
     const a = await message.channel.bulkDelete(amount, true).catch(() => null);
 
-    const m = await message.client.sendEmbed(message, 'Moderation', `Cleared ${a?.size || 0} messages.`);
+    const m = await prompt.embed(`Cleared ${a?.size || 0} messages.`);
 
     m.delete({
         timeout: 5000

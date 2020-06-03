@@ -3,7 +3,7 @@ import { dbl } from '../../';
 import { PromptManager } from '../../interfaces/helpers/PromptManager';
 import { GuildMember } from 'discord.js';
 
-const callback = async (message: AMessage, args: { member?: GuildMember }, _prompt: PromptManager) => {
+const callback = async (message: AMessage, args: { member?: GuildMember }, prompt: PromptManager) => {
     let member = message.guild && args.member ? args.member.user : message.author;
 
     if (member instanceof GuildMember) member = member.user;
@@ -12,9 +12,7 @@ const callback = async (message: AMessage, args: { member?: GuildMember }, _prom
 
     const hasVoted = await dbl.hasVoted(member.id);
 
-    message.client.sendEmbed(
-        message,
-        'Vote',
+    prompt.embed(
         `${hasVoted ? (member ? `${member.username} has` : "You've") : member ? `${member.username} hasn't` : "You haven't"} voted today!`,
         `\n\nSupport Autumn Bot by voting [here](https://top.gg/bot/672548437346222110/vote)!`
     );

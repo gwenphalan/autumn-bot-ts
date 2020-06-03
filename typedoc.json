@@ -1,0 +1,6 @@
+{
+    "inputFiles": ["./src"],
+    "mode": "modules",
+    "out": "doc",
+    "theme": "node_modules/typedoc-clarity-theme"
+}

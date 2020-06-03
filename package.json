@@ -1,7 +1,7 @@
 {
-    "name": "venus-ts",
+    "name": "autumn-bot-ts",
     "version": "1.0.0",
-    "author": "VenNeptury",
+    "author": "GwenBebe",
     "license": "MIT",
     "main": "dist/src/index.js",
     "scripts": {
@@ -51,6 +51,10 @@
         "query-string": "^6.12.1",
         "timestring": "^6.0.0",
         "tinycolor2": "^1.4.1",
+        "typedoc": "^0.17.7",
+        "typedoc-clarity-theme": "^1.1.0",
+        "typedoc-plugin-external-module-name": "^4.0.0",
+        "typedoc-plugin-markdown": "^2.3.0",
         "typescript": "^3.8.3"
     },
     "devDependencies": {

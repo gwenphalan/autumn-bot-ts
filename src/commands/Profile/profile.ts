@@ -2,7 +2,7 @@ import { Command, AMessage } from '../../interfaces/Client';
 import { getUserProfile, createUserProfile, updateUserProfile, getGuildSettings, profileProperty } from '../../database';
 import { client } from '../../index';
 import { PromptManager } from '../../interfaces/helpers/PromptManager';
-import { GuildMember } from 'discord.js';
+import { GuildMember, EmbedField } from 'discord.js';
 
 //* Command Code
 
@@ -15,14 +15,13 @@ const callback = async (message: AMessage, args: { action?: 'view' | 'edit' | 'c
         const Profile = await getUserProfile(user.id);
 
         if (Profile) {
-            const fields = [];
-            Profile.age !== '' ? fields.push({ name: 'Age', value: Profile.age, inline: true }) : null;
-            Profile.gender !== '' ? fields.push({ name: 'Gender', value: Profile.gender, inline: true }) : null;
-            Profile.pronouns !== '' ? fields.push({ name: 'Pronouns', value: Profile.pronouns, inline: true }) : null;
+            const fields: EmbedField[] = [];
 
-            message.client.sendEmbed(
-                message,
-                'Profiles',
+            Profile.age ? fields.push({ name: 'Age', value: Profile.age, inline: true }) : null;
+            Profile.gender ? fields.push({ name: 'Gender', value: Profile.gender, inline: true }) : null;
+            Profile.pronouns ? fields.push({ name: 'Pronouns', value: Profile.pronouns, inline: true }) : null;
+
+            prompt.embed(
                 `${user.username}#${user.discriminator}`,
                 Profile.biography !== '' ? `${Profile.biography}` : undefined,
                 user.displayAvatarURL({
@@ -34,10 +33,7 @@ const callback = async (message: AMessage, args: { action?: 'view' | 'edit' | 'c
             );
             return;
         } else {
-            message.client.sendEmbed(
-                message,
-                'Profiles',
-                `Uh Oh!`,
+            prompt.error(
                 `${user} doesn't have a profile!\nHowever they can set one up with \`${
                     guildSettings?.general.prefix || client.config.defaultPrefix
                 }profile create\`.`
@@ -47,10 +43,7 @@ const callback = async (message: AMessage, args: { action?: 'view' | 'edit' | 'c
     } else if (action === 'create') {
         const Profile = await getUserProfile(message.author.id);
         if (Profile) {
-            message.client.sendEmbed(
-                message,
-                'Profiles',
-                `Uh Oh!`,
+            prompt.error(
                 `You already have a profile! You can view it with \`${
                     guildSettings?.general.prefix || client.config.defaultPrefix
                 }profile\` or edit it with \`${guildSettings?.general.prefix || client.config.defaultPrefix}profile edit\``
@@ -75,12 +68,7 @@ const callback = async (message: AMessage, args: { action?: 'view' | 'edit' | 'c
 
         createUserProfile(message.author.id, color, pronouns, gender, age.toString(), bio);
 
-        message.client.sendEmbed(
-            message,
-            'Profiles',
-            `Profile Created`,
-            `You can view your new profile with \`${guildSettings?.general.prefix || client.config.defaultPrefix}profile\`.`
-        );
+        prompt.embed(`Profile Created`, `You can view your new profile with \`${guildSettings?.general.prefix || client.config.defaultPrefix}profile\`.`);
         return prompt.delete();
     } else if (action === 'edit') {
         const options = await prompt.options('Which property of your profile would you like to edit?', ['color', 'biography', 'age', 'pronouns', 'gender']);
@@ -114,9 +102,7 @@ const callback = async (message: AMessage, args: { action?: 'view' | 'edit' | 'c
         if (!value) return;
 
         updateUserProfile(message.author.id, property, value);
-        message.client.sendEmbed(
-            message,
-            'Profiles',
+        prompt.embed(
             `Profile Edited`,
             `\`${options.choice}\` has been set to \`${value}\`\n\nDo \`${
                 guildSettings?.general.prefix || client.config.defaultPrefix

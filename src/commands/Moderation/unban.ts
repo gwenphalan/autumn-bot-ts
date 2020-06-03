@@ -4,7 +4,7 @@ import { TextChannel, MessageEmbed, User } from 'discord.js';
 import { client } from '../..';
 import { PromptManager } from '../../interfaces/helpers/PromptManager';
 
-const callback = async (message: AMessage, args: { user: User; reason?: string }, _prompt: PromptManager) => {
+const callback = async (message: AMessage, args: { user: User; reason?: string }, prompt: PromptManager) => {
     if (!message.guild || !message.member) return;
 
     const guildSettings = message.guild?.id ? await getGuildSettings(message.guild.id) : null;
@@ -14,25 +14,14 @@ const callback = async (message: AMessage, args: { user: User; reason?: string }
     const moderation = guildSettings.moderation;
 
     if (!moderation.enabled)
-        return message.client.sendEmbed(
-            message,
-            'Moderation',
-            'Uh Oh!',
+        return prompt.error(
             "Moderation isn't enabled on this server! A server administrator can turn it on with `{prefix}settings moderation enabled set true`"
         );
 
     const user = args.user;
     const reason = args.reason;
 
-    message.client.sendEmbed(
-        message,
-        'Moderation',
-        'Unbanned User',
-        ` **• User:** ${user}\n **• Reason:** ${reason || 'No Reason Provided'}`,
-        undefined,
-        undefined,
-        undefined
-    );
+    prompt.embed('Unbanned User', ` **• User:** ${user}\n **• Reason:** ${reason || 'No Reason Provided'}`, undefined, undefined, undefined);
 
     message.guild.members.unban(user.id);
 

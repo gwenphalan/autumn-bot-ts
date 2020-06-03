@@ -5,7 +5,7 @@ import { client } from '../..';
 import prettyMs from 'pretty-ms';
 import { PromptManager } from '../../interfaces/helpers/PromptManager';
 
-const callback = async (message: AMessage, args: { member: GuildMember; reason?: string }, _prompt: PromptManager) => {
+const callback = async (message: AMessage, args: { member: GuildMember; reason?: string }, prompt: PromptManager) => {
     if (!message.guild || !message.member) return;
 
     const guildSettings = message.guild?.id ? await getGuildSettings(message.guild.id) : null;
@@ -15,17 +15,13 @@ const callback = async (message: AMessage, args: { member: GuildMember; reason?:
     const moderation = guildSettings.moderation;
 
     if (!moderation.enabled)
-        return message.client.sendEmbed(
-            message,
-            'Moderation',
-            'Uh Oh!',
+        return prompt.error(
             "Moderation isn't enabled on this server! A server administrator can turn it on with `{prefix}settings moderation enabled set true`"
         );
 
     const member = args.member;
 
-    if (message.member.roles.highest.position < member.roles.highest.position)
-        return message.client.sendEmbed(message, 'Moderation', 'Uh Oh!', `You can't warn ${member}!`);
+    if (message.member.roles.highest.position < member.roles.highest.position) return prompt.error(`You can't warn ${member}!`);
 
     const time = guildSettings.moderation.warnExpire || 2592000000;
 
@@ -43,9 +39,7 @@ const callback = async (message: AMessage, args: { member: GuildMember; reason?:
             .setTimestamp()
     );
 
-    message.client.sendEmbed(
-        message,
-        'Moderation',
+    prompt.embed(
         'Warned User',
         ` **• User:** ${member}\n **• Reason:** ${reason || 'No Reason Provided'}\n **• Time:** ${prettyMs(time)}`,
         undefined,

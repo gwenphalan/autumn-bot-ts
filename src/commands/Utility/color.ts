@@ -3,7 +3,7 @@ import color from 'tinycolor2';
 import Canvas from 'canvas';
 import { PromptManager } from '../../interfaces/helpers/PromptManager';
 
-const callback = async (message: AMessage, args: { color?: string }, _prompt: PromptManager) => {
+const callback = async (_message: AMessage, args: { color?: string }, prompt: PromptManager) => {
     const arg = args.color || color.random().toHexString();
 
     const colorData = color(arg);
@@ -15,9 +15,7 @@ const callback = async (message: AMessage, args: { color?: string }, _prompt: Pr
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     const buffer = await canvas.toBuffer('image/png');
 
-    return message.client.sendEmbed(
-        message,
-        'Color',
+    return prompt.embed(
         `${colorData.toName() || 'Unnamed'}`,
         ` • Hex: ${colorData.toHexString()}\n • RGB: ${colorData.toRgbString()}\n • HSV: ${colorData.toHsvString()}\n • HSL: ${colorData.toHslString()}`,
         undefined,

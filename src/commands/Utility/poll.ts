@@ -75,7 +75,7 @@ const callback = async (message: AMessage, _args: {}, prompt: PromptManager): Pr
     if (pollType.index === 0) {
         prompt.delete();
 
-        const msg = await message.client.sendEmbed(message, 'Polls', question, undefined, undefined, undefined, undefined, undefined, true);
+        const msg = await prompt.embed(question, undefined, undefined, undefined, undefined, undefined, true);
 
         await msg.react(message.client.constants.emotes.upvote);
         await msg.react(message.client.constants.emotes.downvote);
@@ -101,7 +101,7 @@ const callback = async (message: AMessage, _args: {}, prompt: PromptManager): Pr
 
     const optsStrings = options.map((opt, i) => `${letEmojis[i]} - ${opt}`);
 
-    const msg = await message.client.sendEmbed(message, 'Polls', question, optsStrings.join('\n\n'), undefined, undefined, undefined, undefined, true);
+    const msg = await prompt.embed(question, optsStrings.join('\n\n'), undefined, undefined, undefined, undefined, true);
 
     const e1 = options.map((_opt, i) => letEmojiIds[i]);
 

@@ -5,7 +5,7 @@ import { TextChannel, MessageEmbed, GuildMember } from 'discord.js';
 import { client } from '../..';
 import { PromptManager } from '../../interfaces/helpers/PromptManager';
 
-const callback = async (message: AMessage, args: { member: GuildMember; reason?: string }, _prompt: PromptManager) => {
+const callback = async (message: AMessage, args: { member: GuildMember; reason?: string }, prompt: PromptManager) => {
     if (!message.guild || !message.member) return;
 
     const guildSettings = message.guild?.id ? await getGuildSettings(message.guild.id) : null;
@@ -15,19 +15,15 @@ const callback = async (message: AMessage, args: { member: GuildMember; reason?:
     const moderation = guildSettings.moderation;
 
     if (!moderation.enabled)
-        return message.client.sendEmbed(
-            message,
-            'Moderation',
-            'Uh Oh!',
+        return prompt.error(
             "Moderation isn't enabled on this server! A server administrator can turn it on with `{prefix}settings moderation enabled set true`"
         );
 
     const member = args.member;
 
-    if (!member.manageable) return message.client.sendEmbed(message, 'Moderation', 'Uh Oh!', `I can't mute ${member}!`);
+    if (!member.manageable) return prompt.error(`I can't mute ${member}!`);
 
-    if (message.member.roles.highest.position < member.roles.highest.position)
-        return message.client.sendEmbed(message, 'Moderation', 'Uh Oh!', `You can't mute ${member}!`);
+    if (message.member.roles.highest.position < member.roles.highest.position) return prompt.error(`You can't mute ${member}!`);
 
     const mutedRole = message.guild.roles.cache.get(guildSettings.moderation.mutedRole) || (await createMutedRole(message.guild));
 
@@ -53,16 +49,9 @@ const callback = async (message: AMessage, args: { member: GuildMember; reason?:
             .setTimestamp()
     );
 
-    message.client.sendEmbed(
-        message,
-        'Moderation',
-        'Muted User',
-        ` **• User:** ${member}\n **• Reason:** ${reason || 'No Reason Provided'}`,
-        undefined,
-        undefined,
-        undefined,
-        { text: `Case: ${infraction.case}` }
-    );
+    prompt.embed('Muted User', ` **• User:** ${member}\n **• Reason:** ${reason || 'No Reason Provided'}`, undefined, undefined, undefined, {
+        text: `Case: ${infraction.case}`
+    });
 
     const modLog = message.guild.channels.cache.get(moderation.modLog);
 

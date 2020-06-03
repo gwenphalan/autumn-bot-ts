@@ -1,13 +1,8 @@
 import { Command, AMessage } from '../../interfaces/Client';
-import constants from '../../constants/constants';
-import { createReactionRole } from '../../database';
 import { PromptManager } from '../../interfaces/helpers/PromptManager';
-//import { createReactionRole } from '../../database';
 
 const callback = async (message: AMessage, _args: {}, prompt: PromptManager) => {
     if (!message.guild) return;
-
-    const GUI = await message.channel.send(`<a:loading:${constants.emotes.aLoading}>`);
 
     const channel = await prompt.textChannel('What channel with the reaction role be in?');
     if (!channel) return;
@@ -25,14 +20,9 @@ const callback = async (message: AMessage, _args: {}, prompt: PromptManager) => 
 
     await msg.react(emoji);
 
-    await createReactionRole(message.guild.id, msg.id, { name: emoji.name, id: emoji.id }, role.id);
+    await message.guild.createReactionRole(msg.id, { name: emoji.name, id: emoji.id }, role.id);
 
-    return message.client.editEmbed(
-        GUI,
-        'Reaction Roles',
-        'Reaction Role Created',
-        ` • Role: ${role}\n • Channel: ${channel}\n • Reaction: ${emoji}\n • Message ID: ${msg.id}`
-    );
+    return prompt.embed('Reaction Role Created', ` • Role: ${role}\n • Channel: ${channel}\n • Reaction: ${emoji}\n • Message ID: ${msg.id}`);
 };
 
 export const command: Command = {

@@ -2,10 +2,10 @@ import { Command, AMessage } from '../../interfaces/Client';
 import { fetchNorris } from '../../util';
 import { PromptManager } from '../../interfaces/helpers/PromptManager';
 
-const callback = async (message: AMessage, _args: {}, _prompt: PromptManager) => {
+const callback = async (_message: AMessage, _args: {}, prompt: PromptManager) => {
     const joke = await fetchNorris();
 
-    message.client.sendEmbed(message, 'Chuck Norris', 'Chuck Norris', joke.value);
+    prompt.embed('Chuck Norris', 'Chuck Norris', joke.value);
 };
 
 export const command: Command = {

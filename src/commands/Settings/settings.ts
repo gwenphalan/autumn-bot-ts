@@ -18,7 +18,7 @@ const callback = async (
     const value = args.value;
 
     // Check if there is a guild, mostly so that TypeScript doesn't give errors when trying to call guild properties.
-    if (!message.guild) return message.client.sendEmbed(message, 'Settings', 'Uh Oh!', `This command can only be ran in a server!`);
+    if (!message.guild) return prompt.error(`This command can only be ran in a server!`);
 
     // Load Guild Settings.
     const guildSettings = await getGuildSettings(message.guild.id);
@@ -34,7 +34,7 @@ const callback = async (
         groups.forEach(group => groupList.push(`\`${group.name}\``));
 
         // Send a message embed with the list groups
-        return message.client.sendEmbed(message, 'Settings', 'Settings Groups', groupList.join('\n'), undefined, undefined, undefined, {
+        return prompt.embed('Settings Groups', groupList.join('\n'), undefined, undefined, undefined, {
             text: "To view a group's settings do {prefix}settings <group>"
         });
     }
@@ -42,34 +42,25 @@ const callback = async (
     // if there is only 1 argument (EXAMPLE: '-settings general')
     if (groupName && !settingName) {
         // Return if the argument is not a valid group.
-        if (!group) return message.client.sendEmbed(message, 'Settings', 'Uh Oh! ', `${groupName} is not a settings group!`);
+        if (!group) return prompt.error(`${groupName} is not a settings group!`);
 
         // Compile the identifer and description of each setting for the group into an array.
         const settingList: string[] = [];
         group.settings.forEach(setting => settingList.push(`\`${setting.identifier}\``));
 
         // Send an embed with the list of settings.
-        return message.client.sendEmbed(
-            message,
-            'Settings',
-            `${group.name} Settings`,
-            group.description + '\n\n' + settingList.join('\n'),
-            undefined,
-            undefined,
-            undefined,
-            {
-                text: `To get more information on a setting do {prefix}settings ${group.name} [setting]`
-            }
-        );
+        return prompt.embed(`${group.name} Settings`, group.description + '\n\n' + settingList.join('\n'), undefined, undefined, undefined, {
+            text: `To get more information on a setting do {prefix}settings ${group.name} [setting]`
+        });
     }
 
     // If there is 2 arguments (EXAMPLE: '-settings general prefix')
     if (settingName && !action) {
         // Return if arg1 is not a valid group.
-        if (!group) return message.client.sendEmbed(message, 'Settings', 'Settings ', `${groupName} is not a settings group!`);
+        if (!group) return prompt.error(`${groupName} is not a settings group!`);
 
         // Return if arg2 is not a valid setting in the group.
-        if (!setting) return message.client.sendEmbed(message, 'Settings', 'Settings ', `${settingName} is not a setting in ${group.name}!`);
+        if (!setting) return prompt.error(`${settingName} is not a setting in ${group.name}!`);
 
         // Declare an embed field array where the setting info will be stored.
         const settingInfo: EmbedField[] = [];
@@ -150,9 +141,7 @@ const callback = async (
         }
 
         // Send the an embed with the information regarding the setting.
-        message.client.sendEmbed(
-            message,
-            'Settings',
+        prompt.embed(
             `${group.name} Settings - \`${setting.name}\``,
             setting.description,
             undefined,
@@ -168,10 +157,10 @@ const callback = async (
     // If there are 3 arguments (EXAMPLE: '-settings general prefix set')
     if (action) {
         // Return if arg1 is not a valid group
-        if (!group) return message.client.sendEmbed(message, 'Settings', 'Settings ', `${groupName} is not a settings group!`);
+        if (!group) return prompt.error(`${groupName} is not a settings group!`);
 
         // Return if arg2 is not a valid setting.
-        if (!setting) return message.client.sendEmbed(message, 'Settings', 'Settings ', `${settingName} is not a setting in ${group.name}!`);
+        if (!setting) return prompt.error(`${settingName} is not a setting in ${group.name}!`);
 
         let response: string;
 
@@ -180,10 +169,7 @@ const callback = async (
             case 'set':
                 // If the setting is an array instead of a single value, return.
                 if (setting.array)
-                    return message.client.sendEmbed(
-                        message,
-                        'Settings',
-                        'Uh Oh!',
+                    return prompt.error(
                         `${setting.identifier} is an array!\n\nTo add or remove values from this setting, do \`{prefix}\`settings ${group.identifier} ${setting.identifier} <Add | Remove>`
                     );
                 let check: any = null;
@@ -237,10 +223,7 @@ const callback = async (
             case 'add':
                 // Return if the setting is a single value and not an array.
                 if (!setting.array)
-                    return message.client.sendEmbed(
-                        message,
-                        'Settings',
-                        'Uh Oh!',
+                    return prompt.error(
                         `${setting.identifier} is not an array!\n\nTo set the value of this setting, do \`{prefix}\`settings ${group.identifier} ${setting.identifier} Set`
                     );
 
@@ -284,20 +267,14 @@ const callback = async (
             case 'remove':
                 // Return if the setting is a single value and not an array.
                 if (!setting.array)
-                    return message.client.sendEmbed(
-                        message,
-                        'Settings',
-                        'Uh Oh!',
+                    return prompt.error(
                         `${setting.identifier} is not an array!\n\nTo set the value of this setting, do \`{prefix}\`settings ${group.identifier} ${setting.identifier} Set`
                     );
                 // Declare the array value in a constant.
                 const arrayVal1: any[] = guildSettings.get(group.identifier)[setting.identifier];
                 // Return if there are no values to remove from the array.
                 if (!arrayVal1.length)
-                    return message.client.sendEmbed(
-                        message,
-                        'Settings',
-                        'Uh Oh!',
+                    return prompt.error(
                         `${setting.name} doesn't have any ${setting.valueType}s to remove!\n\nTo add a value to this setting, do \`{prefix}\`settings ${group.identifier} ${setting.identifier} add`
                     );
 
@@ -371,7 +348,7 @@ const callback = async (
         }
 
         // Fetch the updated settings, and assign the updated group the a constant
-        const updated = await message.client.settings(message.guild.id);
+        const updated = await message.guild.settings();
         const updatedGroup = updated.get(group.identifier);
 
         // Declared a variable that will be filled with required settings that do not have a value yet.
@@ -435,18 +412,7 @@ const callback = async (
               )
             : null;
         // Send an embed containing the response
-        await message.client.sendEmbed(
-            message,
-            'Settings',
-            `${group.name} Settings Edited`,
-            responseArray.join('\n\n'),
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            attachment
-        );
+        await prompt.embed(`${group.name} Settings Edited`, responseArray.join('\n\n'), undefined, undefined, undefined, undefined, undefined, attachment);
 
         // Return and call the update method for the group.
         return await group.update(message.guild);

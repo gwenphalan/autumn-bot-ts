@@ -4,7 +4,24 @@ import { parseType } from '../../commands/Settings/settings/util';
 import { PromptManager } from './PromptManager';
 import { GuildMember, Role, VoiceChannel, GuildChannel, User, Message } from 'discord.js';
 
-const parseArgs = (argString: string, argCount: number, allowSingleQuote = true) => {
+/**
+ * Returns an array of strings parsed from an args string. If a group of text is surrounded with quotes (' or "), it will parse that into a single string.
+ *
+ *
+ * @param {string} argString
+ * @param {number} argCount
+ * @param {boolean} [allowSingleQuote=true]
+ * @returns
+ *
+ * ****
+ * ### Example
+ * ```js
+ * const argString = 'Hello, there. My name is bob. "My favorite food is pizza." Bye.';
+ *
+ * console.log(parseArgs(argString, 12)) // [ 'Hello,', 'there.', 'My', 'name', 'is', 'bob.', 'My favorite food is pizza.', 'Bye.' ]
+ * ```
+ */
+function parseArgs(argString: string, argCount: number, allowSingleQuote = true) {
     const re = allowSingleQuote ? /\s*(?:("|')([^]*?)\1|(\S+))\s*/g : /\s*(?:(")([^]*?)"|(\S+))\s*/g;
     const result = [];
     let match: RegExpExecArray | null = null;
@@ -18,11 +35,28 @@ const parseArgs = (argString: string, argCount: number, allowSingleQuote = true)
         result.push(argString.substr(re.lastIndex).replace(re2, '$2'));
     }
     return result;
-};
+}
 export type Arg = string | number | boolean | GuildMember | User | Role | VoiceChannel | GuildChannel | undefined;
 
 export type Args = { [key: string]: Arg };
 
+/**
+ *
+ * @export
+ * @interface Argument
+ *
+ * ****
+ *
+ *  ### Example
+ *  ```js
+ *  const arg = {
+ *      name = "Member",
+ *      key = "member",
+ *      type = "guildMember",
+ *      optional = true
+ *  }
+ *  ```
+ */
 export interface Argument {
     name: string;
     key: string;
@@ -33,12 +67,11 @@ export interface Argument {
     acceptedValues?: string[];
     cases?: { [key: string]: string };
 }
-
 /**
- *
+ * Used to manage arguments. It parses arguments and generates usages dynamically.
  *
  * @export
- * @class ArgumentManager is used to manage arguments. It parses arguments and generates usages dynamically.
+ * @class ArgumentManager
  */
 export class ArgumentManager {
     args: Argument[];
@@ -59,6 +92,18 @@ export class ArgumentManager {
      * @param {Message} [message] Used to parse arguments.
      * @param {string} [argString] Used to parse arguments.
      * @memberof ArgumentManager
+     *
+     * ****
+     *
+     * ### Example
+     * ```js
+     * const command = client.commands.get(commandName) || client.commands.find(command => command.aliases.includes(commandName));
+     * const prefix = '?';
+     * const prompt = new PromptManager(message, command.module, 5);
+     * const argString = message.content.slice(prefix.length).trim().split(/ +/).join(' ');
+     *
+     * const argManager = new ArgumentManager(command, prefix, prompt, message, argString);
+     * ```
      */
     constructor(command: Command, prefix: string, prompt?: PromptManager, message?: Message, argString?: string) {
         this.args = command.args;
@@ -71,6 +116,12 @@ export class ArgumentManager {
         this.prefix = prefix;
     }
 
+    /**
+     * Returns dynamically generated usages string based on `this.command` and `this.args`;
+     *
+     * @readonly
+     * @memberof ArgumentManager
+     */
     get usage() {
         if (this.argsType === 'none') return this.prefix + this.command.name;
 
@@ -81,6 +132,21 @@ export class ArgumentManager {
         return this.prefix + this.command.name + ' ' + usages.join(' ');
     }
 
+    /**
+     * Returns object containing parsed arguments.
+     *
+     * @returns {(Promise<Args | void>)}
+     * @memberof ArgumentManager
+     *
+     * ****
+     *
+     * ### Example
+     * ```ts
+     * const argManager = new ArgumentManager(command, prefix, prompt, message, argString);
+     *
+     * const args = await argManager.parseArgs();
+     * ```
+     */
     async parseArgs(): Promise<Args | void> {
         if (this.argString === undefined) throw new Error('No argString Provided');
         if (!this.message) throw new Error('No message Provided');

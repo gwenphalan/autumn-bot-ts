@@ -36,27 +36,25 @@ const callback = async (
         await msg.edit(embed);
 
         if (channel !== message.channel) {
-            await message.client.sendEmbed(
-                message,
-                'Custom Embeds',
+            await prompt.embed(
                 'Embed Created',
                 `You can customize the new embed by doing the command \`${prefix}embed edit ${msg.channel.toString()} ${msg.id}\``
             );
         }
     } else if (act === 'edit') {
-        if (!channel) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `Please provide a text channel!`);
+        if (!channel) return prompt.error(`Please provide a text channel!`);
 
-        if (!id) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `Please provide a message ID!`);
+        if (!id) return prompt.error(`Please provide a message ID!`);
 
         const msg = await channel.messages.fetch(id).catch(() => null);
 
-        if (!msg) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `I couldn't find message with ID \`${id}\` in ${channel.toString()}!`);
+        if (!msg) return prompt.error(`I couldn't find message with ID \`${id}\` in ${channel.toString()}!`);
 
-        if (msg.author.id !== client.user?.id) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `I can't edit a message I didn't send!`);
+        if (msg.author.id !== client.user?.id) return prompt.error(`I can't edit a message I didn't send!`);
 
         embed = msg.embeds[0];
 
-        if (!msg.embeds.length) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `Message with ID \`${id}\` does not have an embed!`);
+        if (!msg.embeds.length) return prompt.error(`Message with ID \`${id}\` does not have an embed!`);
 
         type embedAction =
             | 'setTitle'
@@ -132,8 +130,7 @@ const callback = async (
             }
         } else if (action === 'editField') {
             const options: string[] = [];
-            if (!embed.fields.length)
-                return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `Embed with ID \`${id}\` doesn't have any fields to edit!`);
+            if (!embed.fields.length) return prompt.error(`Embed with ID \`${id}\` doesn't have any fields to edit!`);
 
             let index = 0;
             if (embed.fields.length > 1) {
@@ -222,31 +219,21 @@ const callback = async (
 
         const key = await uploadHaste(JSON.stringify(msg.embeds[0].toJSON()));
 
-        message.client.sendEmbed(message, 'Custom Embeds', 'Embed Copied', `You can paste the embed with \`${prefix}embed paste <channel> ${key}\``);
+        prompt.embed('Embed Copied', `You can paste the embed with \`${prefix}embed paste <channel> ${key}\``);
     } else if (act === 'paste') {
-        if (!channel) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `Please provide a text channel!`);
+        if (!channel) return prompt.error(`Please provide a text channel!`);
 
-        if (!id) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `Please provide a pasteID!`);
+        if (!id) return prompt.error(`Please provide a pasteID!`);
 
         const paste = await fetchHaste(id);
 
-        if (!paste) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `I couldn't find a copied embed with id \`${id}\`!`);
+        if (!paste) return prompt.error(`I couldn't find a copied embed with id \`${id}\`!`);
 
-        try {
-            embed = JSON.parse(paste);
-        } catch (err) {
-            message.client.sendEmbed(message, undefined, 'Error', err);
-            return console.log(err);
-        }
+        embed = JSON.parse(paste);
 
         channel.send({ embed: embed });
 
-        const response = await message.client.sendEmbed(message, 'Custom Embeds', 'Embed Pasted');
-        await response
-            .delete({
-                timeout: 5000
-            })
-            .catch(() => null);
+        prompt.embed('Embed Pasted');
     }
     return;
 };

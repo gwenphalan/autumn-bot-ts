@@ -6,7 +6,7 @@ import { client } from '../..';
 import prettyMs from 'pretty-ms';
 import { PromptManager } from '../../interfaces/helpers/PromptManager';
 
-const callback = async (message: AMessage, args: { member: GuildMember; time: number; reason?: string }, _prompt: PromptManager) => {
+const callback = async (message: AMessage, args: { member: GuildMember; time: number; reason?: string }, prompt: PromptManager) => {
     if (!message.guild || !message.member) return;
 
     const guildSettings = message.guild?.id ? await getGuildSettings(message.guild.id) : null;
@@ -16,10 +16,7 @@ const callback = async (message: AMessage, args: { member: GuildMember; time: nu
     const moderation = guildSettings.moderation;
 
     if (!moderation.enabled)
-        return message.client.sendEmbed(
-            message,
-            'Moderation',
-            'Uh Oh!',
+        return prompt.error(
             "Moderation isn't enabled on this server! A server administrator can turn it on with `{prefix}settings moderation enabled set true`"
         );
 
@@ -27,10 +24,9 @@ const callback = async (message: AMessage, args: { member: GuildMember; time: nu
     const time = args.time;
     const reason = args.reason;
 
-    if (!member.bannable) return message.client.sendEmbed(message, 'Moderation', 'Uh Oh!', `I can't mute ${member}!`);
+    if (!member.bannable) return prompt.error(`I can't mute ${member}!`);
 
-    if (message.member.roles.highest.position < member.roles.highest.position)
-        return message.client.sendEmbed(message, 'Moderation', 'Uh Oh!', `You can't mute ${member}!`);
+    if (message.member.roles.highest.position < member.roles.highest.position) return prompt.error(`You can't mute ${member}!`);
 
     const mutedRole = message.guild.roles.cache.get(guildSettings.moderation.mutedRole) || (await createMutedRole(message.guild));
 
@@ -54,9 +50,7 @@ const callback = async (message: AMessage, args: { member: GuildMember; time: nu
             .setTimestamp()
     );
 
-    message.client.sendEmbed(
-        message,
-        'Moderation',
+    prompt.embed(
         'Muted User',
         ` **• User:** ${member}\n **• Reason:** ${reason || 'No Reason Provided'}\n **• Expires In:** ${prettyMs(time)}`,
         undefined,

@@ -31,13 +31,38 @@ export const bannedMemberFilterInexact = (search: string) => (ban: Ban) =>
     ban.user.username.toLowerCase().includes(search.toLowerCase()) ||
     ban.user.tag.toLowerCase().includes(search.toLowerCase()) ||
     search.toLowerCase().includes(ban.user.id);
-export class Parse {
-    prompt: PromptManager;
 
+/**
+ * Used to parse strings into various values.
+ *
+ * @export
+ * @class Parse
+ */
+export class Parse {
+    /**
+     * Used to alert the user in case of an error.
+     *
+     * @type {PromptManager}
+     * @memberof Parse
+     */
+    private prompt: PromptManager;
+
+    /**
+     * Creates an instance of Parse.
+     * @param {PromptManager} prompt Prompt manager used to alert the user in case of an error.
+     * @memberof Parse
+     */
     constructor(prompt: PromptManager) {
         this.prompt = prompt;
     }
 
+    /**
+     * Returns a parsed integer.
+     *
+     * @param {string} str
+     * @returns {(Promise<number | void>)}
+     * @memberof Parse
+     */
     async number(str: string): Promise<number | void> {
         const number = str.match(/\d+/);
 
@@ -46,6 +71,13 @@ export class Parse {
         return parseInt(number[0]);
     }
 
+    /**
+     * Returns a parsed HEX color string.
+     *
+     * @param {string} str
+     * @returns {(Promise<string | void>)}
+     * @memberof Parse
+     */
     async color(str: string): Promise<string | void> {
         const colorData = color(str);
 
@@ -54,6 +86,13 @@ export class Parse {
         return colorData.toHexString();
     }
 
+    /**
+     * Returns a parsed URL string.
+     *
+     * @param {string} str
+     * @returns {(Promise<string | void>)}
+     * @memberof Parse
+     */
     async url(str: string): Promise<string | void> {
         const url = str.match(linkRegex);
 
@@ -62,14 +101,28 @@ export class Parse {
         return url[0];
     }
 
-    async boolean(str: string): Promise<string | void> {
+    /**
+     * Returns a parsed boolean.
+     *
+     * @param {string} str
+     * @returns {(Promise<string | void>)}
+     * @memberof Parse
+     */
+    async boolean(str: string): Promise<boolean | void> {
         const bool = str.match(/(true|false)/gi);
 
         if (!bool) return this.prompt.error(`${str} is not a valid URL!`);
 
-        return bool[0];
+        return bool[0] === 'true';
     }
 
+    /**
+     * Returns a parsed snowflake ID.
+     *
+     * @param {string} str
+     * @returns {(Promise<string | void>)}
+     * @memberof Parse
+     */
     async snowflake(str: string): Promise<string | void> {
         const snowflake = str.match(/\d{17,19}/gi);
 
@@ -78,6 +131,13 @@ export class Parse {
         return snowflake[0];
     }
 
+    /**
+     * Returns a parsed timelength in milliseconds.
+     *
+     * @param {string} str
+     * @returns {(Promise<number | void>)}
+     * @memberof Parse
+     */
     async timeLength(str: string): Promise<number | void> {
         try {
             const time = timestring(str, 'ms');
@@ -87,6 +147,14 @@ export class Parse {
         }
     }
 
+    /**
+     * Returns an imgur link based on image attachment or image link.
+     *
+     * @param {(Message | AMessage)} message
+     * @param {string} str
+     * @returns {(Promise<string | void>)}
+     * @memberof Parse
+     */
     async image(message: Message | AMessage, str: string): Promise<string | void> {
         let imageUrl;
         const urlSearch = str.match(/https?\:\/\/.*\..*.(gif|png|web(p|m)|jpe?g)/gi);
@@ -108,6 +176,14 @@ export class Parse {
         return link;
     }
 
+    /**
+     * Returns guild member.
+     *
+     * @param {Guild} guild
+     * @param {string} str
+     * @returns {(Promise<GuildMember | void>)}
+     * @memberof Parse
+     */
     async member(guild: Guild, str: string): Promise<GuildMember | void> {
         const members = guild.members.cache;
 
@@ -135,6 +211,14 @@ export class Parse {
         }
     }
 
+    /**
+     * Returns banned user.
+     *
+     * @param {Guild} guild
+     * @param {string} str
+     * @returns {(Promise<User | void>)}
+     * @memberof Parse
+     */
     async bannedUser(guild: Guild, str: string): Promise<User | void> {
         const bans = await guild.fetchBans();
 
@@ -162,6 +246,14 @@ export class Parse {
         }
     }
 
+    /**
+     * Returns guild role.
+     *
+     * @param {Guild} guild
+     * @param {string} str
+     * @returns {(Promise<Role | void>)}
+     * @memberof Parse
+     */
     async role(guild: Guild, str: string): Promise<Role | void> {
         const roles = guild.roles.cache;
 
@@ -189,6 +281,14 @@ export class Parse {
         }
     }
 
+    /**
+     * Returns guildChannel
+     *
+     * @param {Guild} guild
+     * @param {string} str
+     * @returns {(Promise<GuildChannel | void>)}
+     * @memberof Parse
+     */
     async guildChannel(guild: Guild, str: string): Promise<GuildChannel | void> {
         const channels = guild.channels.cache;
 
@@ -218,6 +318,14 @@ export class Parse {
         }
     }
 
+    /**
+     * Returns voice channel.
+     *
+     * @param {Guild} guild
+     * @param {string} str
+     * @returns {(Promise<VoiceChannel | void>)}
+     * @memberof Parse
+     */
     async voiceChannel(guild: Guild, str: string): Promise<VoiceChannel | void> {
         const channels = guild.channels.cache;
 
@@ -252,6 +360,14 @@ export class Parse {
         }
     }
 
+    /**
+     * Returns category channel.
+     *
+     * @param {Guild} guild
+     * @param {string} str
+     * @returns {(Promise<CategoryChannel | void>)}
+     * @memberof Parse
+     */
     async categoryChannel(guild: Guild, str: string): Promise<CategoryChannel | void> {
         const channels = guild.channels.cache;
 
@@ -286,6 +402,14 @@ export class Parse {
         }
     }
 
+    /**
+     * Returns text channel.
+     *
+     * @param {Guild} guild
+     * @param {string} str
+     * @returns {(Promise<TextChannel | NewsChannel | void>)}
+     * @memberof Parse
+     */
     async textChannel(guild: Guild, str: string): Promise<TextChannel | NewsChannel | void> {
         const channels = guild.channels.cache;
 

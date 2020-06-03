@@ -53,9 +53,7 @@ const callback = async (message: AMessage, _args: {}, prompt: PromptManager) => 
 
     const role = message.guild.roles.cache.get(reactionRole.roleId);
 
-    return message.client.sendEmbed(
-        message,
-        'Reaction Roles',
+    return prompt.embed(
         'Reaction Role Removed',
         ` • Role: ${role || reactionRole.roleId}\n • Channel: ${channel}\n • Reaction: ${rEmoji}\n • Message ID: ${msg.id}`
     );

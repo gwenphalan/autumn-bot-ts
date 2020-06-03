@@ -1,7 +1,7 @@
 import { Command, AMessage } from '../../interfaces/Client';
 import { PromptManager } from '../../interfaces/helpers/PromptManager';
 
-const callback = async (message: AMessage, _args: {}, prompt: PromptManager) => {
+const callback = async (_message: AMessage, _args: {}, prompt: PromptManager) => {
     const string = await prompt.string(`String`);
     if (!string) return;
 
@@ -37,9 +37,7 @@ const callback = async (message: AMessage, _args: {}, prompt: PromptManager) => 
     const image = await prompt.image(`Image`);
     if (!image) return;
 
-    message.client.sendEmbed(
-        message,
-        'Prompts',
+    prompt.embed(
         "You're all done!",
         `String: ${string}\nTextChannel: ${textChannel}\nVoiceChannel: ${voiceChannel}\nCategoryChannel: ${categoryChannel}\nGuildChannel: ${guildChannel}\nMember: ${member}\nRole: ${role}\nOptions: ${
             options.choice

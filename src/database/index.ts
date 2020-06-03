@@ -26,7 +26,9 @@ db.once('open', () => console.log(`Connected to MongoDB Atlas at ${db.name}!`));
 export const database = {
     infractions: Infraction,
     guildSettings: GuildSettings,
-    userProfiles: UserProfile
+    userProfiles: UserProfile,
+    reactionRoles: ReactionRole,
+    verifyApps: VerifyApp
 };
 
 // Helper function to get a guild's settings
@@ -104,7 +106,7 @@ export const createVerifyApp = async (guildId: string, userId: string, messageId
     return profile;
 };
 
-interface Reaction {
+export interface Reaction {
     name: string;
     id: string | null;
 }

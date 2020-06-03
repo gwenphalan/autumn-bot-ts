@@ -2,23 +2,17 @@ import { Command, AMessage } from '../../interfaces/Client';
 import { getGuildSettings } from '../../database';
 import { PromptManager } from '../../interfaces/helpers/PromptManager';
 
-const callback = async (message: AMessage, args: { prefix?: string }, _prompt: PromptManager) => {
+const callback = async (message: AMessage, args: { prefix?: string }, prompt: PromptManager) => {
     if (!message.guild) return;
     const guildSettings = await getGuildSettings(message.guild.id);
 
-    if (!args.prefix)
-        return message.client.sendEmbed(
-            message,
-            undefined,
-            'Prefix',
-            `Your prefix is set to \`${guildSettings.general.prefix || message.client.config.defaultPrefix}\``
-        );
+    if (!args.prefix) return prompt.embed(`Your prefix is set to \`${guildSettings.general.prefix || message.client.config.defaultPrefix}\``);
 
     // Gets the guild's settings and set the prefix
     guildSettings.general.prefix = args.prefix;
     guildSettings.save();
 
-    return message.client.sendEmbed(message, undefined, 'Change Prefix', `Your prefix has been set to \`${args.prefix}\``);
+    return prompt.embed(`Your prefix has been set to \`${args.prefix}\``);
 };
 
 export const command: Command = {

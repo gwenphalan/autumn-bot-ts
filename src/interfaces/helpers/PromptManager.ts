@@ -1,4 +1,4 @@
-import { AMessage, Client } from '../Client';
+import { AMessage, Client, checkPerm } from '../Client';
 import {
     TextChannel,
     DMChannel,
@@ -13,9 +13,12 @@ import {
     CategoryChannel,
     MessageReaction,
     GuildEmoji,
-    ReactionEmoji
+    ReactionEmoji,
+    EmbedField,
+    MessageAttachment
 } from 'discord.js';
 import { Parse } from './Parse';
+import { replace } from '../../util';
 
 interface OptionsResponse {
     index: number;
@@ -41,6 +44,13 @@ export class PromptManager {
         this.parse = new Parse(this);
     }
 
+    /**
+     * Initializes the prompt if there is no `this.GUI` with a loading emote, then returns the GUI message.
+     *
+     * @private
+     * @returns {Promise<AMessage>}
+     * @memberof PromptManager
+     */
     private async init(): Promise<AMessage> {
         if (this.GUI) return this.GUI;
 
@@ -51,8 +61,21 @@ export class PromptManager {
         return this.GUI;
     }
 
-    private async sendEmbed(embed: MessageEmbed): Promise<AMessage> {
+    /**
+     * Edits the GUI with the given title and body.
+     *
+     * @param {string} [title]
+     * @param {string} [body]
+     * @returns {Promise<AMessage>}
+     * @memberof PromptManager
+     */
+    async sendMsg(title?: string, body?: string): Promise<AMessage> {
         let GUI;
+        const embed = new MessageEmbed().setColor(this.client.config.accentColor).setTimestamp();
+
+        if (title) embed.setTitle(title);
+        if (body) embed.setDescription(body);
+        if (this.module) embed.setAuthor(this.module, this.client.user?.displayAvatarURL({ format: 'png', dynamic: true }));
 
         if (this.GUI) {
             GUI = this.GUI;
@@ -66,16 +89,10 @@ export class PromptManager {
         return GUI;
     }
 
-    async sendMsg(title?: string, body?: string): Promise<AMessage> {
-        const embed = new MessageEmbed().setColor(this.client.config.accentColor).setTimestamp();
-
-        if (title) embed.setTitle(title);
-        if (body) embed.setDescription(body);
-        if (this.module) embed.setAuthor(this.module, this.client.user?.displayAvatarURL({ format: 'png', dynamic: true }));
-
-        return this.sendEmbed(embed);
-    }
-
+    /**
+     * Sends a new embed with the error message, then deletes the prompt.
+     * @param message
+     */
     async error(message: string): Promise<void> {
         const embed = new MessageEmbed().setColor('#DB6260').setTimestamp().setTitle('Uh Oh!').setDescription(message);
         if (this.module) embed.setAuthor(this.module, this.client.user?.displayAvatarURL({ format: 'png', dynamic: true }));
@@ -85,22 +102,117 @@ export class PromptManager {
         return this.delete();
     }
 
+    /**
+     * Edits the GUI with a loading emote to indicate the current prompt is finished and the next one is loading.
+     */
     private async done(): Promise<void> {
         const GUI = await this.init();
 
         GUI.edit(`<a:loading:${this.client.constants.emotes.aLoading}>`).catch(() => null);
     }
 
+    /**
+     * Deletes the GUI
+     *
+     * @memberof PromptManager
+     */
     async delete() {
         this.GUI?.delete().catch(() => null);
     }
 
+    /**
+     * Sends an embed in the prompt channel with the given parameters.
+     *
+     * @param {string} [title]
+     * @param {string} [body]
+     * @param {string} [thumbnail]
+     * @param {EmbedField[]} [fields]
+     * @param {string} [color]
+     * @param {{
+     *             text: any;
+     *             iconURL?: string;
+     *         }} [footer] Object containing the footer text and iconURL.
+     * @param {boolean} [displayAuthor]
+     * @param {(string | Buffer)} [image]
+     * @returns
+     * @memberof PromptManager
+     */
+    async embed(
+        title?: string,
+        body?: string,
+        thumbnail?: string,
+        fields?: EmbedField[],
+        color?: string,
+        footer?: {
+            text: any;
+            iconURL?: string;
+        },
+        displayAuthor?: boolean,
+        image?: string | Buffer
+    ) {
+        const embedPermission = checkPerm(this.trigger, 'EMBED_LINKS');
+
+        const guildSettings = await this.trigger.guild.settings();
+
+        const embed = new MessageEmbed().setTimestamp().setColor(color ? color : this.client.config.accentColor);
+
+        const prefix = guildSettings?.general.prefix;
+
+        const placeholders: { [prop: string]: string } = {
+            guildName: this.trigger.guild ? this.trigger.guild.name : this.trigger.author.username,
+            username: this.user.username,
+            defaultPrefix: this.client.config.defaultPrefix,
+            prefix: prefix ? prefix : this.client.config.defaultPrefix
+        };
+
+        footer ? embed.setFooter(replace(footer.text, placeholders), footer.iconURL) : null;
+
+        displayAuthor
+            ? embed.setFooter(`Requested By ${this.user.username}#${this.user.discriminator}`, this.user.displayAvatarURL({ dynamic: true, format: 'png' }))
+            : null;
+
+        this.module ? embed.setAuthor(replace(this.module, placeholders), this.client.user?.displayAvatarURL({ dynamic: true, format: 'png' })) : null;
+
+        title ? embed.setTitle(replace(title, placeholders)) : null;
+
+        body ? embed.setDescription(replace(body, placeholders)) : null;
+
+        thumbnail ? embed.setThumbnail(thumbnail) : null;
+
+        fields?.forEach(field => embed.addField(replace(field.name, placeholders), replace(field.value, placeholders), field.inline));
+
+        if (image) {
+            if (image instanceof Buffer) {
+                const attachment = new MessageAttachment(image, 'attachment.png');
+
+                embed.attachFiles([attachment]);
+                embed.setImage('attachment://attachment.png');
+            } else {
+                embed.setImage(image);
+            }
+        }
+
+        let fieldString = '';
+        fields?.forEach(field => (fieldString += `\n\n**${replace(field.name, placeholders)}**\n${replace(field.value, placeholders)}`));
+        const text = `${title ? `***${replace(title, placeholders)}*` : ''}${body ? `\n\n${replace(body, placeholders)}` : ''}${fieldString}`;
+
+        return await this.channel.send(embedPermission ? embed : text);
+    }
+
+    /**
+     * Prompts the user for a string response.
+     *
+     * @param {string} question
+     * @param {boolean} [optional] If optional, the prompt will state "Type `none` to leave this blank."
+     * @returns {(Promise<string | 'none' | void>)}
+     * @memberof PromptManager
+     */
     async string(question: string, optional: true): Promise<string | 'none' | void>;
 
     async string(question: string, optional?: false): Promise<string | void>;
 
     async string(question: string, optional?: boolean): Promise<string | 'none' | void> {
-        await this.sendMsg(question, `Type \`cancel\` to cancel at any time.`);
+        await this.sendMsg(question, `${optional ? 'Type `none` to leave this blank.\n\n' : ''}Type \`cancel\` to cancel at any time.`);
 
         const input = (await this.channel.awaitMessages((msg: Message) => msg.author.id === this.user.id, { max: 1, time: 1000 * 60 * this.timeout })).first();
 
@@ -116,7 +228,15 @@ export class PromptManager {
 
         return input.content;
     }
-
+    /**
+     * Prompts the user for a string response, returns a number (or a string if `string` is `true`)
+     *
+     * @param {string} question
+     * @param {boolean} [string] Returns a number as a string instead of a number.
+     * @param {boolean} [optional] If optional, the prompt will state "Type `none` to leave this blank."
+     * @returns {(Promise<number | string | 'none' | void>)}
+     * @memberof PromptManager
+     */
     async number(question: string): Promise<number | void>;
 
     async number(question: string, string: true): Promise<string | void>;
@@ -128,7 +248,7 @@ export class PromptManager {
     async number(question: string, string: false, optional: true): Promise<number | 'none' | void>;
 
     async number(question: string, string?: boolean, optional?: boolean): Promise<number | string | 'none' | void> {
-        await this.sendMsg(question, `Type \`cancel\` to cancel at any time.`);
+        await this.sendMsg(question, `${optional ? 'Type `none` to leave this blank.\n\n' : ''}Type \`cancel\` to cancel at any time.`);
 
         const input = (await this.channel.awaitMessages((msg: Message) => msg.author.id === this.user.id, { max: 1, time: 1000 * 60 * this.timeout })).first();
 
@@ -150,13 +270,20 @@ export class PromptManager {
 
         return number;
     }
-
+    /**
+     *
+     *
+     * @param {string} question
+     * @param {boolean} [optional] If optional, the prompt will state "Type `none` to leave this blank."
+     * @returns {(Promise<string | 'none' | void>)}
+     * @memberof PromptManager
+     */
     async url(question: string, optional: true): Promise<string | 'none' | void>;
 
     async url(question: string, optional?: false): Promise<string | void>;
 
     async url(question: string, optional?: boolean): Promise<string | 'none' | void> {
-        await this.sendMsg(question, `Type \`cancel\` to cancel at any time.`);
+        await this.sendMsg(question, `${optional ? 'Type `none` to leave this blank.\n\n' : ''}Type \`cancel\` to cancel at any time.`);
 
         const input = (await this.channel.awaitMessages((msg: Message) => msg.author.id === this.user.id, { max: 1, time: 1000 * 60 * this.timeout })).first();
 
@@ -177,6 +304,13 @@ export class PromptManager {
         return url;
     }
 
+    /**
+     * Prompts to react with a yes/no format. Returns a boolean
+     *
+     * @param {string} question
+     * @returns {(Promise<boolean | void>)}
+     * @memberof PromptManager
+     */
     async boolean(question: string): Promise<boolean | void> {
         const GUI = await this.sendMsg(question, `\nReact with <:leave:${this.client.constants.emotes.leave}> to cancel.`);
 
@@ -202,13 +336,22 @@ export class PromptManager {
         return answer.emoji.id === this.client.constants.emotes.yes;
     }
 
+    /**
+     *  Prompts the user for a messageID, returns the fetched message.
+     *
+     * @param {string} question
+     * @param {(TextChannel | NewsChannel)} channel
+     * @param {boolean} [optional] If optional, the prompt will state "Type `none` to leave this blank."
+     * @returns {(Promise<AMessage | 'none' | void>)}
+     * @memberof PromptManager
+     */
     async message(question: string, channel: TextChannel | NewsChannel, optional: true): Promise<AMessage | 'none' | void>;
 
     async message(question: string, channel: TextChannel | NewsChannel, optional?: false): Promise<AMessage | void>;
 
     async message(question: string, channel: TextChannel | NewsChannel, optional?: boolean): Promise<AMessage | 'none' | void> {
         if (this.channel instanceof DMChannel || !this.trigger.guild) throw new Error('Message Prompt Used In DM');
-        await this.sendMsg(question, `Type \`cancel\` to cancel at any time.`);
+        await this.sendMsg(question, `${optional ? 'Type `none` to leave this blank.\n\n' : ''}Type \`cancel\` to cancel at any time.`);
 
         const input = (await this.channel.awaitMessages((msg: Message) => msg.author.id === this.user.id, { max: 1, time: 1000 * 60 * this.timeout })).first();
 
@@ -232,14 +375,21 @@ export class PromptManager {
 
         return message as AMessage;
     }
-
+    /**
+     * Prompts the user for a text channel. Returns the text channel object.
+     *
+     * @param {string} question
+     * @param {boolean} [optional] If optional, the prompt will state "Type `none` to leave this blank."
+     * @returns {(Promise<TextChannel | NewsChannel | 'none' | void>)}
+     * @memberof PromptManager
+     */
     async textChannel(question: string, optional: true): Promise<TextChannel | NewsChannel | 'none' | void>;
 
     async textChannel(question: string, optional?: false): Promise<TextChannel | NewsChannel | void>;
 
     async textChannel(question: string, optional?: boolean): Promise<TextChannel | NewsChannel | 'none' | void> {
         if (this.channel instanceof DMChannel || !this.trigger.guild) throw new Error('Channel Prompt Used In DM');
-        await this.sendMsg(question, `Type \`cancel\` to cancel at any time.`);
+        await this.sendMsg(question, `${optional ? 'Type `none` to leave this blank.\n\n' : ''}Type \`cancel\` to cancel at any time.`);
 
         const input = (await this.channel.awaitMessages((msg: Message) => msg.author.id === this.user.id, { max: 1, time: 1000 * 60 * this.timeout })).first();
 
@@ -258,14 +408,21 @@ export class PromptManager {
 
         return channel;
     }
-
+    /**
+     * Prompts the user for a voice channel. Returns the voice channel object.
+     *
+     * @param {string} question
+     * @param {boolean} [optional] If optional, the prompt will state "Type `none` to leave this blank."
+     * @returns {(Promise<VoiceChannel | 'none' | void>)}
+     * @memberof PromptManager
+     */
     async voiceChannel(question: string, optional: true): Promise<VoiceChannel | 'none' | void>;
 
     async voiceChannel(question: string, optional?: false): Promise<VoiceChannel | void>;
 
     async voiceChannel(question: string, optional?: boolean): Promise<VoiceChannel | 'none' | void> {
         if (this.channel instanceof DMChannel || !this.trigger.guild) throw new Error('Voice Channel Prompt Used In DM');
-        await this.sendMsg(question, `Type \`cancel\` to cancel at any time.`);
+        await this.sendMsg(question, `${optional ? 'Type `none` to leave this blank.\n\n' : ''}Type \`cancel\` to cancel at any time.`);
 
         const input = (await this.channel.awaitMessages((msg: Message) => msg.author.id === this.user.id, { max: 1, time: 1000 * 60 * this.timeout })).first();
 
@@ -284,14 +441,21 @@ export class PromptManager {
 
         return channel;
     }
-
+    /**
+     * Prompts the user for a category channel. Returns the category channel object.
+     *
+     * @param {string} question
+     * @param {boolean} [optional] If optional, the prompt will state "Type `none` to leave this blank."
+     * @returns {(Promise<CategoryChannel | 'none' | void>)}
+     * @memberof PromptManager
+     */
     async categoryChannel(question: string, optional: true): Promise<CategoryChannel | 'none' | void>;
 
     async categoryChannel(question: string, optional?: false): Promise<CategoryChannel | void>;
 
     async categoryChannel(question: string, optional?: boolean): Promise<CategoryChannel | 'none' | void> {
         if (this.channel instanceof DMChannel || !this.trigger.guild) throw new Error('Voice Channel Prompt Used In DM');
-        await this.sendMsg(question, `Type \`cancel\` to cancel at any time.`);
+        await this.sendMsg(question, `${optional ? 'Type `none` to leave this blank.\n\n' : ''}Type \`cancel\` to cancel at any time.`);
 
         const input = (await this.channel.awaitMessages((msg: Message) => msg.author.id === this.user.id, { max: 1, time: 1000 * 60 * this.timeout })).first();
 
@@ -310,14 +474,21 @@ export class PromptManager {
 
         return channel;
     }
-
+    /**
+     * Prompts the user for a guild channel. Returns the guild channel object.
+     *
+     * @param {string} question
+     * @param {boolean} [optional] If optional, the prompt will state "Type `none` to leave this blank."
+     * @returns {(Promise<GuildChannel | 'none' | void>)}
+     * @memberof PromptManager
+     */
     async guildChannel(question: string, optional: true): Promise<GuildChannel | 'none' | void>;
 
     async guildChannel(question: string, optional?: false): Promise<GuildChannel | void>;
 
     async guildChannel(question: string, optional?: boolean): Promise<GuildChannel | 'none' | void> {
         if (this.channel instanceof DMChannel || !this.trigger.guild) throw new Error('Voice Channel Prompt Used In DM');
-        await this.sendMsg(question, `Type \`cancel\` to cancel at any time.`);
+        await this.sendMsg(question, `${optional ? 'Type `none` to leave this blank.\n\n' : ''}Type \`cancel\` to cancel at any time.`);
 
         const input = (await this.channel.awaitMessages((msg: Message) => msg.author.id === this.user.id, { max: 1, time: 1000 * 60 * this.timeout })).first();
 
@@ -336,14 +507,21 @@ export class PromptManager {
 
         return channel;
     }
-
+    /**
+     * Prompts the user for a guild member. Returns the guild member object.
+     *
+     * @param {string} question
+     * @param {boolean} [optional] If optional, the prompt will state "Type `none` to leave this blank."
+     * @returns {(Promise<GuildMember | 'none' | void>)}
+     * @memberof PromptManager
+     */
     async member(question: string, optional: true): Promise<GuildMember | 'none' | void>;
 
     async member(question: string, optional?: false): Promise<GuildMember | void>;
 
     async member(question: string, optional?: boolean): Promise<GuildMember | 'none' | void> {
         if (this.channel instanceof DMChannel || !this.trigger.guild) throw new Error('Member Prompt Used In DM');
-        await this.sendMsg(question, `Type \`cancel\` to cancel at any time.`);
+        await this.sendMsg(question, `${optional ? 'Type `none` to leave this blank.\n\n' : ''}Type \`cancel\` to cancel at any time.`);
 
         const input = (await this.channel.awaitMessages((msg: Message) => msg.author.id === this.user.id, { max: 1, time: 1000 * 60 * this.timeout })).first();
 
@@ -363,13 +541,21 @@ export class PromptManager {
         return member;
     }
 
+    /**
+     * Prompts the user for a banned user. Returns the user object.
+     *
+     * @param {string} question
+     * @param {boolean} [optional] If optional, the prompt will state "Type `none` to leave this blank."
+     * @returns {(Promise<User | 'none' | void>)}
+     * @memberof PromptManager
+     */
     async bannedUser(question: string, optional: true): Promise<User | 'none' | void>;
 
     async bannedUser(question: string, optional?: false): Promise<User | void>;
 
     async bannedUser(question: string, optional?: boolean): Promise<User | 'none' | void> {
         if (this.channel instanceof DMChannel || !this.trigger.guild) throw new Error('Banned User Prompt Used In DM');
-        await this.sendMsg(question, `Type \`cancel\` to cancel at any time.`);
+        await this.sendMsg(question, `${optional ? 'Type `none` to leave this blank.\n\n' : ''}Type \`cancel\` to cancel at any time.`);
 
         const input = (await this.channel.awaitMessages((msg: Message) => msg.author.id === this.user.id, { max: 1, time: 1000 * 60 * this.timeout })).first();
 
@@ -389,13 +575,21 @@ export class PromptManager {
         return member;
     }
 
+    /**
+     * Prompts the user for a role. Returns the role object.
+     *
+     * @param {string} question
+     * @param {boolean} [optional] If optional, the prompt will state "Type `none` to leave this blank."
+     * @returns {(Promise<User | 'none' | void>)}
+     * @memberof PromptManager
+     */
     async role(question: string, optional: true): Promise<Role | 'none' | void>;
 
     async role(question: string, optional?: false): Promise<Role | void>;
 
     async role(question: string, optional?: boolean): Promise<Role | 'none' | void> {
         if (this.channel instanceof DMChannel || !this.trigger.guild) throw new Error('Role Prompt Used In DM');
-        await this.sendMsg(question, `Type \`cancel\` to cancel at any time.`);
+        await this.sendMsg(question, `${optional ? 'Type `none` to leave this blank.\n\n' : ''}Type \`cancel\` to cancel at any time.`);
 
         const input = (await this.channel.awaitMessages((msg: Message) => msg.author.id === this.user.id, { max: 1, time: 1000 * 60 * this.timeout })).first();
 
@@ -415,13 +609,21 @@ export class PromptManager {
         return role;
     }
 
+    /**
+     * Prompts the user for an image. Returns imgur link.
+     *
+     * @param {string} question
+     * @param {boolean} [optional] If optional, the prompt will state "Type `none` to leave this blank."
+     * @returns {(Promise<string | 'none' | void>)}
+     * @memberof PromptManager
+     */
     async image(question: string, optional: true): Promise<string | 'none' | void>;
 
     async image(question: string, optional?: false): Promise<string | void>;
 
     async image(question: string, optional?: boolean): Promise<string | 'none' | void> {
         if (this.channel instanceof DMChannel) throw new Error('Role Prompt Used In DM');
-        await this.sendMsg(question, `Type \`cancel\` to cancel at any time.`);
+        await this.sendMsg(question, `${optional ? 'Type `none` to leave this blank.\n\n' : ''}Type \`cancel\` to cancel at any time.`);
 
         const input = (await this.channel.awaitMessages((msg: Message) => msg.author.id === this.user.id, { max: 1, time: 1000 * 60 * this.timeout })).first();
 
@@ -442,13 +644,26 @@ export class PromptManager {
         return link;
     }
 
+    /**
+     * Prompts the user for a color. Returns hex string.
+     *
+     * @param {string} question
+     * @param {boolean} [optional] If optional, the prompt will state "Type `none` to leave this blank."
+     * @returns {(Promise<string | 'none' | void>)}
+     * @memberof PromptManager
+     */
     async color(question: string, optional: true): Promise<string | 'none' | void>;
 
     async color(question: string, optional?: false): Promise<string | void>;
 
     async color(question: string, optional?: boolean): Promise<string | 'none' | void> {
         if (this.channel instanceof DMChannel) throw new Error('Role Prompt Used In DM');
-        await this.sendMsg(question, `• [Adobe Color Picker](https://color.adobe.com/create)\n\nType \`cancel\` to cancel at any time.`);
+        await this.sendMsg(
+            question,
+            `• [Adobe Color Picker](https://color.adobe.com/create)\n\n${
+                optional ? 'Type `none` to leave this blank.\n\n' : ''
+            }Type \`cancel\` to cancel at any time.`
+        );
 
         const input = (await this.channel.awaitMessages((msg: Message) => msg.author.id === this.user.id, { max: 1, time: 1000 * 60 * this.timeout })).first();
 
@@ -467,6 +682,15 @@ export class PromptManager {
         return color;
     }
 
+    /**
+     * Provides the user with a list of numbered options. Returns an object containing the index of the option as well as the option string.
+     *
+     * @param {string} question
+     * @param {string[]} options
+     * @param {boolean} [optional] If optional, the prompt will state "Type `none` to leave this blank."
+     * @returns {(Promise<OptionsResponse | 'none' | void>)}
+     * @memberof PromptManager
+     */
     async options(question: string, options: string[], optional: true): Promise<OptionsResponse | 'none' | void>;
 
     async options(question: string, options: string[], optional?: false): Promise<OptionsResponse | void>;
@@ -476,7 +700,7 @@ export class PromptManager {
 
         const opts = options.map((o, i) => `\`${i + 1}\`: ${o}`);
 
-        await this.sendMsg(question, `${opts.join('\n')}\n\nType \`cancel\` to cancel at any time.`);
+        await this.sendMsg(question, `${opts.join('\n')}\n\n${optional ? 'Type `none` to leave this blank.\n\n' : ''}Type \`cancel\` to cancel at any time.`);
 
         const input = (await this.channel.awaitMessages((msg: Message) => msg.author.id === this.user.id, { max: 1, time: 1000 * 60 * this.timeout })).first();
 
@@ -501,6 +725,13 @@ export class PromptManager {
         };
     }
 
+    /**
+     * Prompts the user to react with a chosen emoji.
+     *
+     * @param {string} question
+     * @returns {(Promise<void | GuildEmoji | ReactionEmoji>)}
+     * @memberof PromptManager
+     */
     async emoji(question: string): Promise<void | GuildEmoji | ReactionEmoji> {
         const GUI = await this.sendMsg(question, `React with your chosen emoji, or react with <:leave:${this.client.constants.emotes.leave}> to cancel.`);
         const filter = (_reaction: MessageReaction, reactionUser: User) => {
@@ -518,6 +749,8 @@ export class PromptManager {
         if (!response || !reply) return this.error('You ran out of time!');
 
         if (reply?.emoji.id === this.client.constants.emotes.leave) return this.delete();
+
+        if (reply.emoji.id && !this.client.emojis.cache.get(reply.emoji.id)) return this.error("I don't have access to that emoji!");
 
         await this.done();
 
