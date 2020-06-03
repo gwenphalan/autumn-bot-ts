@@ -4,7 +4,7 @@ import { createReactionRole } from '../../database';
 import { PromptManager } from '../../interfaces/helpers/PromptManager';
 //import { createReactionRole } from '../../database';
 
-const callback = async (message: AMessage, _args: string[], prompt: PromptManager) => {
+const callback = async (message: AMessage, _args: {}, prompt: PromptManager) => {
     if (!message.guild) return;
 
     const GUI = await message.channel.send(`<a:loading:${constants.emotes.aLoading}>`);
@@ -41,8 +41,7 @@ export const command: Command = {
     module: 'Reaction Roles',
     aliases: ['rr'],
     description: 'Creates a message reaction that gives users the specified role.',
-    usage: '',
-    requiresArgs: 0,
+    args: [],
     devOnly: false,
     guildOnly: true,
     NSFW: false,

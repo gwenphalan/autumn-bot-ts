@@ -4,7 +4,7 @@ import Color from 'color';
 import { MessageEmbed } from 'discord.js';
 import { PromptManager } from '../../interfaces/helpers/PromptManager';
 
-const callback = async (message: AMessage, _args: string[], _prompt: PromptManager) => {
+const callback = async (message: AMessage, _args: {}, _prompt: PromptManager) => {
     const hue = Math.floor(Math.random() * 360);
     const pastel = 'hsl(' + hue + ', 100%, 80%)';
 
@@ -21,8 +21,7 @@ export const command: Command = {
     module: 'Fun',
     aliases: [],
     description: 'Goose.',
-    usage: '',
-    requiresArgs: 0,
+    args: [],
     devOnly: false,
     guildOnly: false,
     NSFW: false,

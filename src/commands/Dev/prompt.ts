@@ -1,7 +1,7 @@
 import { Command, AMessage } from '../../interfaces/Client';
 import { PromptManager } from '../../interfaces/helpers/PromptManager';
 
-const callback = async (message: AMessage, _args: string[], prompt: PromptManager) => {
+const callback = async (message: AMessage, _args: {}, prompt: PromptManager) => {
     const string = await prompt.string(`String`);
     if (!string) return;
 
@@ -55,8 +55,7 @@ export const command: Command = {
     module: 'Dev',
     aliases: ['pr'],
     description: 'Gives a series of sample prompts',
-    usage: '',
-    requiresArgs: 0,
+    args: [],
     devOnly: true,
     guildOnly: true,
     NSFW: false,

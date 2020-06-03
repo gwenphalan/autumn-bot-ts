@@ -3,10 +3,11 @@ import { Command, Client, AMessage } from '../../interfaces/Client';
 import { client } from '../../index';
 import { config } from '../../../config';
 import { PromptManager } from '../../interfaces/helpers/PromptManager';
+import { ArgumentManager } from '../../interfaces/helpers/ArgumentManager';
 
 const bot = client;
 
-const callback = async (message: AMessage, args: string[], _prompt: PromptManager) => {
+const callback = async (message: AMessage, args: { command?: string }, _prompt: PromptManager) => {
     // Get the guild's settings if on a guild and determine the prefix that needs to be used in the help
     const client = message.client as Client;
     const guildSettings = message.guild ? await client.database.guildSettings.findOne({ guild: message.guild.id }) : null;
@@ -27,7 +28,7 @@ const callback = async (message: AMessage, args: string[], _prompt: PromptManage
         );
 
     // If no arguments are provided, send all commands
-    if (!args.length) {
+    if (!args.command) {
         // Do some Voodoo magic to create an object having all commands sorted by their category
         const commandList: { [key: string]: string[] } = {};
         client.commands.forEach(command => {
@@ -49,15 +50,17 @@ const callback = async (message: AMessage, args: string[], _prompt: PromptManage
     }
 
     // Get the command from the provided args
-    const commandName = args.join(' ').toLowerCase();
+    const commandName = args.command;
     const command = client.commands.find(cmd => cmd.name === commandName || cmd.aliases.includes(commandName));
     if (!command) return message.channel.send('That is not a valid command!');
+
+    const argsManager = new ArgumentManager(command, prefix);
 
     output
         .setTitle(command.name)
         .setDescription(command.description)
         .addFields([
-            { name: 'Usage', value: `${prefix}${command.name}${command.usage ? ' ' + command.usage : ''}` },
+            { name: 'Usage', value: `${argsManager.usage}` },
             { name: 'Aliases', value: command.aliases.join(', ') || 'This command has no aliases.' }
         ]);
 
@@ -70,8 +73,14 @@ export const command: Command = {
     module: 'Help',
     aliases: ['h'],
     description: 'Get a list of all commands or info on a specific command',
-    usage: '[command name]',
-    requiresArgs: 0,
+    args: [
+        {
+            name: 'Command Name',
+            key: 'command',
+            type: 'string',
+            optional: true
+        }
+    ],
     devOnly: false,
     guildOnly: false,
     NSFW: false,

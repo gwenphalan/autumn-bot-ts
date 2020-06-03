@@ -6,7 +6,7 @@ import { replace } from '../util';
 import { getGuildSettings } from '../database';
 import constants from '../constants/constants';
 import { PromptManager } from './helpers/PromptManager';
-
+import { Args, Argument } from './helpers/ArgumentManager';
 // Our custom client adding new properties to the Discord Client
 export class Client extends DClient {
     commands: Collection<string, Command> = new Collection(); // Our commands
@@ -24,15 +24,14 @@ export interface Command {
     category: string; // The category of this command, used to separate commands in the help command
     module: string; // The module displayed on prompts
     description: string; // The description of the command
-    usage: string; // How to use this command
     aliases: string[]; // The aliases of this command, these can be used instead of the name
-    requiresArgs: number; // How many args this command requires
+    args: Argument[];
     devOnly: boolean; // Whether this command should only be usable by developers
     guildOnly: boolean; // Whether this command should only be usable on a guild
     NSFW: boolean;
     userPermissions: PermissionString[];
     botPermissions: PermissionString[];
-    callback(message: BaseMessage, args: string[], prompt: PromptManager): Promise<void | BaseMessage>; // The command function
+    callback(message: BaseMessage, args: Args, prompt: PromptManager): Promise<void | BaseMessage>; // The command function
 }
 
 export interface AMessage extends BaseMessage {

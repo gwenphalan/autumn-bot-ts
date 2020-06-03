@@ -4,7 +4,7 @@ import { PromptManager } from '../../interfaces/helpers/PromptManager';
 
 //const numEmojis = ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣'];
 
-const callback = async (message: AMessage, _args: string[], prompt: PromptManager): Promise<void | Message> => {
+const callback = async (message: AMessage, _args: {}, prompt: PromptManager): Promise<void | Message> => {
     const e = message.client.constants.emotes;
 
     const letEmojis = [
@@ -116,8 +116,7 @@ export const command: Command = {
     module: 'Polls',
     aliases: ['p'],
     description: 'Creates a poll and reacts to it with the corresponding emojis.',
-    usage: '',
-    requiresArgs: 0,
+    args: [],
     devOnly: false,
     guildOnly: false,
     NSFW: false,

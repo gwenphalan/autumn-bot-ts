@@ -5,7 +5,7 @@ import { ReactionRole } from '../../database/schemas/ReactionRoles';
 import { GuildEmoji } from 'discord.js';
 import { PromptManager } from '../../interfaces/helpers/PromptManager';
 
-const callback = async (message: AMessage, _args: string[], prompt: PromptManager) => {
+const callback = async (message: AMessage, _args: {}, prompt: PromptManager) => {
     if (!message.guild) return;
 
     const channel = await prompt.textChannel('What channel is the reaction role in?');
@@ -67,8 +67,7 @@ export const command: Command = {
     module: 'Reaction Roles',
     aliases: [],
     description: 'Removes a reaction role from a message.',
-    usage: '',
-    requiresArgs: 0,
+    args: [],
     devOnly: false,
     guildOnly: true,
     NSFW: false,

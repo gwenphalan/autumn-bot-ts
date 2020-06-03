@@ -3,7 +3,7 @@ import { Command, Client, AMessage } from '../../interfaces/Client';
 import { MessageEmbed, Permissions } from 'discord.js';
 import { PromptManager } from '../../interfaces/helpers/PromptManager';
 
-const callback = async (message: AMessage, args: string[], _prompt: PromptManager) => {
+const callback = async (message: AMessage, args: { code: string }, _prompt: PromptManager) => {
     // Define a bunch of shortcuts which will be usable in your eval code
     const client = message.client as Client;
     //@ts-ignore
@@ -32,10 +32,10 @@ const callback = async (message: AMessage, args: string[], _prompt: PromptManage
     try {
         let output =
             (await eval(`( async () => {
-            ${args.join(' ')}
+            ${args.code}
           })()`)) ||
             (await eval(`( async () => {
-            return ${args.join(' ')}
+            return ${args.code}
           })()`));
 
         if (typeof output !== 'string') output = require('util').inspect(output);
@@ -55,8 +55,14 @@ export const command: Command = {
     module: 'Dev',
     aliases: ['console', 'debug'],
     description: 'Used to run commands from discord',
-    usage: '<code>',
-    requiresArgs: 1,
+    args: [
+        {
+            name: 'Code',
+            key: 'code',
+            description: 'JavaScript code to run.',
+            type: 'string'
+        }
+    ],
     devOnly: true,
     guildOnly: false,
     NSFW: false,

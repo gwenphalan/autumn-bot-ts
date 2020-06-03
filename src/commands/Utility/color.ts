@@ -3,12 +3,10 @@ import color from 'tinycolor2';
 import Canvas from 'canvas';
 import { PromptManager } from '../../interfaces/helpers/PromptManager';
 
-const callback = async (message: AMessage, args: string[], _prompt: PromptManager) => {
-    const arg = args.join(' ') || color.random().toHexString();
+const callback = async (message: AMessage, args: { color?: string }, _prompt: PromptManager) => {
+    const arg = args.color || color.random().toHexString();
 
     const colorData = color(arg);
-
-    if (!colorData.isValid()) return message.client.sendEmbed(message, 'Color', 'Uh Oh!', `\`${arg}\` is not a valid color!`);
 
     const canvas = Canvas.createCanvas(700, 700);
     const ctx = canvas.getContext('2d');
@@ -37,8 +35,13 @@ export const command: Command = {
     module: 'Utility',
     aliases: [],
     description: 'Displays the provided color, or gives a random one.',
-    usage: '',
-    requiresArgs: 0,
+    args: [
+        {
+            name: 'Color',
+            key: 'color',
+            type: 'color'
+        }
+    ],
     devOnly: false,
     guildOnly: false,
     NSFW: false,

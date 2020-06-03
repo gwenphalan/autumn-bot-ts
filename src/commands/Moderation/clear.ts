@@ -4,7 +4,7 @@ import { TextChannel, MessageEmbed } from 'discord.js';
 import { client } from '../..';
 import { PromptManager } from '../../interfaces/helpers/PromptManager';
 
-const callback = async (message: AMessage, args: string[], _prompt: PromptManager) => {
+const callback = async (message: AMessage, args: { amount: number; reason?: string }, _prompt: PromptManager) => {
     if (!message.guild) return;
 
     const guildSettings = await getGuildSettings(message.guild.id);
@@ -21,14 +21,8 @@ const callback = async (message: AMessage, args: string[], _prompt: PromptManage
             "Moderation isn't enabled on this server! A server administrator can turn it on with `{prefix}settings moderation enabled set true`"
         );
 
-    const [arg1] = args;
-
-    const amount = parseInt(arg1);
-
-    if (!arg1)
-        return message.client.sendEmbed(message, 'Moderation', 'Missing Arguments: `Amount`', 'Command Usage:\n`{prefix}clear <Amount (MAX: 100)> [Reason]`');
-
-    if (!amount) return message.client.sendEmbed(message, 'Moderation', 'Uh Oh!', `${arg1} is not a valid number!`);
+    const amount = args.amount;
+    const reason = args.reason;
 
     if (amount > 100) return message.client.sendEmbed(message, 'Moderation', 'Uh Oh!', 'I can only clear 100 messages at a time!');
 
@@ -44,8 +38,6 @@ const callback = async (message: AMessage, args: string[], _prompt: PromptManage
     m.delete({
         timeout: 5000
     });
-
-    const reason = args.slice(1).join(' ');
 
     const modLog = message.guild.channels.cache.get(moderation.modLog);
 
@@ -71,8 +63,21 @@ export const command: Command = {
     module: 'Moderation',
     aliases: [],
     description: 'Clears up to 100 messages from a channel.',
-    usage: '<amount (MAX: 100)> [Reason]',
-    requiresArgs: 0,
+    args: [
+        {
+            name: 'Amount (MAX: 100)',
+            description: 'Amount of messages to be cleared. Max: 100',
+            key: 'amount',
+            type: 'number'
+        },
+        {
+            name: 'Reason',
+            description: 'Reason for clearing the messages.',
+            key: 'reason',
+            type: 'string',
+            optional: true
+        }
+    ],
     devOnly: false,
     guildOnly: true,
     NSFW: false,

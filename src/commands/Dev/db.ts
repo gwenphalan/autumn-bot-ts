@@ -3,7 +3,7 @@ import { getGuildSettings } from '../../database';
 import { client } from '../..';
 import { PromptManager } from '../../interfaces/helpers/PromptManager';
 
-const callback = async (message: AMessage, _args: string[], _prompt: PromptManager) => {
+const callback = async (message: AMessage, _args: {}, _prompt: PromptManager) => {
     let i = 0;
     await Promise.all(
         client.guilds.cache.map(g => {
@@ -21,8 +21,7 @@ export const command: Command = {
     module: 'Dev',
     aliases: [],
     description: '',
-    usage: '',
-    requiresArgs: 0,
+    args: [],
     devOnly: true,
     guildOnly: false,
     NSFW: false,

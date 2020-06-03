@@ -1,10 +1,10 @@
 import { Command, AMessage } from '../../interfaces/Client';
 import { neko } from '../../neko/';
-import { MessageEmbed } from 'discord.js';
+import { MessageEmbed, GuildMember } from 'discord.js';
 import Color from 'color';
 import { PromptManager } from '../../interfaces/helpers/PromptManager';
 
-const callback = async (message: AMessage, args: string[], prompt: PromptManager) => {
+const callback = async (message: AMessage, args: { member: GuildMember }, _prompt: PromptManager) => {
     if (!message.guild) return;
 
     const hue = Math.floor(Math.random() * 360);
@@ -12,8 +12,7 @@ const callback = async (message: AMessage, args: string[], prompt: PromptManager
 
     const color = Color(pastel).hex();
 
-    const member = await prompt.parse.member(message.guild, args.join(' '));
-    if (!member) return;
+    const member = args.member;
 
     const result = await neko.sfw.pat();
 
@@ -27,9 +26,15 @@ export const command: Command = {
     category: 'Fun',
     module: 'Fun',
     aliases: [],
-    description: 'Pokes the targeted user.',
-    usage: '<user>',
-    requiresArgs: 0,
+    description: 'Pats the targeted user.',
+    args: [
+        {
+            name: 'User',
+            description: 'User that will be patted.',
+            key: 'member',
+            type: 'guildMember'
+        }
+    ],
     devOnly: false,
     guildOnly: true,
     NSFW: false,

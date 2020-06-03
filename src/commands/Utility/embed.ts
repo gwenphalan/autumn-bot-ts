@@ -1,11 +1,15 @@
-import { MessageEmbed, TextChannel, EmbedField } from 'discord.js';
+import { MessageEmbed, TextChannel, EmbedField, NewsChannel, DMChannel } from 'discord.js';
 import { Command, AMessage } from '../../interfaces/Client';
 import { getGuildSettings } from '../../database';
 import { uploadHaste, fetchHaste } from '../../util/hastebin';
 import { client } from '../../index';
 import { PromptManager } from '../../interfaces/helpers/PromptManager';
 
-const callback = async (message: AMessage, args: string[], prompt: PromptManager) => {
+const callback = async (
+    message: AMessage,
+    args: { action?: 'edit' | 'copy' | 'create' | 'paste'; channel?: TextChannel | NewsChannel | DMChannel; id?: string },
+    prompt: PromptManager
+) => {
     // * Load Guild Settings
     const guildSettings = message.guild?.id ? await getGuildSettings(message.guild?.id) : null;
     const prefix = guildSettings?.general.prefix || message.client.config.defaultPrefix;
@@ -14,21 +18,14 @@ const callback = async (message: AMessage, args: string[], prompt: PromptManager
 
     let embed = new MessageEmbed();
 
-    const [arg1, arg2, arg3] = args;
+    const act = args.action;
+    let channel = args.channel;
+    const id = args.id;
 
-    if (arg1 === 'create') {
-        let channel;
+    if (act === 'create' || !act) {
+        if (!channel) channel = message.channel;
 
-        if (arg2) {
-            channel = await prompt.parse.textChannel(message.guild, arg2);
-        } else {
-            channel = message.channel;
-        }
-
-        if (!channel || !(channel instanceof TextChannel))
-            return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `I couldn't find \`${arg2}\`! Please provide a valid text channel!`);
-
-        const msg = await channel?.send(embed);
+        const msg = await channel.send(embed);
 
         embed
             .setColor('#2f3136')
@@ -46,25 +43,20 @@ const callback = async (message: AMessage, args: string[], prompt: PromptManager
                 `You can customize the new embed by doing the command \`${prefix}embed edit ${msg.channel.toString()} ${msg.id}\``
             );
         }
-    } else if (arg1 === 'edit') {
-        if (!arg2) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `Please provide a text channel!`);
+    } else if (act === 'edit') {
+        if (!channel) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `Please provide a text channel!`);
 
-        const channel = await prompt.parse.textChannel(message.guild, arg2);
+        if (!id) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `Please provide a message ID!`);
 
-        if (!channel) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `I couldn't find \`${arg2}\`! Please provide a valid text channel!`);
-        if (!(channel instanceof TextChannel)) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `\`${arg2}\` is not a text channel!`);
+        const msg = await channel.messages.fetch(id).catch(() => null);
 
-        if (!arg3) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `Please provide a message ID!`);
-
-        const msg = await channel.messages.fetch(arg3).catch(() => null);
-
-        if (!msg) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `I couldn't find message with ID \`${arg3}\` in ${channel.toString()}!`);
+        if (!msg) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `I couldn't find message with ID \`${id}\` in ${channel.toString()}!`);
 
         if (msg.author.id !== client.user?.id) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `I can't edit a message I didn't send!`);
 
         embed = msg.embeds[0];
 
-        if (!msg.embeds.length) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `Message with ID \`${arg3}\` does not have an embed!`);
+        if (!msg.embeds.length) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `Message with ID \`${id}\` does not have an embed!`);
 
         type embedAction =
             | 'setTitle'
@@ -120,7 +112,7 @@ const callback = async (message: AMessage, args: string[], prompt: PromptManager
             embed.addField(name, value, inline);
         } else if (action === 'removeField') {
             const options: string[] = [];
-            if (!embed.fields.length) return prompt.error(`Embed with ID \`${arg3}\` doesn't have any fields to remove!`);
+            if (!embed.fields.length) return prompt.error(`Embed with ID \`${id}\` doesn't have any fields to remove!`);
             if (embed.fields.length === 1) {
                 embed.fields = [];
             } else {
@@ -141,7 +133,7 @@ const callback = async (message: AMessage, args: string[], prompt: PromptManager
         } else if (action === 'editField') {
             const options: string[] = [];
             if (!embed.fields.length)
-                return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `Embed with ID \`${arg3}\` doesn't have any fields to edit!`);
+                return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `Embed with ID \`${id}\` doesn't have any fields to edit!`);
 
             let index = 0;
             if (embed.fields.length > 1) {
@@ -217,38 +209,28 @@ const callback = async (message: AMessage, args: string[], prompt: PromptManager
 
         prompt.sendMsg('Embed Edited');
         return prompt.delete();
-    } else if (arg1 === 'copy') {
-        if (!arg2) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `Please provide a text channel!`);
+    } else if (act === 'copy') {
+        if (!channel) return prompt.error(`Please provide a text channel!`);
 
-        const channel = await prompt.parse.textChannel(message.guild, arg2);
+        if (!id) return prompt.error(`Please provide a message ID!`);
 
-        if (!channel) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `I couldn't find \`${arg2}\`! Please provide a valid text channel!`);
-        if (!(channel instanceof TextChannel)) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `\`${arg2}\` is not a text channel!`);
+        const msg = await channel.messages.fetch(id).catch(() => null);
 
-        if (!arg3) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `Please provide a message ID!`);
+        if (!msg) return prompt.error(`I couldn't find message with ID \`${id}\` in ${channel.toString()}!`);
 
-        const msg = await channel.messages.fetch(arg3).catch(() => null);
-
-        if (!msg) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `I couldn't find message with ID \`${arg3}\` in ${channel.toString()}!`);
-
-        if (!msg.embeds.length) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `Message with ID \`${arg3}\` does not have an embed!`);
+        if (!msg.embeds.length) return prompt.error(`Message with ID \`${id}\` does not have an embed!`);
 
         const key = await uploadHaste(JSON.stringify(msg.embeds[0].toJSON()));
 
         message.client.sendEmbed(message, 'Custom Embeds', 'Embed Copied', `You can paste the embed with \`${prefix}embed paste <channel> ${key}\``);
-    } else if (arg1 === 'paste') {
-        if (!arg2) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `Please provide a text channel!`);
+    } else if (act === 'paste') {
+        if (!channel) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `Please provide a text channel!`);
 
-        const channel = await prompt.parse.textChannel(message.guild, arg2);
+        if (!id) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `Please provide a pasteID!`);
 
-        if (!channel) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `I couldn't find \`${arg2}\`! Please provide a valid text channel!`);
-        if (!(channel instanceof TextChannel)) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `\`${arg2}\` is not a text channel!`);
+        const paste = await fetchHaste(id);
 
-        if (!arg3) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `Please provide a pasteID!`);
-
-        const paste = await fetchHaste(arg3);
-
-        if (!paste) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `I couldn't find a copied embed with id \`${arg3}\`!`);
+        if (!paste) return message.client.sendEmbed(message, 'Custom Embeds', 'Uh Oh!', `I couldn't find a copied embed with id \`${id}\`!`);
 
         try {
             embed = JSON.parse(paste);
@@ -275,8 +257,27 @@ export const command: Command = {
     module: 'Custom Embeds',
     aliases: [],
     description: 'Create/Edit a Message Embed',
-    usage: '<Create | Edit | Copy> <TextChannel> <MessageID | PasteID>',
-    requiresArgs: 0,
+    args: [
+        {
+            name: 'Action',
+            key: 'action',
+            type: 'string',
+            acceptedValues: ['Create', 'Edit', 'Copy', 'Paste'],
+            optional: true
+        },
+        {
+            name: 'Channel',
+            key: 'channel',
+            type: 'textChannel',
+            optional: true
+        },
+        {
+            name: 'MessageID/PasteID',
+            key: 'id',
+            type: 'string',
+            optional: true
+        }
+    ],
     devOnly: false,
     guildOnly: true,
     NSFW: false,

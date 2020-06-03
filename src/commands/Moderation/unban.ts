@@ -1,10 +1,10 @@
 import { Command, AMessage } from '../../interfaces/Client';
 import { getGuildSettings } from '../../database';
-import { TextChannel, MessageEmbed } from 'discord.js';
+import { TextChannel, MessageEmbed, User } from 'discord.js';
 import { client } from '../..';
 import { PromptManager } from '../../interfaces/helpers/PromptManager';
 
-const callback = async (message: AMessage, args: string[], prompt: PromptManager) => {
+const callback = async (message: AMessage, args: { user: User; reason?: string }, _prompt: PromptManager) => {
     if (!message.guild || !message.member) return;
 
     const guildSettings = message.guild?.id ? await getGuildSettings(message.guild.id) : null;
@@ -21,15 +21,8 @@ const callback = async (message: AMessage, args: string[], prompt: PromptManager
             "Moderation isn't enabled on this server! A server administrator can turn it on with `{prefix}settings moderation enabled set true`"
         );
 
-    const arg1 = args[0];
-
-    if (!arg1) return message.client.sendEmbed(message, 'Moderation', 'Missing Arguments: `User`', 'Command Usage:\n`{prefix}kick <User> [Reason]`');
-
-    const user = await prompt.parse.bannedUser(message.guild, args[0]);
-
-    if (!user) return message.client.sendEmbed(message, 'Moderation', 'Uh Oh!', `I couldn't find the banned user ${arg1}!`);
-
-    const reason = args.slice(1).join(' ');
+    const user = args.user;
+    const reason = args.reason;
 
     message.client.sendEmbed(
         message,
@@ -62,9 +55,22 @@ export const command: Command = {
     category: 'Moderation',
     module: 'Moderation',
     aliases: [],
-    description: 'Bans the specified user from the server.',
-    usage: '<User> [Reason]',
-    requiresArgs: 0,
+    description: 'Unbans the specified user from the server.',
+    args: [
+        {
+            name: 'User',
+            description: 'User that will be unbanned',
+            key: 'user',
+            type: 'bannedUser'
+        },
+        {
+            name: 'Reason',
+            description: 'Reason for unbanning',
+            key: 'reason',
+            type: 'string',
+            optional: true
+        }
+    ],
     devOnly: false,
     guildOnly: true,
     NSFW: false,

@@ -7,9 +7,15 @@ import { labelImage, drawExampleCard } from '../../util/canvas';
 import { parseType, sendSetting } from './settings/util';
 import { PromptManager } from '../../interfaces/helpers/PromptManager';
 
-const callback = async (message: AMessage, args: string[], prompt: PromptManager) => {
-    // Declare arguments as variables
-    const [arg1, arg2, arg3] = args;
+const callback = async (
+    message: AMessage,
+    args: { groupName?: string; settingName?: string; action?: 'set' | 'add' | 'remove'; value?: string },
+    prompt: PromptManager
+) => {
+    const groupName = args.groupName;
+    const settingName = args.settingName;
+    const action = args.action;
+    const value = args.value;
 
     // Check if there is a guild, mostly so that TypeScript doesn't give errors when trying to call guild properties.
     if (!message.guild) return message.client.sendEmbed(message, 'Settings', 'Uh Oh!', `This command can only be ran in a server!`);
@@ -18,11 +24,11 @@ const callback = async (message: AMessage, args: string[], prompt: PromptManager
     const guildSettings = await getGuildSettings(message.guild.id);
 
     // Declare group and setting arguments
-    const group = arg1 ? groups.find(group => group.name.toLowerCase() === args[0]?.toLowerCase()) : null;
-    const setting = arg2 ? group?.settings.find(setting => setting.identifier.toLowerCase() === arg2.toLowerCase()) : null;
+    const group = groupName ? groups.find(group => group.name.toLowerCase() === groupName.toLowerCase()) : null;
+    const setting = settingName ? group?.settings.find(setting => setting.identifier.toLowerCase() === settingName.toLowerCase()) : null;
 
     // If no arguments are called (EXAMPLE: '-settings')
-    if (!args.length) {
+    if (!groupName) {
         // Compile the names and descriptions of each settings group into an array
         const groupList: string[] = [];
         groups.forEach(group => groupList.push(`\`${group.name}\``));
@@ -34,9 +40,9 @@ const callback = async (message: AMessage, args: string[], prompt: PromptManager
     }
 
     // if there is only 1 argument (EXAMPLE: '-settings general')
-    if (args.length === 1) {
+    if (groupName && !settingName) {
         // Return if the argument is not a valid group.
-        if (!group) return message.client.sendEmbed(message, 'Settings', 'Uh Oh! ', `${arg1} is not a settings group!`);
+        if (!group) return message.client.sendEmbed(message, 'Settings', 'Uh Oh! ', `${groupName} is not a settings group!`);
 
         // Compile the identifer and description of each setting for the group into an array.
         const settingList: string[] = [];
@@ -58,12 +64,12 @@ const callback = async (message: AMessage, args: string[], prompt: PromptManager
     }
 
     // If there is 2 arguments (EXAMPLE: '-settings general prefix')
-    if (args.length === 2) {
+    if (settingName && !action) {
         // Return if arg1 is not a valid group.
-        if (!group) return message.client.sendEmbed(message, 'Settings', 'Settings ', `${arg1} is not a settings group!`);
+        if (!group) return message.client.sendEmbed(message, 'Settings', 'Settings ', `${groupName} is not a settings group!`);
 
         // Return if arg2 is not a valid setting in the group.
-        if (!setting) return message.client.sendEmbed(message, 'Settings', 'Settings ', `${arg2} is not a setting in ${group.name}!`);
+        if (!setting) return message.client.sendEmbed(message, 'Settings', 'Settings ', `${settingName} is not a setting in ${group.name}!`);
 
         // Declare an embed field array where the setting info will be stored.
         const settingInfo: EmbedField[] = [];
@@ -77,7 +83,6 @@ const callback = async (message: AMessage, args: string[], prompt: PromptManager
         // If there is a value set for the setting and it is a snowflake, convert it to a mention, with the exception of voice channel.
         if (setting.array && value.length) {
             const newValues: string[] = [];
-            console.log(value);
             value.forEach((id: any) => {
                 switch (setting.valueType) {
                     case 'guildMember':
@@ -161,36 +166,16 @@ const callback = async (message: AMessage, args: string[], prompt: PromptManager
         );
     }
     // If there are 3 arguments (EXAMPLE: '-settings general prefix set')
-    if (args.length >= 3) {
+    if (action) {
         // Return if arg1 is not a valid group
-        if (!group) return message.client.sendEmbed(message, 'Settings', 'Settings ', `${arg1} is not a settings group!`);
-
-        let arg4: string | null = null;
-
-        const e = message.attachments.first();
-
-        if (args.length > 3) arg4 = args.slice(3).join(' ');
-
-        if (e) arg4 = e.url;
+        if (!group) return message.client.sendEmbed(message, 'Settings', 'Settings ', `${groupName} is not a settings group!`);
 
         // Return if arg2 is not a valid setting.
-        if (!setting) return message.client.sendEmbed(message, 'Settings', 'Settings ', `${arg2} is not a setting in ${group.name}!`);
-
-        // Return if arg3 is not "set", "add", or "remove".
-        if (!['set', 'add', 'remove'].includes(arg3.toLowerCase()))
-            return message.client.sendEmbed(
-                message,
-                'Settings',
-                `Invalid Argument: \`${arg3}\``,
-                `**Usage**\n\`{prefix}settings [Group] [Setting] [Set | Add | Remove] [Value]\``
-            );
+        if (!setting) return message.client.sendEmbed(message, 'Settings', 'Settings ', `${settingName} is not a setting in ${group.name}!`);
 
         let response: string;
 
-        // Send a message to later be used to load the embed GUI.
-        const GUI = await message.channel.send(`<a:loading:${message.client.constants.emotes.aLoading}>`);
-
-        switch (arg3.toLowerCase()) {
+        switch (action) {
             // If arg3 is 'set'
             case 'set':
                 // If the setting is an array instead of a single value, return.
@@ -204,10 +189,9 @@ const callback = async (message: AMessage, args: string[], prompt: PromptManager
                 let check: any = null;
                 let response4: any = null;
 
-                if (arg4) {
-                    check = await parseType(message, setting.valueType, arg4, prompt);
-                    if (check === 'canceled') return message.client.editEmbed(GUI, 'Settings', 'Settings Change Canceled');
-                    if (check === null) return message.client.editEmbed(GUI, 'Uh Oh!', `\`${arg4}\` is not a valid ${setting.valueType}!`);
+                if (value) {
+                    check = await parseType(message, setting.valueType, value, prompt);
+                    if (!check) return;
                 } else {
                     try {
                         // Send a setting embed.
@@ -218,20 +202,20 @@ const callback = async (message: AMessage, args: string[], prompt: PromptManager
 
                     // Return if the user responded 'canceled'
                     try {
-                        if (response4.canceled) return message.client.editEmbed(GUI, 'Settings', 'Settings Change Canceled');
+                        if (response4.canceled) return prompt.error('Settings Change Canceled');
                     } catch {
                         console.error;
                     }
                 }
 
                 // Await the Promised answer.
-                let value = arg4 ? check : response4.answer;
+                let value5 = value ? check : response4.answer;
                 let toString1: string | undefined;
 
                 // If the value provided is something that is stored is an ID (TextChannel, Role, GuildMember, VoiceChannel) replace value1 with the id.
-                if (value instanceof GuildChannel || value instanceof Role || value instanceof GuildMember) {
-                    toString1 = value.toString();
-                    value = value.id;
+                if (value5 instanceof GuildChannel || value5 instanceof Role || value5 instanceof GuildMember) {
+                    toString1 = value5.toString();
+                    value5 = value5.id;
                 }
 
                 // Set the setting to the value given by the user.
@@ -239,25 +223,15 @@ const callback = async (message: AMessage, args: string[], prompt: PromptManager
 
                 const settings = guildSettings;
 
-                console.log(value);
-
-                console.log(guildSettings.get(group.identifier)[setting.identifier]);
-
                 /**
                  * * NOTE: I only create a custom method do update the guild settings because for some reason doing guildSettings.save() didn't work.
                  */
 
-                console.log(guildSettings);
-                console.log(settings);
-
                 // Update guild settings
                 await updateGuildSettings(message.guild.id, settings);
 
-                const a = await getGuildSettings(message.guild.id);
-
-                console.log(a);
                 // Confirm to the user the value was changed.
-                response = toString1 || value;
+                response = toString1 || value5;
                 break;
             // If arg3 is 'add'
             case 'add':
@@ -273,25 +247,17 @@ const callback = async (message: AMessage, args: string[], prompt: PromptManager
                 let check1: any = null;
                 let response1: any = null;
 
-                if (arg4) {
-                    let valid = false;
-                    for (let i = 0; i < 4; i++) {
-                        if (!valid) {
-                            check1 = await parseType(message, setting.valueType, arg4, prompt);
-                            if (check1 === 'canceled') return message.client.editEmbed(GUI, 'Settings', 'Settings Change Canceled');
-                            if (check1 !== null) valid = true;
-                        }
-                    }
+                if (value) {
+                    check1 = await parseType(message, setting.valueType, value, prompt);
+                    if (!check1) return;
                 } else {
                     // Send a setting embed.
-                    response1 = await (await sendSetting(message, setting.identifier, setting.valueType, prompt)).answer;
-
-                    // Return if the user responded 'canceled'
-                    if (response1.canceled) return message.client.editEmbed(GUI, 'Settings', 'Settings Change Canceled');
+                    response1 = await sendSetting(message, setting.identifier, setting.valueType, prompt);
+                    if (!response1) return;
                 }
 
                 // Await the Promised answer.
-                let value1 = arg4 ? check1 : response1;
+                let value1 = value ? check1 : response1;
                 let toString: string | undefined;
 
                 // If the value provided is something that is stored is an ID (TextChannel, Role, GuildMember, VoiceChannel) replace value1 with the id.
@@ -338,18 +304,11 @@ const callback = async (message: AMessage, args: string[], prompt: PromptManager
                 let check2: any = null;
                 let response2: any = null;
 
-                if (arg4) {
-                    let valid = false;
-                    for (let i = 0; i < 4; i++) {
-                        if (!valid) {
-                            check2 = await parseType(message, setting.valueType, arg4, prompt);
-                            if (check2 === 'canceled') return message.client.editEmbed(GUI, 'Settings', 'Settings Change Canceled');
-                            if (check2 !== null) valid = true;
-                        }
-                    }
+                if (value) {
+                    check2 = await parseType(message, setting.valueType, value, prompt);
 
                     // Await the Promised answer.
-                    let value1 = arg4 ? check2 : response2;
+                    let value1 = value ? check2 : response2;
                     let toString: string | undefined;
 
                     // If the value provided is something that is stored is an ID (TextChannel, Role, GuildMember, VoiceChannel) replace value1 with the id.
@@ -358,8 +317,7 @@ const callback = async (message: AMessage, args: string[], prompt: PromptManager
                         value1 = value1.id;
                     }
 
-                    if (!arrayVal1.find(settingValue => settingValue === value1))
-                        return message.client.editEmbed(GUI, 'Settings', 'Uh Oh!', `I couldn't find ${toString} in ${setting.name}`);
+                    if (!arrayVal1.find(settingValue => settingValue === value1)) return prompt.error(`I couldn't find ${toString} in ${setting.name}`);
 
                     delete arrayVal1[arrayVal1.indexOf(value1)];
                 } else {
@@ -434,7 +392,7 @@ const callback = async (message: AMessage, args: string[], prompt: PromptManager
         const responseArray: string[] = [];
 
         let attachment: Buffer | string | undefined;
-        switch (arg3) {
+        switch (action) {
             case 'set':
                 if (setting.valueType === 'image') responseArray.push(`Set **${setting.name}**`);
                 if (setting.valueType !== 'image') responseArray.push(`Set **${setting.name}** to **${response}**`);
@@ -476,13 +434,9 @@ const callback = async (message: AMessage, args: string[], prompt: PromptManager
                   `${setting.name} depends on the following settings. It will not function until they have settings.\n\n\`${dependencies.join('`\n`')}\``
               )
             : null;
-
-        GUI.delete({
-            timeout: 30
-        });
         // Send an embed containing the response
         await message.client.sendEmbed(
-            GUI,
+            message,
             'Settings',
             `${group.name} Settings Edited`,
             responseArray.join('\n\n'),
@@ -506,8 +460,33 @@ export const command: Command = {
     module: 'Settings',
     aliases: ['setting', 's'],
     description: 'Change the settings for your server',
-    usage: '[Group] [Setting] [Set | Add | Remove]',
-    requiresArgs: 0,
+    args: [
+        {
+            name: 'Group',
+            key: 'groupName',
+            type: 'string',
+            optional: true
+        },
+        {
+            name: 'Setting',
+            key: 'settingName',
+            type: 'string',
+            optional: true
+        },
+        {
+            name: 'Action',
+            key: 'action',
+            type: 'string',
+            optional: true,
+            acceptedValues: ['Set', 'Add', 'Remove']
+        },
+        {
+            name: 'Value',
+            key: 'value',
+            type: 'string',
+            optional: true
+        }
+    ],
     devOnly: false,
     guildOnly: true,
     NSFW: false,

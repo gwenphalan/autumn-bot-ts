@@ -3,7 +3,7 @@ import { MessageEmbed } from 'discord.js';
 import { config } from '../../../config';
 import { PromptManager } from '../../interfaces/helpers/PromptManager';
 
-const callback = async (message: AMessage, _args: string[], _prompt: PromptManager) => {
+const callback = async (message: AMessage, _args: {}, _prompt: PromptManager) => {
     message.channel.send(new MessageEmbed().setImage('https://i.imgur.com/MN2q244.gif').setColor(config.accentColor));
 };
 
@@ -13,8 +13,7 @@ export const command: Command = {
     module: 'Fun',
     aliases: [''],
     description: 'Kek',
-    usage: '',
-    requiresArgs: 0,
+    args: [],
     devOnly: false,
     guildOnly: false,
     NSFW: false,

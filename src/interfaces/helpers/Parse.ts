@@ -3,13 +3,16 @@ import { AMessage } from '../Client';
 import Canvas from 'canvas';
 import { uploadImgur } from '../../util/imgur';
 import { PromptManager } from './PromptManager';
-import { GuildMember, Guild, TextChannel, NewsChannel, GuildChannel, Role, VoiceChannel, CategoryChannel, User } from 'discord.js';
+import { GuildMember, Guild, TextChannel, NewsChannel, GuildChannel, Role, VoiceChannel, CategoryChannel, User, Message } from 'discord.js';
 import timestring from 'timestring';
 
 const linkRegex = /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/gi;
 
 export const memberFilterInexact = (search: string) => (mem: GuildMember) =>
-    mem.displayName.toLowerCase().includes(search.toLowerCase()) || mem.user.tag.toLowerCase().includes(search.toLowerCase());
+    mem.user.username.toLowerCase().includes(search.toLowerCase()) ||
+    (mem.nickname && mem.nickname.toLowerCase().includes(search.toLowerCase())) ||
+    `${mem.user.username.toLowerCase()}#${mem.user.discriminator}`.includes(search.toLowerCase()) ||
+    search.includes(mem.user.id);
 
 export const channelFilterInexact = (search: string) => (chan: GuildChannel) =>
     chan.name.toLowerCase().includes(search.toLowerCase()) || search.toLowerCase().includes(chan.id);
@@ -84,7 +87,7 @@ export class Parse {
         }
     }
 
-    async image(message: AMessage, str: string): Promise<string | void> {
+    async image(message: Message | AMessage, str: string): Promise<string | void> {
         let imageUrl;
         const urlSearch = str.match(/https?\:\/\/.*\..*.(gif|png|web(p|m)|jpe?g)/gi);
 
@@ -128,7 +131,7 @@ export class Parse {
 
             return members[reply.index];
         } else {
-            return this.prompt.error(`I couldn't find ${str}`);
+            return this.prompt.error(`I couldn't find the member ${str}!`);
         }
     }
 
@@ -155,7 +158,7 @@ export class Parse {
 
             return users[reply.index];
         } else {
-            return this.prompt.error(`I couldn't find ${str}`);
+            return this.prompt.error(`I couldn't find the banned user ${str}!`);
         }
     }
 
@@ -182,7 +185,7 @@ export class Parse {
 
             return roles[reply.index];
         } else {
-            return this.prompt.error(`I couldn't find ${str}`);
+            return this.prompt.error(`I couldn't find the role ${str}!`);
         }
     }
 
@@ -211,7 +214,7 @@ export class Parse {
 
             return c;
         } else {
-            return this.prompt.error(`I couldn't find ${str}`);
+            return this.prompt.error(`I couldn't find the channel ${str}!`);
         }
     }
 
@@ -241,11 +244,11 @@ export class Parse {
 
             const c = channels[reply.index];
 
-            if (!(c instanceof VoiceChannel)) return this.prompt.error(`${c} is not a Text Channel!`);
+            if (!(c instanceof VoiceChannel)) return this.prompt.error(`${c} is not a Voice Channel!`);
 
             return c;
         } else {
-            return this.prompt.error(`I couldn't find ${str}`);
+            return this.prompt.error(`I couldn't find the voice channel ${str}!`);
         }
     }
 
@@ -279,7 +282,7 @@ export class Parse {
 
             return c;
         } else {
-            return this.prompt.error(`I couldn't find ${str}`);
+            return this.prompt.error(`I couldn't find the category ${str}!`);
         }
     }
 
@@ -313,7 +316,7 @@ export class Parse {
 
             return c;
         } else {
-            return this.prompt.error(`I couldn't find ${str}`);
+            return this.prompt.error(`I couldn't find the text channel ${str}!`);
         }
     }
 }

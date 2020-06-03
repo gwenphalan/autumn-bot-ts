@@ -2,11 +2,11 @@ import { Command, AMessage } from '../../interfaces/Client';
 import { getGuildSettings } from '../../database';
 import { PromptManager } from '../../interfaces/helpers/PromptManager';
 
-const callback = async (message: AMessage, args: string[], _prompt: PromptManager) => {
+const callback = async (message: AMessage, args: { prefix?: string }, _prompt: PromptManager) => {
     if (!message.guild) return;
     const guildSettings = await getGuildSettings(message.guild.id);
 
-    if (!args[0])
+    if (!args.prefix)
         return message.client.sendEmbed(
             message,
             undefined,
@@ -15,10 +15,10 @@ const callback = async (message: AMessage, args: string[], _prompt: PromptManage
         );
 
     // Gets the guild's settings and set the prefix
-    guildSettings.general.prefix = args.join(' ');
+    guildSettings.general.prefix = args.prefix;
     guildSettings.save();
 
-    return message.client.sendEmbed(message, undefined, 'Change Prefix', `Your prefix has been set to \`${args.join(' ')}\``);
+    return message.client.sendEmbed(message, undefined, 'Change Prefix', `Your prefix has been set to \`${args.prefix}\``);
 };
 
 export const command: Command = {
@@ -27,8 +27,14 @@ export const command: Command = {
     module: 'Settings',
     description: 'Sets the prefix on this guild',
     aliases: [],
-    usage: '[prefix]',
-    requiresArgs: 0,
+    args: [
+        {
+            name: 'Prefix',
+            key: 'prefix',
+            type: 'string',
+            optional: true
+        }
+    ],
     devOnly: true,
     guildOnly: true,
     NSFW: false,

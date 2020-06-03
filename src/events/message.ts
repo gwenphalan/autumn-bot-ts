@@ -5,6 +5,7 @@ import { createVerifyApp } from '../database';
 import { drawCard } from '../util/canvas';
 import { toCamelCase, missingPermissions, nicerPermissions } from '../util';
 import { PromptManager } from '../interfaces/helpers/PromptManager';
+import { ArgumentManager } from '../interfaces/helpers/ArgumentManager';
 
 export default async (client: Client, message: Message) => {
     // We have partials enabled, so we have to make sure the message is fetched
@@ -147,8 +148,8 @@ export default async (client: Client, message: Message) => {
     if (!message.content.replace(prefix, '').length && pingRegex.test(prefix))
         return client.sendEmbed(message, 'Prefix', undefined, `My prefix is set to \`${guildPrefix}\`\n\nDo \`${guildPrefix}help\` for a list of commands`);
     // Prepare args
-    const args = message.content.slice(prefix.length).trim().split(/ +/);
-    const commandName = args.shift();
+    const argsArray = message.content.slice(prefix.length).trim().split(/ +/);
+    const commandName = argsArray.shift();
     if (!commandName) return;
 
     // Find command
@@ -160,10 +161,6 @@ export default async (client: Client, message: Message) => {
     if (command.guildOnly && !message.guild) return message.channel.send('This command can only be used on a server!');
     if (command.NSFW && message.channel instanceof TextChannel && !message.channel.nsfw)
         return client.sendEmbed(message, 'NSFW', 'Uh Oh!', `The command \`${prefix}${command.name}\` can only be used in channels marked as **NSFW**!`);
-    if (args.length < command.requiresArgs)
-        return message.channel.send(
-            `This command requires ${command.requiresArgs} arguments and you only provided ${args.length}.\nPlease use the command like this: \`${prefix}${command.name} ${command.usage}\``
-        );
 
     if (command.botPermissions && missingPermissions(message, command.botPermissions, 'self'))
         return sendEmbed(
@@ -186,9 +183,43 @@ export default async (client: Client, message: Message) => {
         );
 
     const prompt = new PromptManager(message as AMessage, command.module);
+
+    const argsManager = new ArgumentManager(command, prefix, prompt, message, argsArray.join(' '));
+
+    const args = await argsManager.parseArgs().catch(err => {
+        const oops = new MessageEmbed()
+            .setTimestamp()
+            .setColor(client.config.accentColor)
+            .setTitle(`Oops! Something went wrong!`)
+            .setDescription(
+                "Don't  worry, the developers have been notified and are getting to work on fixing the issue!\n\nIn the meantime, please join the [Autumn Bot Support Server](https://discord.gg/DfByvyN)."
+            );
+        message.channel.send(oops);
+        console.error(err);
+        if (err) {
+            const embed = new MessageEmbed()
+                .setTimestamp()
+                .setColor(client.config.accentColor)
+                .setTitle(`ERROR`)
+                .setDescription(
+                    `\`\`\`${err.stack ? err.stack : err}\`\`\`\n\n** • Command: **${command.name}${
+                        argsManager.argString ? `\n** • Args: **${argsManager.argString}` : ''
+                    }${message.guild ? `\n** • Guild: **${message.guild} (ID: ${message.guild.id})` : ''}\n** • Author: **${message.author.username}#${
+                        message.author.discriminator
+                    } (ID: ${message.author.id})`
+                );
+            const errorChannel = client.channels.cache.get(client.config.errorChannel);
+            if (!errorChannel || !(errorChannel instanceof TextChannel)) throw new Error('Provided error channel is unreachable or not a text channel.');
+            errorChannel.send(embed);
+        }
+        prompt.delete();
+    });
+
+    if (!args) return;
+
     // Execute the command and handle any potential errors
     return command
-        .callback(message, args, prompt)
+        .callback(message, args || {}, prompt)
         .then(async () => {
             const updatedSettings = message.guild ? await client.database.guildSettings.findOne({ guild: message.guild.id }) : null;
             if (updatedSettings && updatedSettings.general.deleteCommands) await message.delete({ timeout: 10 }).catch(() => null);
@@ -210,9 +241,11 @@ export default async (client: Client, message: Message) => {
                     .setColor(client.config.accentColor)
                     .setTitle(`ERROR`)
                     .setDescription(
-                        `\`\`\`${err.stack ? err.stack : err}\`\`\`\n\n** • Command: **${command.name}${args.length ? `\n** • Args: **${args.join(' ')}` : ''}${
-                            message.guild ? `\n** • Guild: **${message.guild} (ID: ${message.guild.id})` : ''
-                        }\n** • Author: **${message.author.username}#${message.author.discriminator} (ID: ${message.author.id})`
+                        `\`\`\`${err.stack ? err.stack : err}\`\`\`\n\n** • Command: **${command.name}${
+                            argsManager.argString ? `\n** • Args: **${argsManager.argString}` : ''
+                        }${message.guild ? `\n** • Guild: **${message.guild} (ID: ${message.guild.id})` : ''}\n** • Author: **${message.author.username}#${
+                            message.author.discriminator
+                        } (ID: ${message.author.id})`
                     );
                 const errorChannel = client.channels.cache.get(client.config.errorChannel);
                 if (!errorChannel || !(errorChannel instanceof TextChannel)) throw new Error('Provided error channel is unreachable or not a text channel.');

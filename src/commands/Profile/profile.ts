@@ -2,23 +2,16 @@ import { Command, AMessage } from '../../interfaces/Client';
 import { getUserProfile, createUserProfile, updateUserProfile, getGuildSettings, profileProperty } from '../../database';
 import { client } from '../../index';
 import { PromptManager } from '../../interfaces/helpers/PromptManager';
+import { GuildMember } from 'discord.js';
 
 //* Command Code
 
-const callback = async (message: AMessage, args: string[], prompt: PromptManager) => {
-    const actions = ['edit', 'create'];
+const callback = async (message: AMessage, args: { action?: 'view' | 'edit' | 'create'; member?: GuildMember }, prompt: PromptManager) => {
+    const action = args.action;
 
-    const action = args[0] && actions.includes(args[0].toString()) ? args[0].toLowerCase() : null;
-    const requireUser = !action && args[0] ? true : false;
-
-    const user = message.guild && requireUser ? await prompt.parse.member(message.guild, args[0]) : null;
+    const user = args.member?.user || message.author;
     const guildSettings = message.guild?.id ? await getGuildSettings(message.guild?.id) : null;
-
-    if (!user && requireUser) {
-        message.client.sendEmbed(message, 'Profiles', `Uh Oh!`, `I couldn't find \`${args[0]}\`! Please provide a valid server member!`);
-        return;
-    }
-    if (user && requireUser) {
+    if (action === 'view' || !action) {
         const Profile = await getUserProfile(user.id);
 
         if (Profile) {
@@ -30,9 +23,9 @@ const callback = async (message: AMessage, args: string[], prompt: PromptManager
             message.client.sendEmbed(
                 message,
                 'Profiles',
-                `${user.user.username}#${user.user.discriminator}`,
+                `${user.username}#${user.discriminator}`,
                 Profile.biography !== '' ? `${Profile.biography}` : undefined,
-                user.user.displayAvatarURL({
+                user.displayAvatarURL({
                     dynamic: true,
                     format: 'png'
                 }),
@@ -45,44 +38,13 @@ const callback = async (message: AMessage, args: string[], prompt: PromptManager
                 message,
                 'Profiles',
                 `Uh Oh!`,
-                `${user.user} doesn't have a profile!\nHowever they can set one up with \`${
+                `${user} doesn't have a profile!\nHowever they can set one up with \`${
                     guildSettings?.general.prefix || client.config.defaultPrefix
                 }profile create\`.`
             );
             return;
         }
-    } else if (!action && !requireUser) {
-        const Profile = await getUserProfile(message.author.id);
-
-        if (Profile) {
-            const fields = [];
-            Profile.age !== '' ? fields.push({ name: 'Age', value: Profile.age, inline: true }) : null;
-            Profile.gender !== '' ? fields.push({ name: 'Gender', value: Profile.gender, inline: true }) : null;
-            Profile.pronouns !== '' ? fields.push({ name: 'Pronouns', value: Profile.pronouns, inline: true }) : null;
-
-            message.client.sendEmbed(
-                message,
-                'Profiles',
-                `${message.author.username}#${message.author.discriminator}`,
-                Profile.biography !== '' ? `${Profile.biography}` : undefined,
-                message.author.displayAvatarURL({
-                    dynamic: true,
-                    format: 'png'
-                }),
-                fields,
-                Profile.color
-            );
-            return;
-        } else {
-            message.client.sendEmbed(
-                message,
-                'Profiles',
-                `Uh Oh!`,
-                `You don't have a profile!\nHowever you can set one up with \`${guildSettings?.general.prefix || client.config.defaultPrefix}profile create\`.`
-            );
-            return;
-        }
-    } else if (action?.toLowerCase() === 'create') {
+    } else if (action === 'create') {
         const Profile = await getUserProfile(message.author.id);
         if (Profile) {
             message.client.sendEmbed(
@@ -120,7 +82,7 @@ const callback = async (message: AMessage, args: string[], prompt: PromptManager
             `You can view your new profile with \`${guildSettings?.general.prefix || client.config.defaultPrefix}profile\`.`
         );
         return prompt.delete();
-    } else if (action?.toLowerCase() === 'edit') {
+    } else if (action === 'edit') {
         const options = await prompt.options('Which property of your profile would you like to edit?', ['color', 'biography', 'age', 'pronouns', 'gender']);
         if (!options) return;
         const property: profileProperty = options.choice as profileProperty;
@@ -170,8 +132,24 @@ export const command: Command = {
     module: 'Profiles',
     aliases: [],
     description: `View someone's profile or edit your own!`,
-    usage: '[User | Edit | Create]',
-    requiresArgs: 0,
+    args: [
+        {
+            name: 'Action',
+            description: 'What you would like to do',
+            key: 'action',
+            type: 'string',
+            acceptedValues: ['View', 'Edit', 'Create'],
+            optional: true
+        },
+        {
+            name: 'User',
+            description: 'What you would like to do',
+            key: 'member',
+            type: 'guildMember',
+            optional: true,
+            cases: { action: 'view' }
+        }
+    ],
     devOnly: false,
     guildOnly: true,
     NSFW: false,

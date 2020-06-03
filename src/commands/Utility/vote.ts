@@ -3,8 +3,8 @@ import { dbl } from '../../';
 import { PromptManager } from '../../interfaces/helpers/PromptManager';
 import { GuildMember } from 'discord.js';
 
-const callback = async (message: AMessage, args: string[], prompt: PromptManager) => {
-    let member = message.guild && args[0] ? await prompt.parse.member(message.guild, args[0]) : message.author;
+const callback = async (message: AMessage, args: { member?: GuildMember }, _prompt: PromptManager) => {
+    let member = message.guild && args.member ? args.member.user : message.author;
 
     if (member instanceof GuildMember) member = member.user;
 
@@ -26,8 +26,14 @@ export const command: Command = {
     module: 'Vote',
     aliases: ['v'],
     description: "Check to see how many times you've voted for the bot, and if you've voted today..",
-    usage: '',
-    requiresArgs: 0,
+    args: [
+        {
+            name: 'User',
+            key: 'member',
+            type: 'guildMember',
+            optional: true
+        }
+    ],
     devOnly: false,
     guildOnly: false,
     NSFW: false,

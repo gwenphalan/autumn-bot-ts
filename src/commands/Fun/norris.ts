@@ -2,7 +2,7 @@ import { Command, AMessage } from '../../interfaces/Client';
 import { fetchNorris } from '../../util';
 import { PromptManager } from '../../interfaces/helpers/PromptManager';
 
-const callback = async (message: AMessage, _args: string[], _prompt: PromptManager) => {
+const callback = async (message: AMessage, _args: {}, _prompt: PromptManager) => {
     const joke = await fetchNorris();
 
     message.client.sendEmbed(message, 'Chuck Norris', 'Chuck Norris', joke.value);
@@ -14,8 +14,7 @@ export const command: Command = {
     module: 'Fun',
     aliases: ['chuck', 'chuck-norris'],
     description: "Chuck Norris doesn't send bot commands. He is the bot command",
-    usage: '',
-    requiresArgs: 0,
+    args: [],
     devOnly: false,
     guildOnly: false,
     NSFW: false,

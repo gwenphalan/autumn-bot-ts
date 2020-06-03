@@ -1,13 +1,12 @@
 import { Command, AMessage } from '../../interfaces/Client';
 import { getGuildSettings, createInfraction, updateGuildSettings } from '../../database';
 import { createMutedRole } from '../../util';
-import { TextChannel, MessageEmbed } from 'discord.js';
+import { TextChannel, MessageEmbed, GuildMember } from 'discord.js';
 import { client } from '../..';
 import prettyMs from 'pretty-ms';
-import timestring from 'timestring';
 import { PromptManager } from '../../interfaces/helpers/PromptManager';
 
-const callback = async (message: AMessage, args: string[], prompt: PromptManager) => {
+const callback = async (message: AMessage, args: { member: GuildMember; time: number; reason?: string }, _prompt: PromptManager) => {
     if (!message.guild || !message.member) return;
 
     const guildSettings = message.guild?.id ? await getGuildSettings(message.guild.id) : null;
@@ -24,27 +23,11 @@ const callback = async (message: AMessage, args: string[], prompt: PromptManager
             "Moderation isn't enabled on this server! A server administrator can turn it on with `{prefix}settings moderation enabled set true`"
         );
 
-    const [arg1, arg2] = args;
-
-    if (!arg1) return message.client.sendEmbed(message, 'Moderation', 'Missing Arguments: `User`', 'Command Usage:\n`{prefix}mute <User> <Time> [Reason]`');
-
-    if (!arg2) return message.client.sendEmbed(message, 'Moderation', 'Missing Arguments: `Time`', 'Command Usage:\n`{prefix}mute <User> <Time> [Reason]');
-
-    const member = await prompt.parse.member(message.guild, args[0]);
-
-    if (!member) return message.client.sendEmbed(message, 'Moderation', 'Uh Oh!', `I couldn't find the user ${arg1}!`);
+    const member = args.member;
+    const time = args.time;
+    const reason = args.reason;
 
     if (!member.bannable) return message.client.sendEmbed(message, 'Moderation', 'Uh Oh!', `I can't mute ${member}!`);
-
-    let time: number | null = null;
-
-    try {
-        time = timestring(arg2, 'ms');
-    } catch (err) {
-        null;
-    }
-
-    if (!time) return message.client.sendEmbed(message, 'Moderation', 'Uh Oh!', `${arg2} is not a valid time!`);
 
     if (message.member.roles.highest.position < member.roles.highest.position)
         return message.client.sendEmbed(message, 'Moderation', 'Uh Oh!', `You can't mute ${member}!`);
@@ -56,8 +39,6 @@ const callback = async (message: AMessage, args: string[], prompt: PromptManager
 
         updateGuildSettings(message.guild.id, guildSettings);
     }
-
-    const reason = args.slice(2).join(' ');
 
     member.roles.add(mutedRole);
 
@@ -109,8 +90,27 @@ export const command: Command = {
     module: 'Moderation',
     aliases: [],
     description: 'Mutes the specified user from the server.',
-    usage: '<User> <Time> [Reason]',
-    requiresArgs: 0,
+    args: [
+        {
+            name: 'User',
+            description: 'User that will be muted',
+            key: 'member',
+            type: 'guildMember'
+        },
+        {
+            name: 'Time',
+            description: 'Amount of time to mute the user',
+            key: 'time',
+            type: 'timeLength'
+        },
+        {
+            name: 'Reason',
+            description: 'Reason for muting',
+            key: 'reason',
+            type: 'string',
+            optional: true
+        }
+    ],
     devOnly: false,
     guildOnly: true,
     NSFW: false,

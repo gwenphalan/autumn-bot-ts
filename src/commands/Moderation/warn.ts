@@ -1,11 +1,11 @@
 import { Command, AMessage } from '../../interfaces/Client';
 import { getGuildSettings, createInfraction } from '../../database';
-import { TextChannel, MessageEmbed } from 'discord.js';
+import { TextChannel, MessageEmbed, GuildMember } from 'discord.js';
 import { client } from '../..';
 import prettyMs from 'pretty-ms';
 import { PromptManager } from '../../interfaces/helpers/PromptManager';
 
-const callback = async (message: AMessage, args: string[], prompt: PromptManager) => {
+const callback = async (message: AMessage, args: { member: GuildMember; reason?: string }, _prompt: PromptManager) => {
     if (!message.guild || !message.member) return;
 
     const guildSettings = message.guild?.id ? await getGuildSettings(message.guild.id) : null;
@@ -22,20 +22,14 @@ const callback = async (message: AMessage, args: string[], prompt: PromptManager
             "Moderation isn't enabled on this server! A server administrator can turn it on with `{prefix}settings moderation enabled set true`"
         );
 
-    const [arg1] = args;
-
-    if (!arg1) return message.client.sendEmbed(message, 'Moderation', 'Missing Arguments: `User`', 'Command Usage:\n`{prefix}warn <User> [Reason]`');
-
-    const member = await prompt.parse.member(message.guild, args[0]);
-
-    if (!member) return message.client.sendEmbed(message, 'Moderation', 'Uh Oh!', `I couldn't find the user ${arg1}!`);
+    const member = args.member;
 
     if (message.member.roles.highest.position < member.roles.highest.position)
         return message.client.sendEmbed(message, 'Moderation', 'Uh Oh!', `You can't warn ${member}!`);
 
     const time = guildSettings.moderation.warnExpire || 2592000000;
 
-    const reason = args.slice(1).join(' ');
+    const reason = args.reason;
 
     const infraction = await createInfraction(message, member.user.id, 'warn', reason || 'No Reason Provided', time);
 
@@ -85,8 +79,21 @@ export const command: Command = {
     module: 'Moderation',
     aliases: [],
     description: 'Warns the targeted user.',
-    usage: '<User> [Reason]',
-    requiresArgs: 0,
+    args: [
+        {
+            name: 'User',
+            description: 'User that will be warned',
+            key: 'member',
+            type: 'guildMember'
+        },
+        {
+            name: 'Reason',
+            description: 'Reason for warning',
+            key: 'reason',
+            type: 'string',
+            optional: true
+        }
+    ],
     devOnly: false,
     guildOnly: true,
     NSFW: false,

@@ -4,7 +4,7 @@ import prettyMs from 'pretty-ms';
 import { MessageEmbed } from 'discord.js';
 import { PromptManager } from '../../interfaces/helpers/PromptManager';
 
-const callback = async (message: AMessage, _args: string[], _prompt: PromptManager) => {
+const callback = async (message: AMessage, _args: {}, _prompt: PromptManager) => {
     const uptime = prettyMs(process.uptime() * 1000);
     const users = message.client.users.cache.size;
     const guilds = message.client.guilds.cache.size;
@@ -27,8 +27,7 @@ export const command: Command = {
     module: 'Stats',
     aliases: [],
     description: 'Gives you the bots stats.',
-    usage: '',
-    requiresArgs: 0,
+    args: [],
     devOnly: false,
     guildOnly: false,
     NSFW: false,

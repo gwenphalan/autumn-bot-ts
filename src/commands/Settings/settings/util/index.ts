@@ -1,6 +1,7 @@
 import { AMessage } from '../../../../interfaces/Client';
 import { valueType } from '../../../../interfaces/SettingsGroup';
 import { PromptManager } from '../../../../interfaces/helpers/PromptManager';
+import { GuildMember, Role, TextChannel, VoiceChannel, GuildChannel, User, Message } from 'discord.js';
 
 export const sendSetting = async (message: AMessage, setting: string, valueType: valueType, prompt: PromptManager, array?: boolean) => {
     if (valueType === 'boolean')
@@ -26,12 +27,50 @@ export const sendSetting = async (message: AMessage, setting: string, valueType:
     return parseType(value as AMessage, valueType, value.content, prompt);
 };
 
-export const parseType = async (message: AMessage, type: valueType, str: string, prompt: PromptManager): Promise<any> => {
+export async function parseType(message: Message | AMessage, type: 'number', str: string, prompt: PromptManager): Promise<number | void>;
+
+export async function parseType(message: Message | AMessage, type: 'color', str: string, prompt: PromptManager): Promise<string | void>;
+
+export async function parseType(message: Message | AMessage, type: 'image', str: string, prompt: PromptManager): Promise<string | void>;
+
+export async function parseType(message: Message | AMessage, type: 'string', str: string, prompt: PromptManager): Promise<string | void>;
+
+export async function parseType(message: Message | AMessage, type: 'url', str: string, prompt: PromptManager): Promise<string | void>;
+
+export async function parseType(message: Message | AMessage, type: 'guildMember', str: string, prompt: PromptManager): Promise<GuildMember | void>;
+
+export async function parseType(message: Message | AMessage, type: 'bannedUser', str: string, prompt: PromptManager): Promise<User | void>;
+
+export async function parseType(message: Message | AMessage, type: 'role', str: string, prompt: PromptManager): Promise<Role | void>;
+
+export async function parseType(message: Message | AMessage, type: 'textChannel', str: string, prompt: PromptManager): Promise<TextChannel | void>;
+
+export async function parseType(message: Message | AMessage, type: 'voiceChannel', str: string, prompt: PromptManager): Promise<VoiceChannel | void>;
+
+export async function parseType(message: Message | AMessage, type: 'guildChannel', str: string, prompt: PromptManager): Promise<GuildChannel | void>;
+
+export async function parseType(message: Message | AMessage, type: 'boolean', str: string, prompt: PromptManager): Promise<boolean | void>;
+
+export async function parseType(message: Message | AMessage, type: 'snowflake', str: string, prompt: PromptManager): Promise<string | void>;
+
+export async function parseType(message: Message | AMessage, type: 'timeLength', str: string, prompt: PromptManager): Promise<number | void>;
+
+export async function parseType(
+    message: Message | AMessage,
+    type: valueType,
+    str: string,
+    prompt: PromptManager
+): Promise<number | string | GuildMember | Role | VoiceChannel | GuildChannel | boolean | User | void>;
+
+export async function parseType(
+    message: Message | AMessage,
+    type: valueType,
+    str: string,
+    prompt: PromptManager
+): Promise<number | string | GuildMember | Role | VoiceChannel | GuildChannel | boolean | User | void> {
     switch (type) {
         case 'number':
-            const number = prompt.parse.number(str) ? prompt.parse.number(str).toString() : null;
-
-            return number;
+            return prompt.parse.number(str);
         case 'color':
             return prompt.parse.color(str);
         case 'image':
@@ -44,6 +83,10 @@ export const parseType = async (message: AMessage, type: valueType, str: string,
             if (!message.guild) return;
 
             return prompt.parse.member(message.guild, str);
+        case 'bannedUser':
+            if (!message.guild) return;
+
+            return prompt.parse.bannedUser(message.guild, str);
         case 'role':
             if (!message.guild) return;
 
@@ -67,6 +110,6 @@ export const parseType = async (message: AMessage, type: valueType, str: string,
         case 'timeLength':
             return prompt.parse.timeLength(str);
         default:
-            return null;
+            return;
     }
-};
+}

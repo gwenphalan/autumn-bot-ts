@@ -6,6 +6,7 @@ export type valueType =
     | 'voiceChannel'
     | 'string'
     | 'guildMember'
+    | 'bannedUser'
     | 'boolean'
     | 'number'
     | 'color'
