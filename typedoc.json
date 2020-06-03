@@ -1,7 +1,0 @@
-{
-    "inputFiles": ["./src"],
-    "mode": "file",
-    "out": "docs",
-    "theme": "node_modules/typedoc-clarity-theme",
-    "name": "Autumn Bot"
-}

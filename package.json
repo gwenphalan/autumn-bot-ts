@@ -47,6 +47,7 @@
         "nekos.life": "^2.0.7",
         "node-fetch": "^2.6.0",
         "pm2": "^4.4.0",
+        "prettier": "^2.0.5",
         "pretty-ms": "^7.0.0",
         "query-string": "^6.12.1",
         "timestring": "^6.0.0",
@@ -63,8 +64,7 @@
         "eslint-config-prettier": "^6.10.1",
         "eslint-plugin-prettier": "^3.1.2",
         "husky": "^4.2.3",
-        "precise-commits": "^1.0.2",
-        "prettier": "^2.0.4"
+        "precise-commits": "^1.0.2"
     },
     "eslintIgnore": [
         "dist",
