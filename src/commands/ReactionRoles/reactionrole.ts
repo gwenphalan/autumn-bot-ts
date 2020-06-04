@@ -1,5 +1,6 @@
 import { Command, AMessage } from '../../interfaces/Client';
 import { PromptManager } from '../../interfaces/helpers/PromptManager';
+import { createReactionRole } from '../../database';
 
 const callback = async (message: AMessage, _args: {}, prompt: PromptManager) => {
     if (!message.guild) return;
@@ -20,7 +21,7 @@ const callback = async (message: AMessage, _args: {}, prompt: PromptManager) => 
 
     await msg.react(emoji);
 
-    await message.guild.createReactionRole(msg.id, { name: emoji.name, id: emoji.id }, role.id);
+    await createReactionRole(message.guild.id, msg.id, { name: emoji.name, id: emoji.id }, role.id);
 
     return prompt.embed('Reaction Role Created', ` • Role: ${role}\n • Channel: ${channel}\n • Reaction: ${emoji}\n • Message ID: ${msg.id}`);
 };

@@ -348,7 +348,7 @@ const callback = async (
         }
 
         // Fetch the updated settings, and assign the updated group the a constant
-        const updated = await message.guild.settings();
+        const updated = await message.client.settings(message.guild.id);
         const updatedGroup = updated.get(group.identifier);
 
         // Declared a variable that will be filled with required settings that do not have a value yet.
