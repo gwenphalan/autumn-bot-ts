@@ -1,4 +1,4 @@
-# Autumn Bot
+# Autumn Bot - [Github](https://github.com/GwenBebe/autumn-bot-ts)
 
 Autumn Bot is a multipurpose utility bot written in typescript. While it is very useful by itself, when bundled with the Web Dashboard, it makes an amazing experience. The Web Dashboard (_which has not been finished yet_), is also written in typescript, and uses the Angular 9 web framework. If you need help with Autumn Bot, feel free to visit our [support server.](https://discord.gg/DfByvyN). If you would like to invite the **Official** Autumn Bot to your server, you can do so [here](https://discord.com/oauth2/authorize?client_id=672548437346222110&permissions=1576397911&scope=bot).
 
@@ -15,7 +15,18 @@ Autumn Bot is a multipurpose utility bot written in typescript. While it is very
         -   [Installing Dependencies](#installing-dependencies)
         -   [Running The Bot](#running-the-bot)
 -   [Commands](#commands)
--   [Settings](#settings)
+    -   [Dev](#dev)
+    -   [Fun](#fun)
+    -   [Moderation](#moderation)
+    -   [Profile](#profile)
+    -   [Reaction Roles](#reaction-roles)
+    -   [Administration](#administration)
+    -   [Utility](#utility)
+-   [Settings](#settings-1)
+    -   [General](#general)
+    -   [Moderation](#moderation-1)
+    -   [Verification](#verification)
+    -   [Welcome](#welcome)
 
 ---
 
@@ -103,6 +114,51 @@ yarn prod
 ```
 
 # Commands
+
+-   [Dev](#dev)
+    -   [card](#card)
+    -   [db](#db)
+    -   [error](#error)
+    -   [eval](#eval)
+    -   [prompt](#reaction-roles)
+-   [Fun](#fun)
+    -   [cuddle](#cuddle)
+    -   [goose](#goose)
+    -   [hug](#hug)
+    -   [kiss](#kiss)
+    -   [norris](#norris)
+    -   [pat](#pat)
+    -   [poke](#poke)
+    -   [slap](#slap)
+    -   [tickle](#tickle)
+-   [Moderation](#moderation)
+    -   [ban](#ban)
+    -   [clear](#clear)
+    -   [kick](#kick)
+    -   [mute](#mute)
+    -   [tempban](#tempban)
+    -   [tempmute](#tempmute)
+    -   [unban](#unban)
+    -   [unmute](#unmute)
+    -   [warn](#warn)
+-   [Profile](#profile)
+    -   [profile](#profile-1)
+-   [Reaction Roles](#reaction-roles)
+    -   [reactionrole](#reactionrole)
+    -   [removerole](#removerole)
+-   [Administration](#administration)
+    -   [prefix](#prefix)
+    -   [settings](#settings)
+-   [Utility](#utility)
+    -   [color](#color)
+    -   [embed](#embed)
+    -   [help](#help)
+    -   [ping](#ping)
+    -   [poll](#poll)
+    -   [stats](#stats)
+    -   [vote](#vote)
+
+---
 
 ## Dev
 
@@ -718,3 +774,286 @@ Check to see how many times you've voted for the bot, and if you've voted today.
 ---
 
 # Settings
+
+-   [General](#general)
+    -   [prefix](#prefix-1)
+    -   [deleteCommands](#deletecommands)
+    -   [memberRole](#memberrole)
+-   [Moderation](#moderation-1)
+    -   [enabled](#enabled)
+    -   [warnExpire](#warnexpire)
+    -   [modLog](#modlog)
+-   [Verification](#verification)
+    -   [enabled](#enabled-1)
+    -   [staffRole](#staffrole)
+    -   [nonVerifiedRole](#nonverifiedrole)
+    -   [nonVerifiedChannels](#nonverifiedchannels)
+    -   [verifyChannel](#verifychannel)
+    -   [manualVerify](#manualverify)
+    -   [pingStaff](#pingstaff)
+    -   [verifyMessage](#verifymessage)
+    -   [denyMessage](#denymessage)
+    -   [acceptMessage](#acceptMessage)
+-   [Welcome](#welcome)
+    -   [enabled](#enabled-2)
+    -   [welcomeChannel](#welcomechannel)
+    -   [backgroundColor](#backgroundcolor)
+    -   [textColor](#textcolor)
+    -   [profileColor](#profilecolor)
+    -   [profileBackground](#profilebackground)
+
+---
+
+## General
+
+Control the general behavior of the bot.
+
+---
+
+### prefix
+
+Prefix indicating a message is a command.
+
+| Type   | Default | Array |
+| ------ | ------- | ----- |
+| string | -       | false |
+
+---
+
+### deleteCommands
+
+Delete user commands after the command is complete.
+
+| Type    | Default | Array |
+| ------- | ------- | ----- |
+| boolean | false   | false |
+
+---
+
+### memberRole
+
+Role given to members. If verification is enabled, users won't receive this until verified.
+
+| Type | Default | Array |
+| ---- | ------- | ----- |
+| role | `n/a`   | false |
+
+---
+
+## Moderation
+
+Moderate your server to improve member experience
+
+---
+
+### enabled
+
+Determines whether or not the moderation plugin is enabled on the server.
+
+| Type    | Default | Array |
+| ------- | ------- | ----- |
+| boolean | false   | false |
+
+---
+
+### warnExpire
+
+How long until a warning expires.
+
+| Type       | Default | Array |
+| ---------- | ------- | ----- |
+| timeLength | 30d     | false |
+
+---
+
+### modLog
+
+Channel where moderation events are logged.
+
+| Type        | Default | Array |
+| ----------- | ------- | ----- |
+| textChannel | `n/a`   | false |
+
+---
+
+## Verification
+
+Verify new users either manually, or automatically, to protect against bots and trolls.
+
+---
+
+### enabled
+
+Determines whether or not the moderation plugin is enabled on this.
+
+| Type    | Default | Array |
+| ------- | ------- | ----- |
+| boolean | false   | false |
+
+---
+
+### staffRole
+
+Role given to those who manage verification applications.
+
+| Type | Default | Array |
+| ---- | ------- | ----- |
+| role | `n/a`   | false |
+
+---
+
+### nonVerifiedRole
+
+Role given to non-verified users. Denied access to view all channels. Taken away upon verification.
+
+| Type | Default | Array |
+| ---- | ------- | ----- |
+| role | `n/a`   | false |
+
+---
+
+### nonVerifiedChannels
+
+Channels that non-verified users have access to view.
+
+| Type         | Default | Array |
+| ------------ | ------- | ----- |
+| guildChannel | `n/a`   | true  |
+
+---
+
+### verifyChannel
+
+Channel where users go through verification. Whether it be through typing `-verify` or going through Manual Verification.
+
+| Type        | Default | Array |
+| ----------- | ------- | ----- |
+| textChannel | `n/a`   | true  |
+
+---
+
+### manualVerify
+
+Staff must manually accept or deny user's verification application. Does not require users to type `-verify`
+
+| Type    | Default | Array |
+| ------- | ------- | ----- |
+| boolean | false   | false |
+
+---
+
+### modVerifyChannel
+
+Channel where moderators accept or deny user verification applications.
+
+| Type        | Default | Array |
+| ----------- | ------- | ----- |
+| textChannel | `n/a`   | false |
+
+---
+
+### pingStaff
+
+Channel where moderators accept or deny user verification applications.
+
+| Type        | Default | Array |
+| ----------- | ------- | ----- |
+| textChannel | `n/a`   | false |
+
+---
+
+### verifyMessage
+
+Message explaining how to be verified. Automatically sent in the verification channel.
+
+| Type   | Default                        | Array |
+| ------ | ------------------------------ | ----- |
+| string | Type `-verify` to be verified. | false |
+
+---
+
+### denyMessage
+
+Ping staff when a user requests verification. (Manual Verification Only).
+
+| Type   | Default | Array |
+| ------ | ------- | ----- |
+| string | boolean | false |
+
+---
+
+### acceptMessage
+
+Message sent to users denied for verification.
+
+| Type   | Default                                                            | Array |
+| ------ | ------------------------------------------------------------------ | ----- |
+| string | You've been denied verification.<br>Contact staff to find out why. | false |
+
+---
+
+## Welcome
+
+Welcome new server members with a customized welcome card.
+
+---
+
+### enabled
+
+Whether or not welcome cards are enabled.
+
+| Type    | Default | Array |
+| ------- | ------- | ----- |
+| boolean | false   | false |
+
+---
+
+### welcomeChannel
+
+Channel where welcome cards are sent.
+
+| Type        | Default | Array |
+| ----------- | ------- | ----- |
+| textChannel | `n/a`   | false |
+
+---
+
+### backgroundColor
+
+Background color of the welcome card.
+
+| Type  | Default | Array |
+| ----- | ------- | ----- |
+| color | #2b2929 | false |
+
+---
+
+### textColor
+
+Text color of the welcome card.
+
+| Type  | Default | Array |
+| ----- | ------- | ----- |
+| color | #FFFFFF | false |
+
+---
+
+### profileColor
+
+Accent color of the profile picture area.
+
+| Type  | Default | Array |
+| ----- | ------- | ----- |
+| color | #30d4e3 | false |
+
+---
+
+### profileBackground
+
+Background image behind the users profile picture.
+
+| Type  | Default | Array |
+| ----- | ------- | ----- |
+| image | `n/a`   | false |
+
+---

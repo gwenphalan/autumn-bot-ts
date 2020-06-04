@@ -64,8 +64,8 @@
 	<div class="row">
 		<div class="col-8 col-content">
 			<div class="tsd-panel tsd-typography">
-				<a href="#autumn-bot" id="autumn-bot" style="color: inherit; text-decoration: none;">
-					<h1>Autumn Bot</h1>
+				<a href="#autumn-bot---github" id="autumn-bot---github" style="color: inherit; text-decoration: none;">
+					<h1>Autumn Bot - <a href="https://github.com/GwenBebe/autumn-bot-ts">Github</a></h1>
 				</a>
 				<p>Autumn Bot is a multipurpose utility bot written in typescript. While it is very useful by itself, when bundled with the Web Dashboard, it makes an amazing experience. The Web Dashboard (<em>which has not been finished yet</em>), is also written in typescript, and uses the Angular 9 web framework. If you need help with Autumn Bot, feel free to visit our <a href="https://discord.gg/DfByvyN">support server.</a>. If you would like to invite the <strong>Official</strong> Autumn Bot to your server, you can do so <a href="https://discord.com/oauth2/authorize?client_id=672548437346222110&amp;permissions=1576397911&amp;scope=bot">here</a>.</p>
 				<hr>
@@ -73,9 +73,37 @@
 					<h3>Table of Contents</h3>
 				</a>
 				<ul>
-					<li><a href="#getting-started">Getting Started</a></li>
-					<li><a href="#commands">Commands</a></li>
-					<li><a href="#settings">Settings</a></li>
+					<li><a href="#getting-started">Getting Started</a><ul>
+							<li><a href="#requirements">Requirements</a></li>
+							<li><a href="#cloning-the-repository">Cloning The Repository</a></li>
+							<li><a href="#configuring-the-bot">Configuring The Bot</a><ul>
+									<li><a href="#config-file">Config File</a></li>
+								</ul>
+							</li>
+							<li><a href="#finishing-up">Finishing Up</a><ul>
+									<li><a href="#installing-dependencies">Installing Dependencies</a></li>
+									<li><a href="#running-the-bot">Running The Bot</a></li>
+								</ul>
+							</li>
+						</ul>
+					</li>
+					<li><a href="#commands">Commands</a><ul>
+							<li><a href="#dev">Dev</a></li>
+							<li><a href="#fun">Fun</a></li>
+							<li><a href="#moderation">Moderation</a></li>
+							<li><a href="#profile">Profile</a></li>
+							<li><a href="#reaction-roles">Reaction Roles</a></li>
+							<li><a href="#administration">Administration</a></li>
+							<li><a href="#utility">Utility</a></li>
+						</ul>
+					</li>
+					<li><a href="#settings-1">Settings</a><ul>
+							<li><a href="#general">General</a></li>
+							<li><a href="#moderation-1">Moderation</a></li>
+							<li><a href="#verification">Verification</a></li>
+							<li><a href="#welcome">Welcome</a></li>
+						</ul>
+					</li>
 				</ul>
 				<hr>
 				<a href="#getting-started" id="getting-started" style="color: inherit; text-decoration: none;">
@@ -165,8 +193,11 @@
 							<td>This is the DBL API Token listed in the <a href="#requirements">requirements</a>.</td>
 						</tr>
 				</tbody></table>
-				<a href="#running-the-bot" id="running-the-bot" style="color: inherit; text-decoration: none;">
-					<h2>Running The Bot</h2>
+				<a href="#finishing-up" id="finishing-up" style="color: inherit; text-decoration: none;">
+					<h2>Finishing Up</h2>
+				</a>
+				<a href="#installing-dependencies" id="installing-dependencies" style="color: inherit; text-decoration: none;">
+					<h3>Installing Dependencies</h3>
 				</a>
 				<p>Before you&#39;ll be able to run the bot, you first need to open a terminal in the folder where you cloned the repository. Start by installing the required node modules.</p>
 				<a href="#npm" id="npm" style="color: inherit; text-decoration: none;">
@@ -177,6 +208,9 @@
 					<h4>Yarn</h4>
 				</a>
 				<pre><code class="language-bash">yarn</code></pre>
+				<a href="#running-the-bot" id="running-the-bot" style="color: inherit; text-decoration: none;">
+					<h3>Running The Bot</h3>
+				</a>
 				<p>After that, you&#39;re all set. To run the bot, run the <code>development</code> or <code>production</code> scripts located in <code>package.json</code></p>
 				<a href="#npm-1" id="npm-1" style="color: inherit; text-decoration: none;">
 					<h4>NPM</h4>
@@ -191,9 +225,1084 @@
 				<a href="#commands" id="commands" style="color: inherit; text-decoration: none;">
 					<h1>Commands</h1>
 				</a>
+				<ul>
+					<li><a href="#dev">Dev</a><ul>
+							<li><a href="#card">card</a></li>
+							<li><a href="#db">db</a></li>
+							<li><a href="#error">error</a></li>
+							<li><a href="#eval">eval</a></li>
+							<li><a href="#reaction-roles">prompt</a></li>
+						</ul>
+					</li>
+					<li><a href="#fun">Fun</a><ul>
+							<li><a href="#cuddle">cuddle</a></li>
+							<li><a href="#goose">goose</a></li>
+							<li><a href="#hug">hug</a></li>
+							<li><a href="#kiss">kiss</a></li>
+							<li><a href="#norris">norris</a></li>
+							<li><a href="#pat">pat</a></li>
+							<li><a href="#poke">poke</a></li>
+							<li><a href="#slap">slap</a></li>
+							<li><a href="#tickle">tickle</a></li>
+						</ul>
+					</li>
+					<li><a href="#moderation">Moderation</a><ul>
+							<li><a href="#ban">ban</a></li>
+							<li><a href="#clear">clear</a></li>
+							<li><a href="#kick">kick</a></li>
+							<li><a href="#mute">mute</a></li>
+							<li><a href="#tempban">tempban</a></li>
+							<li><a href="#tempmute">tempmute</a></li>
+							<li><a href="#unban">unban</a></li>
+							<li><a href="#unmute">unmute</a></li>
+							<li><a href="#warn">warn</a></li>
+						</ul>
+					</li>
+					<li><a href="#profile">Profile</a><ul>
+							<li><a href="#profile-1">profile</a></li>
+						</ul>
+					</li>
+					<li><a href="#reaction-roles">Reaction Roles</a><ul>
+							<li><a href="#reactionrole">reactionrole</a></li>
+							<li><a href="#removerole">removerole</a></li>
+						</ul>
+					</li>
+					<li><a href="#administration">Administration</a><ul>
+							<li><a href="#prefix">prefix</a></li>
+							<li><a href="#settings">settings</a></li>
+						</ul>
+					</li>
+					<li><a href="#utility">Utility</a><ul>
+							<li><a href="#color">color</a></li>
+							<li><a href="#embed">embed</a></li>
+							<li><a href="#help">help</a></li>
+							<li><a href="#ping">ping</a></li>
+							<li><a href="#poll">poll</a></li>
+							<li><a href="#stats">stats</a></li>
+							<li><a href="#vote">vote</a></li>
+						</ul>
+					</li>
+				</ul>
+				<hr>
+				<a href="#dev" id="dev" style="color: inherit; text-decoration: none;">
+					<h2>Dev</h2>
+				</a>
+				<hr>
+				<a href="#card" id="card" style="color: inherit; text-decoration: none;">
+					<h3>card</h3>
+				</a>
+				<p>Sends an example welcome card.</p>
+				<a href="#usage" id="usage" style="color: inherit; text-decoration: none;">
+					<h4>Usage</h4>
+				</a>
+				<pre><code><span class="hljs-selector-tag">-card</span> <span class="hljs-selector-attr">[Member]</span></code></pre>
+				<a href="#aliases" id="aliases" style="color: inherit; text-decoration: none;">
+					<h4>Aliases</h4>
+				</a>
+				<ul>
+					<li>c</li>
+				</ul>
+				<hr>
+				<a href="#db" id="db" style="color: inherit; text-decoration: none;">
+					<h3>db</h3>
+				</a>
+				<p>This command has no description.</p>
+				<a href="#usage-1" id="usage-1" style="color: inherit; text-decoration: none;">
+					<h4>Usage</h4>
+				</a>
+				<pre><code><span class="hljs-deletion">-db</span></code></pre>
+				<a href="#aliases-1" id="aliases-1" style="color: inherit; text-decoration: none;">
+					<h4>Aliases</h4>
+				</a>
+				<p>This command has no aliases.</p>
+				<hr>
+				<a href="#error" id="error" style="color: inherit; text-decoration: none;">
+					<h3>error</h3>
+				</a>
+				<p>Intentionally throws an error.</p>
+				<a href="#usage-2" id="usage-2" style="color: inherit; text-decoration: none;">
+					<h4>Usage</h4>
+				</a>
+				<pre><code><span class="hljs-deletion">-db</span></code></pre>
+				<a href="#aliases-2" id="aliases-2" style="color: inherit; text-decoration: none;">
+					<h4>Aliases</h4>
+				</a>
+				<p>This command has no aliases.</p>
+				<hr>
+				<a href="#eval" id="eval" style="color: inherit; text-decoration: none;">
+					<h3>eval</h3>
+				</a>
+				<p>Used to run commands from discord.</p>
+				<a href="#usage-3" id="usage-3" style="color: inherit; text-decoration: none;">
+					<h4>Usage</h4>
+				</a>
+				<pre><code>-<span class="hljs-built_in">eval</span> <span class="hljs-symbol">&lt;Code&gt;</span></code></pre>
+				<a href="#aliases-3" id="aliases-3" style="color: inherit; text-decoration: none;">
+					<h4>Aliases</h4>
+				</a>
+				<ul>
+					<li>console</li>
+					<li>debug</li>
+				</ul>
+				<hr>
+				<a href="#prompt" id="prompt" style="color: inherit; text-decoration: none;">
+					<h3>prompt</h3>
+				</a>
+				<p>Gives a series of sample prompts</p>
+				<a href="#usage-4" id="usage-4" style="color: inherit; text-decoration: none;">
+					<h4>Usage</h4>
+				</a>
+				<pre><code><span class="hljs-deletion">-prompt</span></code></pre>
+				<a href="#aliases-4" id="aliases-4" style="color: inherit; text-decoration: none;">
+					<h4>Aliases</h4>
+				</a>
+				<ul>
+					<li>debug</li>
+				</ul>
+				<hr>
+				<a href="#fun" id="fun" style="color: inherit; text-decoration: none;">
+					<h2>Fun</h2>
+				</a>
+				<hr>
+				<a href="#cuddle" id="cuddle" style="color: inherit; text-decoration: none;">
+					<h3>cuddle</h3>
+				</a>
+				<p>Cuddles the targeted user</p>
+				<a href="#usage-5" id="usage-5" style="color: inherit; text-decoration: none;">
+					<h4>Usage</h4>
+				</a>
+				<pre><code>-cuddle <span class="hljs-tag">&lt;<span class="hljs-name">User</span>&gt;</span></code></pre>
+				<a href="#aliases-5" id="aliases-5" style="color: inherit; text-decoration: none;">
+					<h4>Aliases</h4>
+				</a>
+				<p>This command has no aliases.</p>
+				<hr>
+				<a href="#goose" id="goose" style="color: inherit; text-decoration: none;">
+					<h3>goose</h3>
+				</a>
+				<p>Goose.</p>
+				<a href="#usage-6" id="usage-6" style="color: inherit; text-decoration: none;">
+					<h4>Usage</h4>
+				</a>
+				<pre><code><span class="hljs-deletion">-goose</span></code></pre>
+				<a href="#aliases-6" id="aliases-6" style="color: inherit; text-decoration: none;">
+					<h4>Aliases</h4>
+				</a>
+				<p>This command has no aliases.</p>
+				<hr>
+				<a href="#hug" id="hug" style="color: inherit; text-decoration: none;">
+					<h3>hug</h3>
+				</a>
+				<p>Hugs the targeted user</p>
+				<a href="#usage-7" id="usage-7" style="color: inherit; text-decoration: none;">
+					<h4>Usage</h4>
+				</a>
+				<pre><code>-hug <span class="hljs-tag">&lt;<span class="hljs-name">User</span>&gt;</span></code></pre>
+				<a href="#aliases-7" id="aliases-7" style="color: inherit; text-decoration: none;">
+					<h4>Aliases</h4>
+				</a>
+				<p>This command has no aliases.</p>
+				<hr>
+				<a href="#kek" id="kek" style="color: inherit; text-decoration: none;">
+					<h3>kek</h3>
+				</a>
+				<p>Kek</p>
+				<a href="#usage-8" id="usage-8" style="color: inherit; text-decoration: none;">
+					<h4>Usage</h4>
+				</a>
+				<pre><code><span class="hljs-deletion">-kek</span></code></pre>
+				<a href="#aliases-8" id="aliases-8" style="color: inherit; text-decoration: none;">
+					<h4>Aliases</h4>
+				</a>
+				<p>This command has no aliases.</p>
+				<hr>
+				<a href="#kiss" id="kiss" style="color: inherit; text-decoration: none;">
+					<h3>kiss</h3>
+				</a>
+				<p>Kisses the targeted user</p>
+				<a href="#usage-9" id="usage-9" style="color: inherit; text-decoration: none;">
+					<h4>Usage</h4>
+				</a>
+				<pre><code>-kiss <span class="hljs-tag">&lt;<span class="hljs-name">User</span>&gt;</span></code></pre>
+				<a href="#aliases-9" id="aliases-9" style="color: inherit; text-decoration: none;">
+					<h4>Aliases</h4>
+				</a>
+				<p>This command has no aliases.</p>
+				<hr>
+				<a href="#norris" id="norris" style="color: inherit; text-decoration: none;">
+					<h3>norris</h3>
+				</a>
+				<p>Chuck Norris doesn&#39;t send bot commands. He is the bot command</p>
+				<a href="#usage-10" id="usage-10" style="color: inherit; text-decoration: none;">
+					<h4>Usage</h4>
+				</a>
+				<pre><code><span class="hljs-deletion">-norris</span></code></pre>
+				<a href="#aliases-10" id="aliases-10" style="color: inherit; text-decoration: none;">
+					<h4>Aliases</h4>
+				</a>
+				<ul>
+					<li>chuck</li>
+					<li>chuck-norris</li>
+				</ul>
+				<hr>
+				<a href="#pat" id="pat" style="color: inherit; text-decoration: none;">
+					<h3>pat</h3>
+				</a>
+				<p>Pats the targeted user</p>
+				<a href="#usage-11" id="usage-11" style="color: inherit; text-decoration: none;">
+					<h4>Usage</h4>
+				</a>
+				<pre><code>-pat <span class="hljs-tag">&lt;<span class="hljs-name">User</span>&gt;</span></code></pre>
+				<a href="#aliases-11" id="aliases-11" style="color: inherit; text-decoration: none;">
+					<h4>Aliases</h4>
+				</a>
+				<p>This command has no aliases.</p>
+				<hr>
+				<a href="#poke" id="poke" style="color: inherit; text-decoration: none;">
+					<h3>poke</h3>
+				</a>
+				<p>Pokes the targeted user</p>
+				<a href="#usage-12" id="usage-12" style="color: inherit; text-decoration: none;">
+					<h4>Usage</h4>
+				</a>
+				<pre><code>-poke <span class="hljs-tag">&lt;<span class="hljs-name">User</span>&gt;</span></code></pre>
+				<a href="#aliases-12" id="aliases-12" style="color: inherit; text-decoration: none;">
+					<h4>Aliases</h4>
+				</a>
+				<p>This command has no aliases.</p>
+				<hr>
+				<a href="#slap" id="slap" style="color: inherit; text-decoration: none;">
+					<h3>slap</h3>
+				</a>
+				<p>Slaps the targeted user</p>
+				<a href="#usage-13" id="usage-13" style="color: inherit; text-decoration: none;">
+					<h4>Usage</h4>
+				</a>
+				<pre><code>-slap <span class="hljs-tag">&lt;<span class="hljs-name">User</span>&gt;</span></code></pre>
+				<a href="#aliases-13" id="aliases-13" style="color: inherit; text-decoration: none;">
+					<h4>Aliases</h4>
+				</a>
+				<p>This command has no aliases.</p>
+				<hr>
+				<a href="#tickle" id="tickle" style="color: inherit; text-decoration: none;">
+					<h3>tickle</h3>
+				</a>
+				<p>Tickles the targeted user</p>
+				<a href="#usage-14" id="usage-14" style="color: inherit; text-decoration: none;">
+					<h4>Usage</h4>
+				</a>
+				<pre><code>-tickle <span class="hljs-tag">&lt;<span class="hljs-name">User</span>&gt;</span></code></pre>
+				<a href="#aliases-14" id="aliases-14" style="color: inherit; text-decoration: none;">
+					<h4>Aliases</h4>
+				</a>
+				<p>This command has no aliases.</p>
+				<hr>
+				<a href="#moderation" id="moderation" style="color: inherit; text-decoration: none;">
+					<h2>Moderation</h2>
+				</a>
+				<hr>
+				<a href="#ban" id="ban" style="color: inherit; text-decoration: none;">
+					<h3>ban</h3>
+				</a>
+				<p>Bans the specified user from the server.</p>
+				<a href="#usage-15" id="usage-15" style="color: inherit; text-decoration: none;">
+					<h4>Usage</h4>
+				</a>
+				<pre><code>-ban <span class="hljs-tag">&lt;<span class="hljs-name">User</span>&gt;</span> [Reason]</code></pre>
+				<a href="#aliases-15" id="aliases-15" style="color: inherit; text-decoration: none;">
+					<h4>Aliases</h4>
+				</a>
+				<p>This command has no aliases.</p>
+				<hr>
+				<a href="#clear" id="clear" style="color: inherit; text-decoration: none;">
+					<h3>clear</h3>
+				</a>
+				<p>Clears up to 100 messages from a channel.</p>
+				<a href="#usage-16" id="usage-16" style="color: inherit; text-decoration: none;">
+					<h4>Usage</h4>
+				</a>
+				<pre><code>-clear &lt;Amount (MAX: <span class="hljs-number">100</span>)&gt; [Reason]</code></pre>
+				<a href="#aliases-16" id="aliases-16" style="color: inherit; text-decoration: none;">
+					<h4>Aliases</h4>
+				</a>
+				<p>This command has no aliases.</p>
+				<hr>
+				<a href="#kick" id="kick" style="color: inherit; text-decoration: none;">
+					<h3>kick</h3>
+				</a>
+				<p>Kicks the specified user from the server.</p>
+				<a href="#usage-17" id="usage-17" style="color: inherit; text-decoration: none;">
+					<h4>Usage</h4>
+				</a>
+				<pre><code>-kick <span class="hljs-tag">&lt;<span class="hljs-name">User</span>&gt;</span> [Reason]</code></pre>
+				<a href="#aliases-17" id="aliases-17" style="color: inherit; text-decoration: none;">
+					<h4>Aliases</h4>
+				</a>
+				<p>This command has no aliases.</p>
+				<hr>
+				<a href="#mute" id="mute" style="color: inherit; text-decoration: none;">
+					<h3>mute</h3>
+				</a>
+				<p>Kicks the specified user from the server.</p>
+				<a href="#usage-18" id="usage-18" style="color: inherit; text-decoration: none;">
+					<h4>Usage</h4>
+				</a>
+				<pre><code>-kick <span class="hljs-tag">&lt;<span class="hljs-name">User</span>&gt;</span> [Reason]</code></pre>
+				<a href="#aliases-18" id="aliases-18" style="color: inherit; text-decoration: none;">
+					<h4>Aliases</h4>
+				</a>
+				<p>This command has no aliases.</p>
+				<hr>
+				<a href="#tempban" id="tempban" style="color: inherit; text-decoration: none;">
+					<h3>tempban</h3>
+				</a>
+				<p>Bans the targeted user from the server for the specified amount of time.</p>
+				<a href="#usage-19" id="usage-19" style="color: inherit; text-decoration: none;">
+					<h4>Usage</h4>
+				</a>
+				<pre><code>-tempban <span class="hljs-tag">&lt;<span class="hljs-name">User</span>&gt;</span> <span class="hljs-tag">&lt;<span class="hljs-name">Time</span>&gt;</span> [Reason]</code></pre>
+				<a href="#aliases-19" id="aliases-19" style="color: inherit; text-decoration: none;">
+					<h4>Aliases</h4>
+				</a>
+				<p>This command has no aliases.</p>
+				<hr>
+				<a href="#tempmute" id="tempmute" style="color: inherit; text-decoration: none;">
+					<h3>tempmute</h3>
+				</a>
+				<p>Mutes the targeted user for the specified amount of time.</p>
+				<a href="#usage-20" id="usage-20" style="color: inherit; text-decoration: none;">
+					<h4>Usage</h4>
+				</a>
+				<pre><code>-mute <span class="hljs-tag">&lt;<span class="hljs-name">User</span>&gt;</span> <span class="hljs-tag">&lt;<span class="hljs-name">Time</span>&gt;</span> [Reason]</code></pre>
+				<a href="#aliases-20" id="aliases-20" style="color: inherit; text-decoration: none;">
+					<h4>Aliases</h4>
+				</a>
+				<p>This command has no aliases.</p>
+				<hr>
+				<a href="#unban" id="unban" style="color: inherit; text-decoration: none;">
+					<h3>unban</h3>
+				</a>
+				<p>Unbans the specified user from the server.</p>
+				<a href="#usage-21" id="usage-21" style="color: inherit; text-decoration: none;">
+					<h4>Usage</h4>
+				</a>
+				<pre><code>-unban <span class="hljs-tag">&lt;<span class="hljs-name">User</span>&gt;</span> [Reason]</code></pre>
+				<a href="#aliases-21" id="aliases-21" style="color: inherit; text-decoration: none;">
+					<h4>Aliases</h4>
+				</a>
+				<p>This command has no aliases.</p>
+				<hr>
+				<a href="#unmute" id="unmute" style="color: inherit; text-decoration: none;">
+					<h3>unmute</h3>
+				</a>
+				<p>This command has no aliases.</p>
+				<hr>
+				<a href="#unban-1" id="unban-1" style="color: inherit; text-decoration: none;">
+					<h3>unban</h3>
+				</a>
+				<p>Unbans the specified user from the server.</p>
+				<a href="#usage-22" id="usage-22" style="color: inherit; text-decoration: none;">
+					<h4>Usage</h4>
+				</a>
+				<pre><code>-unban <span class="hljs-tag">&lt;<span class="hljs-name">User</span>&gt;</span> [Reason]</code></pre>
+				<a href="#aliases-22" id="aliases-22" style="color: inherit; text-decoration: none;">
+					<h4>Aliases</h4>
+				</a>
+				<p>This command has no aliases.</p>
+				<hr>
+				<a href="#warn" id="warn" style="color: inherit; text-decoration: none;">
+					<h3>warn</h3>
+				</a>
+				<p>Warns the targeted user.</p>
+				<a href="#usage-23" id="usage-23" style="color: inherit; text-decoration: none;">
+					<h4>Usage</h4>
+				</a>
+				<pre><code>-warn <span class="hljs-tag">&lt;<span class="hljs-name">User</span>&gt;</span> [Reason]</code></pre>
+				<a href="#aliases-23" id="aliases-23" style="color: inherit; text-decoration: none;">
+					<h4>Aliases</h4>
+				</a>
+				<p>This command has no aliases.</p>
+				<hr>
+				<a href="#profile" id="profile" style="color: inherit; text-decoration: none;">
+					<h2>Profile</h2>
+				</a>
+				<hr>
+				<a href="#profile-1" id="profile-1" style="color: inherit; text-decoration: none;">
+					<h3>profile</h3>
+				</a>
+				<p>View someone&#39;s profile or edit your own!</p>
+				<a href="#usage-24" id="usage-24" style="color: inherit; text-decoration: none;">
+					<h4>Usage</h4>
+				</a>
+				<pre><code>-profile [<span class="hljs-built_in">View</span> | <span class="hljs-keyword">Edit</span> | <span class="hljs-keyword">Create</span>] [User]</code></pre>
+				<a href="#aliases-24" id="aliases-24" style="color: inherit; text-decoration: none;">
+					<h4>Aliases</h4>
+				</a>
+				<p>This command has no aliases.</p>
+				<hr>
+				<a href="#reaction-roles" id="reaction-roles" style="color: inherit; text-decoration: none;">
+					<h2>Reaction Roles</h2>
+				</a>
+				<hr>
+				<a href="#reactionrole" id="reactionrole" style="color: inherit; text-decoration: none;">
+					<h3>reactionrole</h3>
+				</a>
+				<p>Creates a message reaction that gives users the specified role.</p>
+				<a href="#usage-25" id="usage-25" style="color: inherit; text-decoration: none;">
+					<h4>Usage</h4>
+				</a>
+				<pre><code><span class="hljs-deletion">-reactionrole</span></code></pre>
+				<a href="#aliases-25" id="aliases-25" style="color: inherit; text-decoration: none;">
+					<h4>Aliases</h4>
+				</a>
+				<ul>
+					<li>rr</li>
+				</ul>
+				<hr>
+				<a href="#removerole" id="removerole" style="color: inherit; text-decoration: none;">
+					<h3>removerole</h3>
+				</a>
+				<p>Removes a reaction role from a message.</p>
+				<a href="#usage-26" id="usage-26" style="color: inherit; text-decoration: none;">
+					<h4>Usage</h4>
+				</a>
+				<pre><code><span class="hljs-deletion">-removerole</span></code></pre>
+				<a href="#aliases-26" id="aliases-26" style="color: inherit; text-decoration: none;">
+					<h4>Aliases</h4>
+				</a>
+				<p>This command has no aliases.</p>
+				<hr>
+				<a href="#administration" id="administration" style="color: inherit; text-decoration: none;">
+					<h2>Administration</h2>
+				</a>
+				<hr>
+				<a href="#prefix" id="prefix" style="color: inherit; text-decoration: none;">
+					<h3>prefix</h3>
+				</a>
+				<p>Sets the command prefix for the server.</p>
+				<a href="#usage-27" id="usage-27" style="color: inherit; text-decoration: none;">
+					<h4>Usage</h4>
+				</a>
+				<pre><code><span class="hljs-deletion">-prefix</span></code></pre>
+				<a href="#aliases-27" id="aliases-27" style="color: inherit; text-decoration: none;">
+					<h4>Aliases</h4>
+				</a>
+				<p>This command has no aliases.</p>
+				<hr>
 				<a href="#settings" id="settings" style="color: inherit; text-decoration: none;">
+					<h3>settings</h3>
+				</a>
+				<p>View/Edit the settings for your server.</p>
+				<a href="#usage-28" id="usage-28" style="color: inherit; text-decoration: none;">
+					<h4>Usage</h4>
+				</a>
+				<pre><code>-settings [Group] [Setting] [<span class="hljs-builtin-name">Set</span> | <span class="hljs-builtin-name">Add</span> | <span class="hljs-builtin-name">Remove</span>] [Value]</code></pre>
+				<a href="#aliases-28" id="aliases-28" style="color: inherit; text-decoration: none;">
+					<h4>Aliases</h4>
+				</a>
+				<ul>
+					<li>setting</li>
+					<li>s</li>
+				</ul>
+				<hr>
+				<a href="#utility" id="utility" style="color: inherit; text-decoration: none;">
+					<h2>Utility</h2>
+				</a>
+				<hr>
+				<a href="#color" id="color" style="color: inherit; text-decoration: none;">
+					<h3>color</h3>
+				</a>
+				<p>Displays the provided color, or gives a random one.</p>
+				<a href="#usage-29" id="usage-29" style="color: inherit; text-decoration: none;">
+					<h4>Usage</h4>
+				</a>
+				<pre><code>-<span class="hljs-built_in">color</span> &lt;<span class="hljs-built_in">Color</span>&gt;</code></pre>
+				<a href="#aliases-29" id="aliases-29" style="color: inherit; text-decoration: none;">
+					<h4>Aliases</h4>
+				</a>
+				<p>This command has no aliases.</p>
+				<hr>
+				<a href="#embed" id="embed" style="color: inherit; text-decoration: none;">
+					<h3>embed</h3>
+				</a>
+				<p>Create/Edit a Message Embed</p>
+				<a href="#usage-30" id="usage-30" style="color: inherit; text-decoration: none;">
+					<h4>Usage</h4>
+				</a>
+				<pre><code>-embed [Create | <span class="hljs-type">Edit</span> | <span class="hljs-type">Copy</span> | <span class="hljs-type">Paste</span>] [Channel] [MessageID/PasteID]</code></pre>
+				<a href="#aliases-30" id="aliases-30" style="color: inherit; text-decoration: none;">
+					<h4>Aliases</h4>
+				</a>
+				<p>This command has no aliases.</p>
+				<hr>
+				<a href="#help" id="help" style="color: inherit; text-decoration: none;">
+					<h3>help</h3>
+				</a>
+				<p>Get a list of all commands or info on a specific command</p>
+				<a href="#usage-31" id="usage-31" style="color: inherit; text-decoration: none;">
+					<h4>Usage</h4>
+				</a>
+				<pre><code>-help <span class="hljs-selector-attr">[Command Name]</span></code></pre>
+				<a href="#aliases-31" id="aliases-31" style="color: inherit; text-decoration: none;">
+					<h4>Aliases</h4>
+				</a>
+				<ul>
+					<li>h</li>
+				</ul>
+				<hr>
+				<a href="#ping" id="ping" style="color: inherit; text-decoration: none;">
+					<h3>ping</h3>
+				</a>
+				<p>Checks the ping</p>
+				<a href="#usage-32" id="usage-32" style="color: inherit; text-decoration: none;">
+					<h4>Usage</h4>
+				</a>
+				<pre><code>-<span class="hljs-built_in">ping</span></code></pre>
+				<a href="#aliases-32" id="aliases-32" style="color: inherit; text-decoration: none;">
+					<h4>Aliases</h4>
+				</a>
+				<p>This command has no aliases.</p>
+				<hr>
+				<a href="#poll" id="poll" style="color: inherit; text-decoration: none;">
+					<h3>poll</h3>
+				</a>
+				<p>Creates a poll and reacts to it with the corresponding emojis.</p>
+				<a href="#usage-33" id="usage-33" style="color: inherit; text-decoration: none;">
+					<h4>Usage</h4>
+				</a>
+				<pre><code><span class="hljs-deletion">-poll</span></code></pre>
+				<a href="#aliases-33" id="aliases-33" style="color: inherit; text-decoration: none;">
+					<h4>Aliases</h4>
+				</a>
+				<ul>
+					<li>p</li>
+				</ul>
+				<hr>
+				<a href="#stats" id="stats" style="color: inherit; text-decoration: none;">
+					<h3>stats</h3>
+				</a>
+				<p>Gives you the bot&#39;s stats.</p>
+				<a href="#usage-34" id="usage-34" style="color: inherit; text-decoration: none;">
+					<h4>Usage</h4>
+				</a>
+				<pre><code><span class="hljs-deletion">-stats</span></code></pre>
+				<a href="#aliases-34" id="aliases-34" style="color: inherit; text-decoration: none;">
+					<h4>Aliases</h4>
+				</a>
+				<p>This command has no aliases.</p>
+				<hr>
+				<a href="#vote" id="vote" style="color: inherit; text-decoration: none;">
+					<h3>vote</h3>
+				</a>
+				<p>Check to see how many times you&#39;ve voted for the bot, and if you&#39;ve voted today.</p>
+				<a href="#usage-35" id="usage-35" style="color: inherit; text-decoration: none;">
+					<h4>Usage</h4>
+				</a>
+				<pre><code><span class="hljs-deletion">-vote</span></code></pre>
+				<a href="#aliases-35" id="aliases-35" style="color: inherit; text-decoration: none;">
+					<h4>Aliases</h4>
+				</a>
+				<ul>
+					<li>v</li>
+				</ul>
+				<hr>
+				<a href="#settings-1" id="settings-1" style="color: inherit; text-decoration: none;">
 					<h1>Settings</h1>
 				</a>
+				<ul>
+					<li><a href="#general">General</a><ul>
+							<li><a href="#prefix-1">prefix</a></li>
+							<li><a href="#deletecommands">deleteCommands</a></li>
+							<li><a href="#memberrole">memberRole</a></li>
+						</ul>
+					</li>
+					<li><a href="#moderation-1">Moderation</a><ul>
+							<li><a href="#enabled">enabled</a></li>
+							<li><a href="#warnexpire">warnExpire</a></li>
+							<li><a href="#modlog">modLog</a></li>
+						</ul>
+					</li>
+					<li><a href="#verification">Verification</a><ul>
+							<li><a href="#enabled-1">enabled</a></li>
+							<li><a href="#staffrole">staffRole</a></li>
+							<li><a href="#nonverifiedrole">nonVerifiedRole</a></li>
+							<li><a href="#nonverifiedchannels">nonVerifiedChannels</a></li>
+							<li><a href="#verifychannel">verifyChannel</a></li>
+							<li><a href="#manualverify">manualVerify</a></li>
+							<li><a href="#pingstaff">pingStaff</a></li>
+							<li><a href="#verifymessage">verifyMessage</a></li>
+							<li><a href="#denymessage">denyMessage</a></li>
+							<li><a href="#acceptMessage">acceptMessage</a></li>
+						</ul>
+					</li>
+					<li><a href="#welcome">Welcome</a><ul>
+							<li><a href="#enabled-2">enabled</a></li>
+							<li><a href="#welcomechannel">welcomeChannel</a></li>
+							<li><a href="#backgroundcolor">backgroundColor</a></li>
+							<li><a href="#textcolor">textColor</a></li>
+							<li><a href="#profilecolor">profileColor</a></li>
+							<li><a href="#profilebackground">profileBackground</a></li>
+						</ul>
+					</li>
+				</ul>
+				<hr>
+				<a href="#general" id="general" style="color: inherit; text-decoration: none;">
+					<h2>General</h2>
+				</a>
+				<p>Control the general behavior of the bot.</p>
+				<hr>
+				<a href="#prefix-1" id="prefix-1" style="color: inherit; text-decoration: none;">
+					<h3>prefix</h3>
+				</a>
+				<p>Prefix indicating a message is a command.</p>
+				<table>
+					<thead>
+						<tr>
+							<th>Type</th>
+							<th>Default</th>
+							<th>Array</th>
+						</tr>
+					</thead>
+					<tbody><tr>
+							<td>string</td>
+							<td>-</td>
+							<td>false</td>
+						</tr>
+				</tbody></table>
+				<hr>
+				<a href="#deletecommands" id="deletecommands" style="color: inherit; text-decoration: none;">
+					<h3>deleteCommands</h3>
+				</a>
+				<p>Delete user commands after the command is complete.</p>
+				<table>
+					<thead>
+						<tr>
+							<th>Type</th>
+							<th>Default</th>
+							<th>Array</th>
+						</tr>
+					</thead>
+					<tbody><tr>
+							<td>boolean</td>
+							<td>false</td>
+							<td>false</td>
+						</tr>
+				</tbody></table>
+				<hr>
+				<a href="#memberrole" id="memberrole" style="color: inherit; text-decoration: none;">
+					<h3>memberRole</h3>
+				</a>
+				<p>Role given to members. If verification is enabled, users won&#39;t receive this until verified.</p>
+				<table>
+					<thead>
+						<tr>
+							<th>Type</th>
+							<th>Default</th>
+							<th>Array</th>
+						</tr>
+					</thead>
+					<tbody><tr>
+							<td>role</td>
+							<td><code>n/a</code></td>
+							<td>false</td>
+						</tr>
+				</tbody></table>
+				<hr>
+				<a href="#moderation-1" id="moderation-1" style="color: inherit; text-decoration: none;">
+					<h2>Moderation</h2>
+				</a>
+				<p>Moderate your server to improve member experience</p>
+				<hr>
+				<a href="#enabled" id="enabled" style="color: inherit; text-decoration: none;">
+					<h3>enabled</h3>
+				</a>
+				<p>Determines whether or not the moderation plugin is enabled on the server.</p>
+				<table>
+					<thead>
+						<tr>
+							<th>Type</th>
+							<th>Default</th>
+							<th>Array</th>
+						</tr>
+					</thead>
+					<tbody><tr>
+							<td>boolean</td>
+							<td>false</td>
+							<td>false</td>
+						</tr>
+				</tbody></table>
+				<hr>
+				<a href="#warnexpire" id="warnexpire" style="color: inherit; text-decoration: none;">
+					<h3>warnExpire</h3>
+				</a>
+				<p>How long until a warning expires.</p>
+				<table>
+					<thead>
+						<tr>
+							<th>Type</th>
+							<th>Default</th>
+							<th>Array</th>
+						</tr>
+					</thead>
+					<tbody><tr>
+							<td>timeLength</td>
+							<td>30d</td>
+							<td>false</td>
+						</tr>
+				</tbody></table>
+				<hr>
+				<a href="#modlog" id="modlog" style="color: inherit; text-decoration: none;">
+					<h3>modLog</h3>
+				</a>
+				<p>Channel where moderation events are logged.</p>
+				<table>
+					<thead>
+						<tr>
+							<th>Type</th>
+							<th>Default</th>
+							<th>Array</th>
+						</tr>
+					</thead>
+					<tbody><tr>
+							<td>textChannel</td>
+							<td><code>n/a</code></td>
+							<td>false</td>
+						</tr>
+				</tbody></table>
+				<hr>
+				<a href="#verification" id="verification" style="color: inherit; text-decoration: none;">
+					<h2>Verification</h2>
+				</a>
+				<p>Verify new users either manually, or automatically, to protect against bots and trolls.</p>
+				<hr>
+				<a href="#enabled-1" id="enabled-1" style="color: inherit; text-decoration: none;">
+					<h3>enabled</h3>
+				</a>
+				<p>Determines whether or not the moderation plugin is enabled on this.</p>
+				<table>
+					<thead>
+						<tr>
+							<th>Type</th>
+							<th>Default</th>
+							<th>Array</th>
+						</tr>
+					</thead>
+					<tbody><tr>
+							<td>boolean</td>
+							<td>false</td>
+							<td>false</td>
+						</tr>
+				</tbody></table>
+				<hr>
+				<a href="#staffrole" id="staffrole" style="color: inherit; text-decoration: none;">
+					<h3>staffRole</h3>
+				</a>
+				<p>Role given to those who manage verification applications.</p>
+				<table>
+					<thead>
+						<tr>
+							<th>Type</th>
+							<th>Default</th>
+							<th>Array</th>
+						</tr>
+					</thead>
+					<tbody><tr>
+							<td>role</td>
+							<td><code>n/a</code></td>
+							<td>false</td>
+						</tr>
+				</tbody></table>
+				<hr>
+				<a href="#nonverifiedrole" id="nonverifiedrole" style="color: inherit; text-decoration: none;">
+					<h3>nonVerifiedRole</h3>
+				</a>
+				<p>Role given to non-verified users. Denied access to view all channels. Taken away upon verification.</p>
+				<table>
+					<thead>
+						<tr>
+							<th>Type</th>
+							<th>Default</th>
+							<th>Array</th>
+						</tr>
+					</thead>
+					<tbody><tr>
+							<td>role</td>
+							<td><code>n/a</code></td>
+							<td>false</td>
+						</tr>
+				</tbody></table>
+				<hr>
+				<a href="#nonverifiedchannels" id="nonverifiedchannels" style="color: inherit; text-decoration: none;">
+					<h3>nonVerifiedChannels</h3>
+				</a>
+				<p>Channels that non-verified users have access to view.</p>
+				<table>
+					<thead>
+						<tr>
+							<th>Type</th>
+							<th>Default</th>
+							<th>Array</th>
+						</tr>
+					</thead>
+					<tbody><tr>
+							<td>guildChannel</td>
+							<td><code>n/a</code></td>
+							<td>true</td>
+						</tr>
+				</tbody></table>
+				<hr>
+				<a href="#verifychannel" id="verifychannel" style="color: inherit; text-decoration: none;">
+					<h3>verifyChannel</h3>
+				</a>
+				<p>Channel where users go through verification. Whether it be through typing <code>-verify</code> or going through Manual Verification.</p>
+				<table>
+					<thead>
+						<tr>
+							<th>Type</th>
+							<th>Default</th>
+							<th>Array</th>
+						</tr>
+					</thead>
+					<tbody><tr>
+							<td>textChannel</td>
+							<td><code>n/a</code></td>
+							<td>true</td>
+						</tr>
+				</tbody></table>
+				<hr>
+				<a href="#manualverify" id="manualverify" style="color: inherit; text-decoration: none;">
+					<h3>manualVerify</h3>
+				</a>
+				<p>Staff must manually accept or deny user&#39;s verification application. Does not require users to type <code>-verify</code></p>
+				<table>
+					<thead>
+						<tr>
+							<th>Type</th>
+							<th>Default</th>
+							<th>Array</th>
+						</tr>
+					</thead>
+					<tbody><tr>
+							<td>boolean</td>
+							<td>false</td>
+							<td>false</td>
+						</tr>
+				</tbody></table>
+				<hr>
+				<a href="#modverifychannel" id="modverifychannel" style="color: inherit; text-decoration: none;">
+					<h3>modVerifyChannel</h3>
+				</a>
+				<p>Channel where moderators accept or deny user verification applications.</p>
+				<table>
+					<thead>
+						<tr>
+							<th>Type</th>
+							<th>Default</th>
+							<th>Array</th>
+						</tr>
+					</thead>
+					<tbody><tr>
+							<td>textChannel</td>
+							<td><code>n/a</code></td>
+							<td>false</td>
+						</tr>
+				</tbody></table>
+				<hr>
+				<a href="#pingstaff" id="pingstaff" style="color: inherit; text-decoration: none;">
+					<h3>pingStaff</h3>
+				</a>
+				<p>Channel where moderators accept or deny user verification applications.</p>
+				<table>
+					<thead>
+						<tr>
+							<th>Type</th>
+							<th>Default</th>
+							<th>Array</th>
+						</tr>
+					</thead>
+					<tbody><tr>
+							<td>textChannel</td>
+							<td><code>n/a</code></td>
+							<td>false</td>
+						</tr>
+				</tbody></table>
+				<hr>
+				<a href="#verifymessage" id="verifymessage" style="color: inherit; text-decoration: none;">
+					<h3>verifyMessage</h3>
+				</a>
+				<p>Message explaining how to be verified. Automatically sent in the verification channel.</p>
+				<table>
+					<thead>
+						<tr>
+							<th>Type</th>
+							<th>Default</th>
+							<th>Array</th>
+						</tr>
+					</thead>
+					<tbody><tr>
+							<td>string</td>
+							<td>Type <code>-verify</code> to be verified.</td>
+							<td>false</td>
+						</tr>
+				</tbody></table>
+				<hr>
+				<a href="#denymessage" id="denymessage" style="color: inherit; text-decoration: none;">
+					<h3>denyMessage</h3>
+				</a>
+				<p>Ping staff when a user requests verification. (Manual Verification Only).</p>
+				<table>
+					<thead>
+						<tr>
+							<th>Type</th>
+							<th>Default</th>
+							<th>Array</th>
+						</tr>
+					</thead>
+					<tbody><tr>
+							<td>string</td>
+							<td>boolean</td>
+							<td>false</td>
+						</tr>
+				</tbody></table>
+				<hr>
+				<a href="#acceptmessage" id="acceptmessage" style="color: inherit; text-decoration: none;">
+					<h3>acceptMessage</h3>
+				</a>
+				<p>Message sent to users denied for verification.</p>
+				<table>
+					<thead>
+						<tr>
+							<th>Type</th>
+							<th>Default</th>
+							<th>Array</th>
+						</tr>
+					</thead>
+					<tbody><tr>
+							<td>string</td>
+							<td>You&#39;ve been denied verification.<br>Contact staff to find out why.</td>
+							<td>false</td>
+						</tr>
+				</tbody></table>
+				<hr>
+				<a href="#welcome" id="welcome" style="color: inherit; text-decoration: none;">
+					<h2>Welcome</h2>
+				</a>
+				<p>Welcome new server members with a customized welcome card.</p>
+				<hr>
+				<a href="#enabled-2" id="enabled-2" style="color: inherit; text-decoration: none;">
+					<h3>enabled</h3>
+				</a>
+				<p>Whether or not welcome cards are enabled.</p>
+				<table>
+					<thead>
+						<tr>
+							<th>Type</th>
+							<th>Default</th>
+							<th>Array</th>
+						</tr>
+					</thead>
+					<tbody><tr>
+							<td>boolean</td>
+							<td>false</td>
+							<td>false</td>
+						</tr>
+				</tbody></table>
+				<hr>
+				<a href="#welcomechannel" id="welcomechannel" style="color: inherit; text-decoration: none;">
+					<h3>welcomeChannel</h3>
+				</a>
+				<p>Channel where welcome cards are sent.</p>
+				<table>
+					<thead>
+						<tr>
+							<th>Type</th>
+							<th>Default</th>
+							<th>Array</th>
+						</tr>
+					</thead>
+					<tbody><tr>
+							<td>textChannel</td>
+							<td><code>n/a</code></td>
+							<td>false</td>
+						</tr>
+				</tbody></table>
+				<hr>
+				<a href="#backgroundcolor" id="backgroundcolor" style="color: inherit; text-decoration: none;">
+					<h3>backgroundColor</h3>
+				</a>
+				<p>Background color of the welcome card.</p>
+				<table>
+					<thead>
+						<tr>
+							<th>Type</th>
+							<th>Default</th>
+							<th>Array</th>
+						</tr>
+					</thead>
+					<tbody><tr>
+							<td>color</td>
+							<td>#2b2929</td>
+							<td>false</td>
+						</tr>
+				</tbody></table>
+				<hr>
+				<a href="#textcolor" id="textcolor" style="color: inherit; text-decoration: none;">
+					<h3>textColor</h3>
+				</a>
+				<p>Text color of the welcome card.</p>
+				<table>
+					<thead>
+						<tr>
+							<th>Type</th>
+							<th>Default</th>
+							<th>Array</th>
+						</tr>
+					</thead>
+					<tbody><tr>
+							<td>color</td>
+							<td>#FFFFFF</td>
+							<td>false</td>
+						</tr>
+				</tbody></table>
+				<hr>
+				<a href="#profilecolor" id="profilecolor" style="color: inherit; text-decoration: none;">
+					<h3>profileColor</h3>
+				</a>
+				<p>Accent color of the profile picture area.</p>
+				<table>
+					<thead>
+						<tr>
+							<th>Type</th>
+							<th>Default</th>
+							<th>Array</th>
+						</tr>
+					</thead>
+					<tbody><tr>
+							<td>color</td>
+							<td>#30d4e3</td>
+							<td>false</td>
+						</tr>
+				</tbody></table>
+				<hr>
+				<a href="#profilebackground" id="profilebackground" style="color: inherit; text-decoration: none;">
+					<h3>profileBackground</h3>
+				</a>
+				<p>Background image behind the users profile picture.</p>
+				<table>
+					<thead>
+						<tr>
+							<th>Type</th>
+							<th>Default</th>
+							<th>Array</th>
+						</tr>
+					</thead>
+					<tbody><tr>
+							<td>image</td>
+							<td><code>n/a</code></td>
+							<td>false</td>
+						</tr>
+				</tbody></table>
+				<hr>
 			</div>
 		</div>
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
@@ -211,9 +1320,6 @@
 					</li>
 					<li class=" tsd-kind-class">
 						<a href="classes/client.html" class="tsd-kind-icon">Client</a>
-					</li>
-					<li class=" tsd-kind-class">
-						<a href="classes/guild.html" class="tsd-kind-icon">Guild</a>
 					</li>
 					<li class=" tsd-kind-class">
 						<a href="classes/parse.html" class="tsd-kind-icon">Parse</a>
