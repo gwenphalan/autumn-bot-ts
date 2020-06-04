@@ -2429,7 +2429,7 @@ footer .tsd-legend {
     border-top: 1px solid #ccc;
 }
 .tsd-panel table tr:nth-child(2n) {
-    background-color: #f8f8f8;
+    background-color: #4d4d4d;
 }
 
 .tsd-panel-group {
@@ -2662,6 +2662,7 @@ ul.tsd-type-parameters .tsd-comment {
     font-size: 14px;
     color: #bfbfbf;
     margin: 0 0 1em 0;
+    display: none;
 }
 .tsd-sources a {
     color: #bfbfbf;

@@ -152,7 +152,7 @@ export class PromptManager {
     ) {
         const embedPermission = checkPerm(this.trigger, 'EMBED_LINKS');
 
-        const guildSettings = await this.trigger.guild.settings();
+        const guildSettings = await this.client.settings(this.trigger.guild.id);
 
         const embed = new MessageEmbed().setTimestamp().setColor(color ? color : this.client.config.accentColor);
 

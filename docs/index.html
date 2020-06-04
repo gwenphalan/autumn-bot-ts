@@ -64,8 +64,135 @@
 	<div class="row">
 		<div class="col-8 col-content">
 			<div class="tsd-panel tsd-typography">
+				<a href="#autumn-bot" id="autumn-bot" style="color: inherit; text-decoration: none;">
+					<h1>Autumn Bot</h1>
+				</a>
+				<p>Autumn Bot is a multipurpose utility bot written in typescript. While it is very useful by itself, when bundled with the Web Dashboard, it makes an amazing experience. The Web Dashboard (<em>which has not been finished yet</em>), is also written in typescript, and uses the Angular 9 web framework. If you need help with Autumn Bot, feel free to visit our <a href="https://discord.gg/DfByvyN">support server.</a>. If you would like to invite the <strong>Official</strong> Autumn Bot to your server, you can do so <a href="https://discord.com/oauth2/authorize?client_id=672548437346222110&amp;permissions=1576397911&amp;scope=bot">here</a>.</p>
+				<hr>
+				<a href="#table-of-contents" id="table-of-contents" style="color: inherit; text-decoration: none;">
+					<h3>Table of Contents</h3>
+				</a>
+				<ul>
+					<li><a href="#getting-started">Getting Started</a></li>
+					<li><a href="#commands">Commands</a></li>
+					<li><a href="#settings">Settings</a></li>
+				</ul>
+				<hr>
 				<a href="#getting-started" id="getting-started" style="color: inherit; text-decoration: none;">
-					<h3>Getting Started</h3>
+					<h1>Getting Started</h1>
+				</a>
+				<a href="#requirements" id="requirements" style="color: inherit; text-decoration: none;">
+					<h2>Requirements</h2>
+				</a>
+				<p>Before you get started with Autumn Bot, there&#39;s a few things you&#39;ll want ot get before the bot can function.</p>
+				<ul>
+					<li><a href="https://api.imgur.com/oauth2/addclient">Imgur API Token</a></li>
+					<li><a href="https://top.gg/api/docs#mybots">DBL API Token</a> (Only if you decide to list your bot on <a href="https://top.gg/">Top.GG</a>)</li>
+				</ul>
+				<a href="#cloning-the-repository" id="cloning-the-repository" style="color: inherit; text-decoration: none;">
+					<h2>Cloning The Repository</h2>
+				</a>
+				<p>To start using Autumn Bot, clone the repository into your folder of choosing. Create a</p>
+				<pre><code class="language-bash">git <span class="hljs-built_in">clone</span> https://github.com/GwenBebe/autumn-bot-ts</code></pre>
+				<a href="#configuring-the-bot" id="configuring-the-bot" style="color: inherit; text-decoration: none;">
+					<h2>Configuring the Bot</h2>
+				</a>
+				<p>You&#39;ll then want to copy the contents of <code>config/config.ts.example</code> into 2 new files:</p>
+				<ul>
+					<li><code>config/production.ts</code></li>
+					<li><code>config/development.ts</code></li>
+				</ul>
+				<p><code>development.ts</code> is the configuration used during the development in the bot. <code>production.ts</code> is the configuration used for release versions of the bot.</p>
+				<a href="#config-file" id="config-file" style="color: inherit; text-decoration: none;">
+					<h3>Config File</h3>
+				</a>
+				<table>
+					<thead>
+						<tr>
+							<th>Value</th>
+							<th>Type</th>
+							<th>Description</th>
+						</tr>
+					</thead>
+					<tbody><tr>
+							<td>token</td>
+							<td>String</td>
+							<td>Your bot token</td>
+						</tr>
+						<tr>
+							<td>mongoString</td>
+							<td>String</td>
+							<td>Your MongoDB connection string</td>
+						</tr>
+						<tr>
+							<td>defaultPrefix</td>
+							<td>String</td>
+							<td>The default prefix</td>
+						</tr>
+						<tr>
+							<td>developers</td>
+							<td>String[]</td>
+							<td>Discord User IDs of you and fellow developers. These can use commands that are devOnly.</td>
+						</tr>
+						<tr>
+							<td>infoChannel</td>
+							<td>String</td>
+							<td>Discord Channel ID where info should be logged to.</td>
+						</tr>
+						<tr>
+							<td>errorChannel</td>
+							<td>String</td>
+							<td>Discord Channel ID where errors should be logged to.</td>
+						</tr>
+						<tr>
+							<td>accentColor</td>
+							<td>String</td>
+							<td>Basic color of all embeds, as well as the welcome cards.</td>
+						</tr>
+						<tr>
+							<td>backgroundImage</td>
+							<td>String</td>
+							<td>Default background image of the welcome card. Placed in <code>assets/images</code>.</td>
+						</tr>
+						<tr>
+							<td>imgurID</td>
+							<td>String</td>
+							<td>This is the Imgur API Token listed in the <a href="#requirements">requirements</a>.</td>
+						</tr>
+						<tr>
+							<td>dblToken</td>
+							<td>String</td>
+							<td>This is the DBL API Token listed in the <a href="#requirements">requirements</a>.</td>
+						</tr>
+				</tbody></table>
+				<a href="#running-the-bot" id="running-the-bot" style="color: inherit; text-decoration: none;">
+					<h2>Running The Bot</h2>
+				</a>
+				<p>Before you&#39;ll be able to run the bot, you first need to open a terminal in the folder where you cloned the repository. Start by installing the required node modules.</p>
+				<a href="#npm" id="npm" style="color: inherit; text-decoration: none;">
+					<h4>NPM</h4>
+				</a>
+				<pre><code class="language-bash">npm install</code></pre>
+				<a href="#yarn" id="yarn" style="color: inherit; text-decoration: none;">
+					<h4>Yarn</h4>
+				</a>
+				<pre><code class="language-bash">yarn</code></pre>
+				<p>After that, you&#39;re all set. To run the bot, run the <code>development</code> or <code>production</code> scripts located in <code>package.json</code></p>
+				<a href="#npm-1" id="npm-1" style="color: inherit; text-decoration: none;">
+					<h4>NPM</h4>
+				</a>
+				<pre><code class="language-bash">npm run dev</code></pre>
+				<pre><code class="language-bash">npm run prod</code></pre>
+				<a href="#yarn-1" id="yarn-1" style="color: inherit; text-decoration: none;">
+					<h4>Yarn</h4>
+				</a>
+				<pre><code class="language-bash">yarn dev</code></pre>
+				<pre><code class="language-bash">yarn prod</code></pre>
+				<a href="#commands" id="commands" style="color: inherit; text-decoration: none;">
+					<h1>Commands</h1>
+				</a>
+				<a href="#settings" id="settings" style="color: inherit; text-decoration: none;">
+					<h1>Settings</h1>
 				</a>
 			</div>
 		</div>
