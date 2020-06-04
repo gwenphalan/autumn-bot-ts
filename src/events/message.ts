@@ -136,14 +136,41 @@ export default async (client: Client, message: Message) => {
             '<:PogXD:716762012134146108>'
         ];
 
-        if (message.content.toLowerCase().includes('pog') && message.content.toLowerCase().includes('kek') && (!prefix || !message.content.startsWith(prefix)))
-            return message.channel.send(kek[Math.floor(Math.random() * kek.length)] + '\n' + pog[Math.floor(Math.random() * pog.length)]);
+        const peepo = [
+            '<:WidePeepoHappy1:718186403439050752><:WidePeepoHappy2:718186416030351451><:WidePeepoHappy3:718186413283213454>',
+            '<a:pepeDD:718186411970265100>',
+            '<:PeepoChick:718187394989424641>',
+            '<:PeepoEek:718187395459186758>',
+            '<:peepoHappyLove:718187395090219069>',
+            '<:peepoggers:718186401891483699>',
+            '<:PeepoUmaru:718187395006332988>'
+        ];
 
-        if (message.content.toLowerCase().includes('kek') && (!prefix || !message.content.startsWith(prefix)))
-            return message.channel.send(kek[Math.floor(Math.random() * kek.length)]);
+        const pepe = [
+            '<:pogPepe:718187395052339350>',
+            '<:PepeLaugh:718186414797357116>',
+            '<:Pepega:718186418379292733>',
+            '<:pepecross:718187394741829723>',
+            '<:pepeblush:718187395089956995>',
+            '<a:9784_weh_bean:718187393374748703>',
+            '<:feelssickman:718187396029481030>',
+            '<a:5813_vegan_pepe:718187393110507641>'
+        ];
 
-        if (message.content.toLowerCase().includes('pog') && (!prefix || !message.content.startsWith(prefix)))
-            return message.channel.send(pog[Math.floor(Math.random() * pog.length)]);
+        const emotes: { [meme: string]: string[] } = {
+            kek: kek,
+            pog: pog,
+            pogchamp: pog,
+            peepo: peepo,
+            pepe: pepe
+        };
+
+        for (const meme in emotes) {
+            const memes: string[] = emotes[meme];
+
+            if (message.content.toLowerCase().includes(meme) && (!prefix || !message.content.startsWith(prefix)))
+                message.channel.send(memes[Math.floor(Math.random() * memes.length)]);
+        }
     }
 
     if (!prefix || !message.content.startsWith(prefix)) return;
