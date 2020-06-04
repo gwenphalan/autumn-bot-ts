@@ -41,7 +41,7 @@ Autumn Bot is a multipurpose utility bot written in typescript. While it is very
 
 ## Requirements
 
-Before you get started with Autumn Bot, there's a few things you'll want ot get before the bot can function.
+Before you get started with Autumn Bot, there's a few things you'll want to get before the bot can function.
 
 -   [Imgur API Token](https://api.imgur.com/oauth2/addclient)
 -   [DBL API Token](https://top.gg/api/docs#mybots) (Only if you decide to list your bot on [Top.GG](https://top.gg/))
