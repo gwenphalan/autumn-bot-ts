@@ -7,6 +7,8 @@ import { getGuildSettings } from '../database';
 import constants from '../constants/constants';
 import { PromptManager } from './helpers/PromptManager';
 import { Args, Argument, ArgumentManager } from './helpers/ArgumentManager';
+import { uploadHaste, fetchHaste } from '../util/hastebin';
+import { uploadImgur } from '../util/imgur';
 // Our custom client adding new properties to the Discord Client
 export class Client extends DClient {
     commands: Collection<string, Command> = new Collection(); // Our commands
@@ -17,6 +19,11 @@ export class Client extends DClient {
     settings = getGuildSettings;
     PromptManager = PromptManager;
     ArgumentManager = ArgumentManager;
+    helpers = {
+        uploadHaste: uploadHaste,
+        uploadImgur: uploadImgur,
+        fetchHaste: fetchHaste
+    };
 }
 
 export interface Command {
