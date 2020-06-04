@@ -7,6 +7,7 @@ Autumn Bot is a multipurpose utility bot written in typescript. While it is very
 -   [Discord Server](https://discord.gg/DfByvyN)
 -   [Website](https://autumnbot.net)
 -   [Autumn Forest Api](https://api.autumn-forest.net/)
+-   [Github Issues](https://github.com/GwenBebe/autumn-bot-ts/issues)
 
 ---
 
