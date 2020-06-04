@@ -45,6 +45,7 @@ Before you get started with Autumn Bot, there's a few things you'll want to get 
 
 -   [Imgur API Token](https://api.imgur.com/oauth2/addclient)
 -   [DBL API Token](https://top.gg/api/docs#mybots) (Only if you decide to list your bot on [Top.GG](https://top.gg/))
+-   [MongoDB Database](https://www.mongodb.com/download-center)
 
 ## Cloning The Repository
 

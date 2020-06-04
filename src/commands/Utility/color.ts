@@ -37,7 +37,8 @@ export const command: Command = {
         {
             name: 'Color',
             key: 'color',
-            type: 'color'
+            type: 'color',
+            optional: true
         }
     ],
     devOnly: false,

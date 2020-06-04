@@ -28836,7 +28836,7 @@
 			"defaultValue": "new mongoose.Schema({\n    guild: String,\n    messageId: String,\n    userId: String,\n    messageContent: String\n})"
 		},
 		{
-			"id": 2162,
+			"id": 2163,
 			"name": "bot",
 			"kind": 32,
 			"kindString": "Variable",
@@ -29201,7 +29201,7 @@
 			"defaultValue": "net.createServer(socket => {\n    socket.on('data', async data => {\n        const a = await updateGuild(data);\n\n        socket.write(JSON.stringify(a));\n        socket.pipe(socket);\n    });\n})"
 		},
 		{
-			"id": 2204,
+			"id": 2205,
 			"name": "task",
 			"kind": 32,
 			"kindString": "Variable",
@@ -29245,7 +29245,7 @@
 			"defaultValue": "path.join(__dirname, './tasks')"
 		},
 		{
-			"id": 2200,
+			"id": 2201,
 			"name": "verifyBotPerms",
 			"kind": 32,
 			"kindString": "Variable",
@@ -29270,7 +29270,7 @@
 			"defaultValue": "['MANAGE_MESSAGES', 'MANAGE_ROLES', 'MANAGE_CHANNELS', 'ADD_REACTIONS']"
 		},
 		{
-			"id": 2201,
+			"id": 2202,
 			"name": "verifyUserPerms",
 			"kind": 32,
 			"kindString": "Variable",
@@ -33146,7 +33146,7 @@
 					}
 				},
 				{
-					"id": 2138,
+					"id": 2139,
 					"name": "callback",
 					"kind": 4096,
 					"kindString": "Call signature",
@@ -33155,7 +33155,7 @@
 					},
 					"parameters": [
 						{
-							"id": 2139,
+							"id": 2140,
 							"name": "message",
 							"kind": 32768,
 							"kindString": "Parameter",
@@ -33169,7 +33169,7 @@
 							}
 						},
 						{
-							"id": 2140,
+							"id": 2141,
 							"name": "args",
 							"kind": 32768,
 							"kindString": "Parameter",
@@ -33179,7 +33179,7 @@
 							"type": {
 								"type": "reflection",
 								"declaration": {
-									"id": 2141,
+									"id": 2142,
 									"name": "__type",
 									"kind": 65536,
 									"kindString": "Type literal",
@@ -33188,7 +33188,7 @@
 									},
 									"children": [
 										{
-											"id": 2142,
+											"id": 2143,
 											"name": "action",
 											"kind": 32,
 											"kindString": "Variable",
@@ -33226,7 +33226,7 @@
 											}
 										},
 										{
-											"id": 2143,
+											"id": 2144,
 											"name": "channel",
 											"kind": 32,
 											"kindString": "Variable",
@@ -33260,7 +33260,7 @@
 											}
 										},
 										{
-											"id": 2144,
+											"id": 2145,
 											"name": "id",
 											"kind": 32,
 											"kindString": "Variable",
@@ -33295,9 +33295,9 @@
 											"title": "Variables",
 											"kind": 32,
 											"children": [
-												2142,
 												2143,
-												2144
+												2144,
+												2145
 											]
 										}
 									],
@@ -33312,7 +33312,7 @@
 							}
 						},
 						{
-							"id": 2145,
+							"id": 2146,
 							"name": "prompt",
 							"kind": 32768,
 							"kindString": "Parameter",
@@ -33338,7 +33338,7 @@
 					}
 				},
 				{
-					"id": 2163,
+					"id": 2164,
 					"name": "callback",
 					"kind": 4096,
 					"kindString": "Call signature",
@@ -33347,7 +33347,7 @@
 					},
 					"parameters": [
 						{
-							"id": 2164,
+							"id": 2165,
 							"name": "message",
 							"kind": 32768,
 							"kindString": "Parameter",
@@ -33361,7 +33361,7 @@
 							}
 						},
 						{
-							"id": 2165,
+							"id": 2166,
 							"name": "args",
 							"kind": 32768,
 							"kindString": "Parameter",
@@ -33371,7 +33371,7 @@
 							"type": {
 								"type": "reflection",
 								"declaration": {
-									"id": 2166,
+									"id": 2167,
 									"name": "__type",
 									"kind": 65536,
 									"kindString": "Type literal",
@@ -33380,7 +33380,7 @@
 									},
 									"children": [
 										{
-											"id": 2167,
+											"id": 2168,
 											"name": "command",
 											"kind": 32,
 											"kindString": "Variable",
@@ -33415,7 +33415,7 @@
 											"title": "Variables",
 											"kind": 32,
 											"children": [
-												2167
+												2168
 											]
 										}
 									],
@@ -33430,7 +33430,7 @@
 							}
 						},
 						{
-							"id": 2168,
+							"id": 2169,
 							"name": "_prompt",
 							"kind": 32768,
 							"kindString": "Parameter",
@@ -33456,7 +33456,7 @@
 					}
 				},
 				{
-					"id": 2174,
+					"id": 2175,
 					"name": "callback",
 					"kind": 4096,
 					"kindString": "Call signature",
@@ -33465,7 +33465,7 @@
 					},
 					"parameters": [
 						{
-							"id": 2175,
+							"id": 2176,
 							"name": "message",
 							"kind": 32768,
 							"kindString": "Parameter",
@@ -33479,7 +33479,7 @@
 							}
 						},
 						{
-							"id": 2176,
+							"id": 2177,
 							"name": "_args",
 							"kind": 32768,
 							"kindString": "Parameter",
@@ -33489,7 +33489,7 @@
 							"type": {
 								"type": "reflection",
 								"declaration": {
-									"id": 2177,
+									"id": 2178,
 									"name": "__type",
 									"kind": 65536,
 									"kindString": "Type literal",
@@ -33507,7 +33507,7 @@
 							}
 						},
 						{
-							"id": 2178,
+							"id": 2179,
 							"name": "_prompt",
 							"kind": 32768,
 							"kindString": "Parameter",
@@ -33533,7 +33533,7 @@
 					}
 				},
 				{
-					"id": 2179,
+					"id": 2180,
 					"name": "callback",
 					"kind": 4096,
 					"kindString": "Call signature",
@@ -33542,7 +33542,7 @@
 					},
 					"parameters": [
 						{
-							"id": 2180,
+							"id": 2181,
 							"name": "message",
 							"kind": 32768,
 							"kindString": "Parameter",
@@ -33556,7 +33556,7 @@
 							}
 						},
 						{
-							"id": 2181,
+							"id": 2182,
 							"name": "_args",
 							"kind": 32768,
 							"kindString": "Parameter",
@@ -33566,7 +33566,7 @@
 							"type": {
 								"type": "reflection",
 								"declaration": {
-									"id": 2182,
+									"id": 2183,
 									"name": "__type",
 									"kind": 65536,
 									"kindString": "Type literal",
@@ -33584,7 +33584,7 @@
 							}
 						},
 						{
-							"id": 2183,
+							"id": 2184,
 							"name": "prompt",
 							"kind": 32768,
 							"kindString": "Parameter",
@@ -33619,7 +33619,7 @@
 					}
 				},
 				{
-					"id": 2184,
+					"id": 2185,
 					"name": "callback",
 					"kind": 4096,
 					"kindString": "Call signature",
@@ -33628,7 +33628,7 @@
 					},
 					"parameters": [
 						{
-							"id": 2185,
+							"id": 2186,
 							"name": "message",
 							"kind": 32768,
 							"kindString": "Parameter",
@@ -33642,7 +33642,7 @@
 							}
 						},
 						{
-							"id": 2186,
+							"id": 2187,
 							"name": "_args",
 							"kind": 32768,
 							"kindString": "Parameter",
@@ -33652,7 +33652,7 @@
 							"type": {
 								"type": "reflection",
 								"declaration": {
-									"id": 2187,
+									"id": 2188,
 									"name": "__type",
 									"kind": 65536,
 									"kindString": "Type literal",
@@ -33670,7 +33670,7 @@
 							}
 						},
 						{
-							"id": 2188,
+							"id": 2189,
 							"name": "_prompt",
 							"kind": 32768,
 							"kindString": "Parameter",
@@ -33696,7 +33696,7 @@
 					}
 				},
 				{
-					"id": 2189,
+					"id": 2190,
 					"name": "callback",
 					"kind": 4096,
 					"kindString": "Call signature",
@@ -33705,7 +33705,7 @@
 					},
 					"parameters": [
 						{
-							"id": 2190,
+							"id": 2191,
 							"name": "message",
 							"kind": 32768,
 							"kindString": "Parameter",
@@ -33719,7 +33719,7 @@
 							}
 						},
 						{
-							"id": 2191,
+							"id": 2192,
 							"name": "args",
 							"kind": 32768,
 							"kindString": "Parameter",
@@ -33729,7 +33729,7 @@
 							"type": {
 								"type": "reflection",
 								"declaration": {
-									"id": 2192,
+									"id": 2193,
 									"name": "__type",
 									"kind": 65536,
 									"kindString": "Type literal",
@@ -33738,7 +33738,7 @@
 									},
 									"children": [
 										{
-											"id": 2193,
+											"id": 2194,
 											"name": "member",
 											"kind": 32,
 											"kindString": "Variable",
@@ -33764,7 +33764,7 @@
 											"title": "Variables",
 											"kind": 32,
 											"children": [
-												2193
+												2194
 											]
 										}
 									],
@@ -33779,7 +33779,7 @@
 							}
 						},
 						{
-							"id": 2194,
+							"id": 2195,
 							"name": "prompt",
 							"kind": 32768,
 							"kindString": "Parameter",
@@ -34036,7 +34036,7 @@
 			]
 		},
 		{
-			"id": 2202,
+			"id": 2203,
 			"name": "checkGuilds",
 			"kind": 64,
 			"kindString": "Function",
@@ -34046,7 +34046,7 @@
 			},
 			"signatures": [
 				{
-					"id": 2203,
+					"id": 2204,
 					"name": "checkGuilds",
 					"kind": 4096,
 					"kindString": "Call signature",
@@ -38611,7 +38611,7 @@
 			]
 		},
 		{
-			"id": 2205,
+			"id": 2206,
 			"name": "style1",
 			"kind": 64,
 			"kindString": "Function",
@@ -38621,7 +38621,7 @@
 			},
 			"signatures": [
 				{
-					"id": 2206,
+					"id": 2207,
 					"name": "style1",
 					"kind": 4096,
 					"kindString": "Call signature",
@@ -38630,7 +38630,7 @@
 					},
 					"parameters": [
 						{
-							"id": 2207,
+							"id": 2208,
 							"name": "guildName",
 							"kind": 32768,
 							"kindString": "Parameter",
@@ -38653,7 +38653,7 @@
 							}
 						},
 						{
-							"id": 2208,
+							"id": 2209,
 							"name": "memberName",
 							"kind": 32768,
 							"kindString": "Parameter",
@@ -38676,7 +38676,7 @@
 							}
 						},
 						{
-							"id": 2209,
+							"id": 2210,
 							"name": "avatarURL",
 							"kind": 32768,
 							"kindString": "Parameter",
@@ -38699,7 +38699,7 @@
 							}
 						},
 						{
-							"id": 2210,
+							"id": 2211,
 							"name": "backgroundImage",
 							"kind": 32768,
 							"kindString": "Parameter",
@@ -38722,7 +38722,7 @@
 							}
 						},
 						{
-							"id": 2211,
+							"id": 2212,
 							"name": "profileColor",
 							"kind": 32768,
 							"kindString": "Parameter",
@@ -38745,7 +38745,7 @@
 							}
 						},
 						{
-							"id": 2212,
+							"id": 2213,
 							"name": "backgroundColor",
 							"kind": 32768,
 							"kindString": "Parameter",
@@ -38768,7 +38768,7 @@
 							}
 						},
 						{
-							"id": 2213,
+							"id": 2214,
 							"name": "textColor",
 							"kind": 32768,
 							"kindString": "Parameter",
@@ -39687,7 +39687,7 @@
 						},
 						{
 							"fileName": "src/commands/Utility/color.ts",
-							"line": 45,
+							"line": 46,
 							"character": 8
 						},
 						{
@@ -40121,7 +40121,7 @@
 						"elementType": {
 							"type": "reflection",
 							"declaration": {
-								"id": 2195,
+								"id": 2196,
 								"name": "__type",
 								"kind": 65536,
 								"kindString": "Type literal",
@@ -40130,7 +40130,7 @@
 								},
 								"children": [
 									{
-										"id": 2197,
+										"id": 2198,
 										"name": "key",
 										"kind": 32,
 										"kindString": "Variable",
@@ -40151,7 +40151,7 @@
 										"defaultValue": "\"member\""
 									},
 									{
-										"id": 2196,
+										"id": 2197,
 										"name": "name",
 										"kind": 32,
 										"kindString": "Variable",
@@ -40172,7 +40172,7 @@
 										"defaultValue": "\"User\""
 									},
 									{
-										"id": 2199,
+										"id": 2200,
 										"name": "optional",
 										"kind": 32,
 										"kindString": "Variable",
@@ -40193,7 +40193,7 @@
 										"defaultValue": "true"
 									},
 									{
-										"id": 2198,
+										"id": 2199,
 										"name": "type",
 										"kind": 32,
 										"kindString": "Variable",
@@ -40219,10 +40219,10 @@
 										"title": "Variables",
 										"kind": 32,
 										"children": [
+											2198,
 											2197,
-											2196,
-											2199,
-											2198
+											2200,
+											2199
 										]
 									}
 								]
@@ -40387,7 +40387,7 @@
 						},
 						{
 							"fileName": "src/commands/Utility/color.ts",
-							"line": 47,
+							"line": 48,
 							"character": 18
 						},
 						{
@@ -40595,7 +40595,7 @@
 						},
 						{
 							"fileName": "src/commands/Utility/color.ts",
-							"line": 48,
+							"line": 49,
 							"character": 12
 						},
 						{
@@ -41184,7 +41184,7 @@
 						},
 						{
 							"fileName": "src/commands/Utility/color.ts",
-							"line": 43,
+							"line": 44,
 							"character": 11
 						},
 						{
@@ -41380,7 +41380,7 @@
 						},
 						{
 							"fileName": "src/commands/Utility/color.ts",
-							"line": 44,
+							"line": 45,
 							"character": 13
 						},
 						{
@@ -41968,7 +41968,7 @@
 						},
 						{
 							"fileName": "src/commands/Utility/color.ts",
-							"line": 46,
+							"line": 47,
 							"character": 19
 						},
 						{
@@ -43362,7 +43362,7 @@
 				410,
 				531,
 				530,
-				2162,
+				2163,
 				1562,
 				1567,
 				12,
@@ -43378,10 +43378,10 @@
 				1566,
 				1677,
 				1571,
-				2204,
+				2205,
 				1568,
-				2200,
-				2201
+				2201,
+				2202
 			]
 		},
 		{
@@ -43392,7 +43392,7 @@
 				844,
 				1612,
 				838,
-				2202,
+				2203,
 				1550,
 				727,
 				768,
@@ -43426,7 +43426,7 @@
 				1535,
 				1027,
 				1569,
-				2205,
+				2206,
 				750,
 				742,
 				2007,
