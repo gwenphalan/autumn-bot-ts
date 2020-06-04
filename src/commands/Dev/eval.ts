@@ -39,7 +39,11 @@ const callback = async (message: AMessage, args: { code: string }, _prompt: Prom
           })()`));
 
         if (typeof output !== 'string') output = require('util').inspect(output);
-        if (output.length > 2000) return message.channel.send(`https://hasteb.in/${await uploadHaste(output)}`);
+        if (output.length > 2000) {
+            // const res = await uploadHaste(output);
+
+            return message.channel.send(`https://hastebin.com/${await uploadHaste(output)}`);
+        }
 
         return message.channel.send(output, { code: 'xl' }).catch(err => {
             return message.channel.send(err, { code: 'xl' });

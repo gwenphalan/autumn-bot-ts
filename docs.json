@@ -235,29 +235,6 @@
 					}
 				},
 				{
-					"id": 1130,
-					"name": "argsSingleQuotes",
-					"kind": 1024,
-					"kindString": "Property",
-					"flags": {
-						"isPrivate": true,
-						"isExported": true,
-						"isReadonly": true
-					},
-					"sources": [
-						{
-							"fileName": "src/interfaces/helpers/ArgumentManager.ts",
-							"line": 84,
-							"character": 37
-						}
-					],
-					"type": {
-						"type": "intrinsic",
-						"name": "true"
-					},
-					"defaultValue": "true"
-				},
-				{
 					"id": 1127,
 					"name": "argsType",
 					"kind": 1024,
@@ -292,28 +269,6 @@
 					}
 				},
 				{
-					"id": 1128,
-					"name": "command",
-					"kind": 1024,
-					"kindString": "Property",
-					"flags": {
-						"isPrivate": true,
-						"isExported": true
-					},
-					"sources": [
-						{
-							"fileName": "src/interfaces/helpers/ArgumentManager.ts",
-							"line": 82,
-							"character": 19
-						}
-					],
-					"type": {
-						"type": "reference",
-						"id": 1400,
-						"name": "Command"
-					}
-				},
-				{
 					"id": 1125,
 					"name": "message",
 					"kind": 1024,
@@ -332,51 +287,6 @@
 					"type": {
 						"type": "reference",
 						"name": "Message"
-					}
-				},
-				{
-					"id": 1131,
-					"name": "prefix",
-					"kind": 1024,
-					"kindString": "Property",
-					"flags": {
-						"isPrivate": true,
-						"isExported": true,
-						"isReadonly": true
-					},
-					"sources": [
-						{
-							"fileName": "src/interfaces/helpers/ArgumentManager.ts",
-							"line": 85,
-							"character": 27
-						}
-					],
-					"type": {
-						"type": "intrinsic",
-						"name": "string"
-					}
-				},
-				{
-					"id": 1129,
-					"name": "prompt",
-					"kind": 1024,
-					"kindString": "Property",
-					"flags": {
-						"isPrivate": true,
-						"isExported": true,
-						"isOptional": true
-					},
-					"sources": [
-						{
-							"fileName": "src/interfaces/helpers/ArgumentManager.ts",
-							"line": 83,
-							"character": 18
-						}
-					],
-					"type": {
-						"type": "reference",
-						"id": 850,
-						"name": "PromptManager"
 					}
 				},
 				{
@@ -508,12 +418,8 @@
 						1124,
 						1123,
 						1126,
-						1130,
 						1127,
-						1128,
-						1125,
-						1131,
-						1129
+						1125
 					]
 				},
 				{
@@ -6020,37 +5926,6 @@
 					]
 				},
 				{
-					"id": 780,
-					"name": "prompt",
-					"kind": 1024,
-					"kindString": "Property",
-					"flags": {
-						"isPrivate": true,
-						"isExported": true
-					},
-					"comment": {
-						"shortText": "Used to alert the user in case of an error.",
-						"tags": [
-							{
-								"tag": "memberof",
-								"text": "Parse\n"
-							}
-						]
-					},
-					"sources": [
-						{
-							"fileName": "src/interfaces/helpers/Parse.ts",
-							"line": 48,
-							"character": 18
-						}
-					],
-					"type": {
-						"type": "reference",
-						"id": 850,
-						"name": "PromptManager"
-					}
-				},
-				{
 					"id": 810,
 					"name": "bannedUser",
 					"kind": 2048,
@@ -7180,13 +7055,6 @@
 					]
 				},
 				{
-					"title": "Properties",
-					"kind": 1024,
-					"children": [
-						780
-					]
-				},
-				{
 					"title": "Methods",
 					"kind": 2048,
 					"children": [
@@ -8115,47 +7983,6 @@
 					]
 				},
 				{
-					"id": 874,
-					"name": "done",
-					"kind": 2048,
-					"kindString": "Method",
-					"flags": {
-						"isPrivate": true,
-						"isExported": true
-					},
-					"signatures": [
-						{
-							"id": 875,
-							"name": "done",
-							"kind": 4096,
-							"kindString": "Call signature",
-							"flags": {
-								"isExported": true
-							},
-							"comment": {
-								"shortText": "Edits the GUI with a loading emote to indicate the current prompt is finished and the next one is loading."
-							},
-							"type": {
-								"type": "reference",
-								"typeArguments": [
-									{
-										"type": "intrinsic",
-										"name": "void"
-									}
-								],
-								"name": "Promise"
-							}
-						}
-					],
-					"sources": [
-						{
-							"fileName": "src/interfaces/helpers/PromptManager.ts",
-							"line": 109,
-							"character": 22
-						}
-					]
-				},
-				{
 					"id": 878,
 					"name": "embed",
 					"kind": 2048,
@@ -8893,50 +8720,6 @@
 							"fileName": "src/interfaces/helpers/PromptManager.ts",
 							"line": 610,
 							"character": 15
-						}
-					]
-				},
-				{
-					"id": 865,
-					"name": "init",
-					"kind": 2048,
-					"kindString": "Method",
-					"flags": {
-						"isPrivate": true,
-						"isExported": true
-					},
-					"signatures": [
-						{
-							"id": 866,
-							"name": "init",
-							"kind": 4096,
-							"kindString": "Call signature",
-							"flags": {
-								"isPrivate": true,
-								"isExported": true
-							},
-							"comment": {
-								"shortText": "Initializes the prompt if there is no `this.GUI` with a loading emote, then returns the GUI message.",
-								"returns": "\n"
-							},
-							"type": {
-								"type": "reference",
-								"typeArguments": [
-									{
-										"type": "reference",
-										"id": 1417,
-										"name": "AMessage"
-									}
-								],
-								"name": "Promise"
-							}
-						}
-					],
-					"sources": [
-						{
-							"fileName": "src/interfaces/helpers/PromptManager.ts",
-							"line": 56,
-							"character": 22
 						}
 					]
 				},
@@ -10777,13 +10560,11 @@
 						948,
 						990,
 						876,
-						874,
 						878,
 						1006,
 						871,
 						955,
 						983,
-						865,
 						962,
 						925,
 						898,
@@ -14243,10 +14024,13 @@
 					"flags": {
 						"isExported": true
 					},
+					"comment": {
+						"shortText": "Basic color of all embeds, as well as the welcome card."
+					},
 					"sources": [
 						{
 							"fileName": "config/index.ts",
-							"line": 10,
+							"line": 31,
 							"character": 15
 						}
 					],
@@ -14263,10 +14047,13 @@
 					"flags": {
 						"isExported": true
 					},
+					"comment": {
+						"shortText": "Default background image of the welcome card. Placed in `assets/images`"
+					},
 					"sources": [
 						{
 							"fileName": "config/index.ts",
-							"line": 11,
+							"line": 35,
 							"character": 19
 						}
 					],
@@ -14283,10 +14070,13 @@
 					"flags": {
 						"isExported": true
 					},
+					"comment": {
+						"shortText": "This is the DBL API Token listed in the [requirements](https://docs.autumnbot.net/#requirements). Used to post stat to [Top.GG](https://top.gg/) and check for user votes."
+					},
 					"sources": [
 						{
 							"fileName": "config/index.ts",
-							"line": 13,
+							"line": 43,
 							"character": 12
 						}
 					],
@@ -14303,10 +14093,13 @@
 					"flags": {
 						"isExported": true
 					},
+					"comment": {
+						"shortText": "The default prefix."
+					},
 					"sources": [
 						{
 							"fileName": "config/index.ts",
-							"line": 6,
+							"line": 15,
 							"character": 17
 						}
 					],
@@ -14323,10 +14116,13 @@
 					"flags": {
 						"isExported": true
 					},
+					"comment": {
+						"shortText": "Discord user IDs of you and fellow developers. These can use commands that are devOnly."
+					},
 					"sources": [
 						{
 							"fileName": "config/index.ts",
-							"line": 7,
+							"line": 19,
 							"character": 14
 						}
 					],
@@ -14346,10 +14142,13 @@
 					"flags": {
 						"isExported": true
 					},
+					"comment": {
+						"shortText": "Discord Channel ID where errors should be logged to."
+					},
 					"sources": [
 						{
 							"fileName": "config/index.ts",
-							"line": 9,
+							"line": 27,
 							"character": 16
 						}
 					],
@@ -14366,10 +14165,13 @@
 					"flags": {
 						"isExported": true
 					},
+					"comment": {
+						"shortText": "This is the Imgur API Token listed in the [requirements](https://docs.autumnbot.net/#requirements). Used to upload images to Imgur."
+					},
 					"sources": [
 						{
 							"fileName": "config/index.ts",
-							"line": 12,
+							"line": 39,
 							"character": 11
 						}
 					],
@@ -14386,10 +14188,13 @@
 					"flags": {
 						"isExported": true
 					},
+					"comment": {
+						"shortText": "Discord Channel ID where info should be logged to."
+					},
 					"sources": [
 						{
 							"fileName": "config/index.ts",
-							"line": 8,
+							"line": 23,
 							"character": 15
 						}
 					],
@@ -14406,10 +14211,13 @@
 					"flags": {
 						"isExported": true
 					},
+					"comment": {
+						"shortText": "Your MongoDB connection string."
+					},
 					"sources": [
 						{
 							"fileName": "config/index.ts",
-							"line": 5,
+							"line": 11,
 							"character": 15
 						}
 					],
@@ -14426,10 +14234,13 @@
 					"flags": {
 						"isExported": true
 					},
+					"comment": {
+						"shortText": "Your bot token."
+					},
 					"sources": [
 						{
 							"fileName": "config/index.ts",
-							"line": 4,
+							"line": 7,
 							"character": 9
 						}
 					],
@@ -39746,7 +39557,7 @@
 						},
 						{
 							"fileName": "src/commands/Dev/eval.ts",
-							"line": 68,
+							"line": 72,
 							"character": 8
 						},
 						{
@@ -39942,7 +39753,7 @@
 						},
 						{
 							"fileName": "src/commands/Dev/eval.ts",
-							"line": 56,
+							"line": 60,
 							"character": 11
 						},
 						{
@@ -40141,7 +39952,7 @@
 						},
 						{
 							"fileName": "src/commands/Dev/eval.ts",
-							"line": 58,
+							"line": 62,
 							"character": 8
 						},
 						{
@@ -40446,7 +40257,7 @@
 						},
 						{
 							"fileName": "src/commands/Dev/eval.ts",
-							"line": 70,
+							"line": 74,
 							"character": 18
 						},
 						{
@@ -40654,7 +40465,7 @@
 						},
 						{
 							"fileName": "src/commands/Dev/eval.ts",
-							"line": 71,
+							"line": 75,
 							"character": 12
 						},
 						{
@@ -40851,7 +40662,7 @@
 						},
 						{
 							"fileName": "src/commands/Dev/eval.ts",
-							"line": 54,
+							"line": 58,
 							"character": 12
 						},
 						{
@@ -41047,7 +40858,7 @@
 						},
 						{
 							"fileName": "src/commands/Dev/eval.ts",
-							"line": 57,
+							"line": 61,
 							"character": 15
 						},
 						{
@@ -41243,7 +41054,7 @@
 						},
 						{
 							"fileName": "src/commands/Dev/eval.ts",
-							"line": 66,
+							"line": 70,
 							"character": 11
 						},
 						{
@@ -41439,7 +41250,7 @@
 						},
 						{
 							"fileName": "src/commands/Dev/eval.ts",
-							"line": 67,
+							"line": 71,
 							"character": 13
 						},
 						{
@@ -41635,7 +41446,7 @@
 						},
 						{
 							"fileName": "src/commands/Dev/eval.ts",
-							"line": 55,
+							"line": 59,
 							"character": 10
 						},
 						{
@@ -41831,7 +41642,7 @@
 						},
 						{
 							"fileName": "src/commands/Dev/eval.ts",
-							"line": 53,
+							"line": 57,
 							"character": 8
 						},
 						{
@@ -42027,7 +41838,7 @@
 						},
 						{
 							"fileName": "src/commands/Dev/eval.ts",
-							"line": 69,
+							"line": 73,
 							"character": 19
 						},
 						{
@@ -42239,7 +42050,7 @@
 				},
 				{
 					"fileName": "src/commands/Dev/eval.ts",
-					"line": 52,
+					"line": 56,
 					"character": 20
 				},
 				{
