@@ -54,6 +54,7 @@
         "tinycolor2": "^1.4.1",
         "typedoc": "^0.17.7",
         "typedoc-clarity-theme": "^1.1.0",
+        "typedoc-neo-theme": "^1.0.8",
         "typedoc-plugin-markdown": "^2.3.0",
         "typescript": "^3.8.3"
     },

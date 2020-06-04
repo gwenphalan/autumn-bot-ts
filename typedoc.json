@@ -1,0 +1,8 @@
+{
+    "inputFiles": ["./src"],
+    "out": "docs",
+    "mode": "file",
+    "json": "docs.json",
+    "name": "Autumn Bot",
+    "theme": "./typedoc-theme"
+}
