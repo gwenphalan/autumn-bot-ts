@@ -7,7 +7,6 @@ import { getGuildSettings } from '../database';
 import constants from '../constants/constants';
 import { PromptManager } from './helpers/PromptManager';
 import { Args, Argument, ArgumentManager } from './helpers/ArgumentManager';
-import { Guild } from './Guild';
 // Our custom client adding new properties to the Discord Client
 export class Client extends DClient {
     commands: Collection<string, Command> = new Collection(); // Our commands
@@ -37,7 +36,6 @@ export interface Command {
 
 export interface AMessage extends BaseMessage {
     client: Client;
-    guild: Guild;
 }
 // Client events, no need to touch these unless new events are added to discord.js
 export type ClientEventTypes =

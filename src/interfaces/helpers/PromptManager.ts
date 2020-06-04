@@ -15,7 +15,8 @@ import {
     GuildEmoji,
     ReactionEmoji,
     EmbedField,
-    MessageAttachment
+    MessageAttachment,
+    Guild
 } from 'discord.js';
 import { Parse } from './Parse';
 import { replace } from '../../util';
@@ -28,6 +29,7 @@ export class PromptManager {
     readonly client: Client;
     readonly channel: TextChannel | DMChannel | NewsChannel;
     readonly user: User;
+    readonly guild?: Guild;
     timeout: number;
     trigger: AMessage;
     module?: string;
@@ -42,6 +44,7 @@ export class PromptManager {
         this.module = module;
         this.timeout = timeout || 5;
         this.parse = new Parse(this);
+        this.guild = trigger.guild || undefined;
     }
 
     /**
@@ -49,7 +52,6 @@ export class PromptManager {
      *
      * @private
      * @returns {Promise<AMessage>}
-     * @memberof PromptManager
      */
     private async init(): Promise<AMessage> {
         if (this.GUI) return this.GUI;
@@ -67,7 +69,6 @@ export class PromptManager {
      * @param {string} [title]
      * @param {string} [body]
      * @returns {Promise<AMessage>}
-     * @memberof PromptManager
      */
     async sendMsg(title?: string, body?: string): Promise<AMessage> {
         let GUI;
@@ -114,7 +115,6 @@ export class PromptManager {
     /**
      * Deletes the GUI
      *
-     * @memberof PromptManager
      */
     async delete() {
         this.GUI?.delete().catch(() => null);
@@ -135,7 +135,6 @@ export class PromptManager {
      * @param {boolean} [displayAuthor]
      * @param {(string | Buffer)} [image]
      * @returns
-     * @memberof PromptManager
      */
     async embed(
         title?: string,
@@ -152,7 +151,7 @@ export class PromptManager {
     ) {
         const embedPermission = checkPerm(this.trigger, 'EMBED_LINKS');
 
-        const guildSettings = await this.client.settings(this.trigger.guild.id);
+        const guildSettings = this.guild ? await this.client.settings(this.guild.id) : null;
 
         const embed = new MessageEmbed().setTimestamp().setColor(color ? color : this.client.config.accentColor);
 
@@ -205,7 +204,6 @@ export class PromptManager {
      * @param {string} question
      * @param {boolean} [optional] If optional, the prompt will state "Type `none` to leave this blank."
      * @returns {(Promise<string | 'none' | void>)}
-     * @memberof PromptManager
      */
     async string(question: string, optional: true): Promise<string | 'none' | void>;
 
@@ -235,7 +233,6 @@ export class PromptManager {
      * @param {boolean} [string] Returns a number as a string instead of a number.
      * @param {boolean} [optional] If optional, the prompt will state "Type `none` to leave this blank."
      * @returns {(Promise<number | string | 'none' | void>)}
-     * @memberof PromptManager
      */
     async number(question: string): Promise<number | void>;
 
@@ -276,7 +273,6 @@ export class PromptManager {
      * @param {string} question
      * @param {boolean} [optional] If optional, the prompt will state "Type `none` to leave this blank."
      * @returns {(Promise<string | 'none' | void>)}
-     * @memberof PromptManager
      */
     async url(question: string, optional: true): Promise<string | 'none' | void>;
 
@@ -309,7 +305,6 @@ export class PromptManager {
      *
      * @param {string} question
      * @returns {(Promise<boolean | void>)}
-     * @memberof PromptManager
      */
     async boolean(question: string): Promise<boolean | void> {
         const GUI = await this.sendMsg(question, `\nReact with <:leave:${this.client.constants.emotes.leave}> to cancel.`);
@@ -343,7 +338,6 @@ export class PromptManager {
      * @param {(TextChannel | NewsChannel)} channel
      * @param {boolean} [optional] If optional, the prompt will state "Type `none` to leave this blank."
      * @returns {(Promise<AMessage | 'none' | void>)}
-     * @memberof PromptManager
      */
     async message(question: string, channel: TextChannel | NewsChannel, optional: true): Promise<AMessage | 'none' | void>;
 
@@ -381,7 +375,6 @@ export class PromptManager {
      * @param {string} question
      * @param {boolean} [optional] If optional, the prompt will state "Type `none` to leave this blank."
      * @returns {(Promise<TextChannel | NewsChannel | 'none' | void>)}
-     * @memberof PromptManager
      */
     async textChannel(question: string, optional: true): Promise<TextChannel | NewsChannel | 'none' | void>;
 
@@ -414,7 +407,6 @@ export class PromptManager {
      * @param {string} question
      * @param {boolean} [optional] If optional, the prompt will state "Type `none` to leave this blank."
      * @returns {(Promise<VoiceChannel | 'none' | void>)}
-     * @memberof PromptManager
      */
     async voiceChannel(question: string, optional: true): Promise<VoiceChannel | 'none' | void>;
 
@@ -447,7 +439,6 @@ export class PromptManager {
      * @param {string} question
      * @param {boolean} [optional] If optional, the prompt will state "Type `none` to leave this blank."
      * @returns {(Promise<CategoryChannel | 'none' | void>)}
-     * @memberof PromptManager
      */
     async categoryChannel(question: string, optional: true): Promise<CategoryChannel | 'none' | void>;
 
@@ -480,7 +471,6 @@ export class PromptManager {
      * @param {string} question
      * @param {boolean} [optional] If optional, the prompt will state "Type `none` to leave this blank."
      * @returns {(Promise<GuildChannel | 'none' | void>)}
-     * @memberof PromptManager
      */
     async guildChannel(question: string, optional: true): Promise<GuildChannel | 'none' | void>;
 
@@ -513,7 +503,6 @@ export class PromptManager {
      * @param {string} question
      * @param {boolean} [optional] If optional, the prompt will state "Type `none` to leave this blank."
      * @returns {(Promise<GuildMember | 'none' | void>)}
-     * @memberof PromptManager
      */
     async member(question: string, optional: true): Promise<GuildMember | 'none' | void>;
 
@@ -547,7 +536,6 @@ export class PromptManager {
      * @param {string} question
      * @param {boolean} [optional] If optional, the prompt will state "Type `none` to leave this blank."
      * @returns {(Promise<User | 'none' | void>)}
-     * @memberof PromptManager
      */
     async bannedUser(question: string, optional: true): Promise<User | 'none' | void>;
 
@@ -581,7 +569,6 @@ export class PromptManager {
      * @param {string} question
      * @param {boolean} [optional] If optional, the prompt will state "Type `none` to leave this blank."
      * @returns {(Promise<User | 'none' | void>)}
-     * @memberof PromptManager
      */
     async role(question: string, optional: true): Promise<Role | 'none' | void>;
 
@@ -615,7 +602,6 @@ export class PromptManager {
      * @param {string} question
      * @param {boolean} [optional] If optional, the prompt will state "Type `none` to leave this blank."
      * @returns {(Promise<string | 'none' | void>)}
-     * @memberof PromptManager
      */
     async image(question: string, optional: true): Promise<string | 'none' | void>;
 
@@ -650,7 +636,6 @@ export class PromptManager {
      * @param {string} question
      * @param {boolean} [optional] If optional, the prompt will state "Type `none` to leave this blank."
      * @returns {(Promise<string | 'none' | void>)}
-     * @memberof PromptManager
      */
     async color(question: string, optional: true): Promise<string | 'none' | void>;
 
@@ -689,7 +674,6 @@ export class PromptManager {
      * @param {string[]} options
      * @param {boolean} [optional] If optional, the prompt will state "Type `none` to leave this blank."
      * @returns {(Promise<OptionsResponse | 'none' | void>)}
-     * @memberof PromptManager
      */
     async options(question: string, options: string[], optional: true): Promise<OptionsResponse | 'none' | void>;
 
@@ -730,7 +714,6 @@ export class PromptManager {
      *
      * @param {string} question
      * @returns {(Promise<void | GuildEmoji | ReactionEmoji>)}
-     * @memberof PromptManager
      */
     async emoji(question: string): Promise<void | GuildEmoji | ReactionEmoji> {
         const GUI = await this.sendMsg(question, `React with your chosen emoji, or react with <:leave:${this.client.constants.emotes.leave}> to cancel.`);
