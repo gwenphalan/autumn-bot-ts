@@ -1,6 +1,6 @@
 # Autumn Bot - [Github](https://github.com/GwenBebe/autumn-bot-ts)
 
-Autumn Bot is a multipurpose utility bot written in typescript. While it is very useful by itself, when bundled with the Web Dashboard, it makes an amazing experience. The Web Dashboard (_which has not been finished yet_), is also written in typescript, and uses the Angular 9 web framework. If you need help with Autumn Bot, feel free to visit our [support server](https://discord.gg/DfByvyN). If you would like to invite the **Official** Autumn Bot to your server, you can do so [here](https://discord.com/oauth2/authorize?client_id=672548437346222110&permissions=1576397911&scope=bot).
+Autumn Bot is a multipurpose utility bot written in typescript. While it is very useful by itself, when bundled with the Web Dashboard, it makes an amazing experience. The Web Dashboard (_which has not been finished yet, and will **not** be open source_), is also written in typescript, and uses the Angular 9 web framework. If you need help with Autumn Bot, feel free to visit our [support server](https://discord.gg/DfByvyN). If you would like to invite the **Official** Autumn Bot to your server, you can do so [here](https://discord.com/oauth2/authorize?client_id=672548437346222110&permissions=1576397911&scope=bot).
 
 ---
 
