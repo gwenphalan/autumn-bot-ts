@@ -31,6 +31,13 @@ export const group: SettingsGroup = {
             identifier: 'memberRole',
             description: "Role given to members. If verification is enabled, users won't receive this until verified.",
             valueType: 'role'
+        },
+        {
+            name: 'Meme Responses',
+            identifier: 'memeResponses',
+            description: 'If enabled, Autumn will response do certain keywords with a randomly chosen meme emoji. (KEK, Pog, Pepe, etc)',
+            valueType: 'boolean',
+            default: false
         }
     ],
     update: update

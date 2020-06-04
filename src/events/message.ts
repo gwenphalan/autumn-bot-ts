@@ -108,41 +108,43 @@ export default async (client: Client, message: Message) => {
         }
     }
 
-    // const kek = [
-    //     '<:kekwHands:716365354917429359>',
-    //     '<:sadkek:716365351436288011>',
-    //     '<:KEKW:716365353852207174>',
-    //     '<:kekjpg:716365352262696991>',
-    //     '<:KEKWPog:716736949288697986>',
-    //     '<:KEKW1:716736951696359466><:KEKW2:716736957623042128>\n<:KEKW3:716736956427534397><:KEKW4:716736954313736253>',
-    //     '<:KEKWFAKE:716736955202928726>',
-    //     '<a:KEKWDEAD:716736960294551562>',
-    //     '<:KEKWPRIDE:716736950303850557>',
-    //     '<a:KEKWPLS:716736963591536723>',
-    //     '<:KekWat:716736952371511559>',
-    //     '<a:3KEKW:716736961339064390>'
-    // ];
+    if (guildSettings?.general.memeResponses) {
+        const kek = [
+            '<:kekwHands:716365354917429359>',
+            '<:sadkek:716365351436288011>',
+            '<:KEKW:716365353852207174>',
+            '<:kekjpg:716365352262696991>',
+            '<:KEKWPog:716736949288697986>',
+            '<:KEKW1:716736951696359466><:KEKW2:716736957623042128>\n<:KEKW3:716736956427534397><:KEKW4:716736954313736253>',
+            '<:KEKWFAKE:716736955202928726>',
+            '<a:KEKWDEAD:716736960294551562>',
+            '<:KEKWPRIDE:716736950303850557>',
+            '<a:KEKWPLS:716736963591536723>',
+            '<:KekWat:716736952371511559>',
+            '<a:3KEKW:716736961339064390>'
+        ];
 
-    // const pog = [
-    //     '<:PogWeird:716762015116558368>',
-    //     '<:PogW:716762009051594752>',
-    //     '<:PogDuck:716762007830921237>',
-    //     '<:Pog1:716762013023338516>',
-    //     '<:PogOmega:716762006199468143>',
-    //     '<:PogE:716762013690363965>',
-    //     '<:PogUUU:716762011001684010>',
-    //     '<:Pog:716762007189323887>',
-    //     '<:PogXD:716762012134146108>'
-    // ];
+        const pog = [
+            '<:PogWeird:716762015116558368>',
+            '<:PogW:716762009051594752>',
+            '<:PogDuck:716762007830921237>',
+            '<:Pog1:716762013023338516>',
+            '<:PogOmega:716762006199468143>',
+            '<:PogE:716762013690363965>',
+            '<:PogUUU:716762011001684010>',
+            '<:Pog:716762007189323887>',
+            '<:PogXD:716762012134146108>'
+        ];
 
-    // if (message.content.toLowerCase().includes('pog') && message.content.toLowerCase().includes('kek') && (!prefix || !message.content.startsWith(prefix)))
-    //     return message.channel.send(kek[Math.floor(Math.random() * kek.length)] + '\n' + pog[Math.floor(Math.random() * pog.length)]);
+        if (message.content.toLowerCase().includes('pog') && message.content.toLowerCase().includes('kek') && (!prefix || !message.content.startsWith(prefix)))
+            return message.channel.send(kek[Math.floor(Math.random() * kek.length)] + '\n' + pog[Math.floor(Math.random() * pog.length)]);
 
-    // if (message.content.toLowerCase().includes('kek') && (!prefix || !message.content.startsWith(prefix)))
-    //     return message.channel.send(kek[Math.floor(Math.random() * kek.length)]);
+        if (message.content.toLowerCase().includes('kek') && (!prefix || !message.content.startsWith(prefix)))
+            return message.channel.send(kek[Math.floor(Math.random() * kek.length)]);
 
-    // if (message.content.toLowerCase().includes('pog') && (!prefix || !message.content.startsWith(prefix)))
-    //     return message.channel.send(pog[Math.floor(Math.random() * pog.length)]);
+        if (message.content.toLowerCase().includes('pog') && (!prefix || !message.content.startsWith(prefix)))
+            return message.channel.send(pog[Math.floor(Math.random() * pog.length)]);
+    }
 
     if (!prefix || !message.content.startsWith(prefix)) return;
     if (!message.content.replace(prefix, '').length && pingRegex.test(prefix))

@@ -6,6 +6,7 @@ export interface GuildSettings extends mongoose.Document {
         prefix: string;
         deleteCommands: boolean;
         memberRole: string;
+        memeResponses: boolean;
     };
     moderation: {
         enabled: boolean;
@@ -41,7 +42,8 @@ const GuildSettingsSchema = new mongoose.Schema({
     general: {
         prefix: String,
         deleteCommands: Boolean,
-        memberRole: String
+        memberRole: String,
+        memeResponses: Boolean
     },
     moderation: {
         enabled: Boolean,
