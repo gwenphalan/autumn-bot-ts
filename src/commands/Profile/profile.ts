@@ -51,19 +51,19 @@ const callback = async (message: AMessage, args: { action?: 'view' | 'edit' | 'c
             return;
         }
 
-        const bio = await prompt.string('`Biography` - Tell me about yourself!');
+        const bio = await prompt.string('`Biography` - Tell me about yourself!', true);
         if (!bio) return;
 
-        const age = await prompt.number('`Age` - How old are you?');
+        const age = await prompt.number('`Age` - How old are you?', true);
         if (!age) return;
 
-        const gender = await prompt.string('`Gender` - What is your gender?');
+        const gender = await prompt.string('`Gender` - What is your gender?', true);
         if (!gender) return;
 
-        const pronouns = await prompt.string('`Pronouns` - What are your pronouns?');
+        const pronouns = await prompt.string('`Pronouns` - What are your pronouns?', true);
         if (!pronouns) return;
 
-        const color = await prompt.color('`Color` - What color would you like your profile to be?');
+        const color = await prompt.color('`Color` - What color would you like your profile to be?', true);
         if (!color) return;
 
         createUserProfile(message.author.id, color, pronouns, gender, age.toString(), bio);
