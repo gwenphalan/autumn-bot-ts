@@ -111,7 +111,9 @@ export class Parse {
     async boolean(str: string): Promise<boolean | void> {
         const bool = str.match(/(true|false)/gi);
 
-        if (!bool) return this.prompt.error(`${str} is not a valid URL!`);
+        if (!bool) return this.prompt.error(`${str} is not a valid boolean!`);
+
+        console.log(bool);
 
         return bool[0] === 'true';
     }

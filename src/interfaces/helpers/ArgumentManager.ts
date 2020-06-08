@@ -70,7 +70,6 @@ export interface Argument {
 /**
  * Used to manage arguments. It parses arguments and generates usages dynamically.
  *
- * @export
  * @class ArgumentManager
  */
 export class ArgumentManager {
@@ -91,7 +90,6 @@ export class ArgumentManager {
      * @param {PromptManager} [prompt] Used to prompt the user in case of an error parsing.
      * @param {Message} [message] Used to parse arguments.
      * @param {string} [argString] Used to parse arguments.
-     * @memberof ArgumentManager
      *
      * ****
      *
@@ -120,7 +118,6 @@ export class ArgumentManager {
      * Returns dynamically generated usages string based on `this.command` and `this.args`;
      *
      * @readonly
-     * @memberof ArgumentManager
      */
     get usage() {
         if (this.argsType === 'none') return this.prefix + this.command.name;
@@ -136,7 +133,6 @@ export class ArgumentManager {
      * Returns object containing parsed arguments.
      *
      * @returns {(Promise<Args | void>)}
-     * @memberof ArgumentManager
      *
      * ****
      *

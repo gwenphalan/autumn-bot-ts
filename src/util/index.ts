@@ -116,6 +116,41 @@ export const createMutedRole = async (guild: Guild) => {
     return mutedRole;
 };
 
+export const createNonVerifiedRole = async (guild: Guild) => {
+    const channels = guild.channels.cache;
+
+    const nonVerifiedRole = await guild.roles.create({
+        data: {
+            name: 'Non-Verified',
+            color: '#4d4d4d'
+        },
+        reason: 'Required for Verification'
+    });
+
+    channels.forEach(channel => {
+        if (channel instanceof CategoryChannel) {
+            channel.createOverwrite(
+                nonVerifiedRole,
+                {
+                    SEND_MESSAGES: false
+                },
+                'Required to mute users.'
+            );
+        } else {
+            if (channel.parent?.permissionOverwrites !== channel.permissionOverwrites)
+                channel.createOverwrite(
+                    nonVerifiedRole,
+                    {
+                        SEND_MESSAGES: false
+                    },
+                    'Required to mute users.'
+                );
+        }
+    });
+
+    return nonVerifiedRole;
+};
+
 export const fetchNorris = async () => {
     const result = await fetch(`https://api.chucknorris.io/jokes/random`, {
         method: 'GET',

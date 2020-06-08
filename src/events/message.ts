@@ -81,7 +81,7 @@ export default async (client: Client, message: Message) => {
                     .setTimestamp()
             );
 
-            modVerifyChannel.send(staffRole.toString()).then(msg => msg.delete());
+            if (verification.pingStaff) modVerifyChannel.send(staffRole.toString()).then(msg => msg.delete());
 
             await message
                 .delete({

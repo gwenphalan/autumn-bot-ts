@@ -177,25 +177,15 @@ const callback = async (
 
                 if (value) {
                     check = await parseType(message, setting.valueType, value, prompt);
-                    if (!check) return;
+                    if (!check && check !== false) return;
                 } else {
-                    try {
-                        // Send a setting embed.
-                        response4 = await sendSetting(message, setting.identifier, setting.valueType, prompt);
-                    } catch {
-                        console.error;
-                    }
-
-                    // Return if the user responded 'canceled'
-                    try {
-                        if (response4.canceled) return prompt.error('Settings Change Canceled');
-                    } catch {
-                        console.error;
-                    }
+                    // Send a setting embed.
+                    response4 = await sendSetting(message, setting.identifier, setting.valueType, prompt);
+                    console.log(response4);
                 }
 
                 // Await the Promised answer.
-                let value5 = value ? check : response4.answer;
+                let value5 = value ? check : response4;
                 let toString1: string | undefined;
 
                 // If the value provided is something that is stored is an ID (TextChannel, Role, GuildMember, VoiceChannel) replace value1 with the id.
@@ -236,6 +226,7 @@ const callback = async (
                 } else {
                     // Send a setting embed.
                     response1 = await sendSetting(message, setting.identifier, setting.valueType, prompt);
+                    console.log(response1);
                     if (!response1) return;
                 }
 

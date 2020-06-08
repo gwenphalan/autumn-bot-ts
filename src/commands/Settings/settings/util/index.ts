@@ -4,8 +4,13 @@ import { PromptManager } from '../../../../interfaces/helpers/PromptManager';
 import { GuildMember, Role, TextChannel, VoiceChannel, GuildChannel, User, Message } from 'discord.js';
 
 export const sendSetting = async (message: AMessage, setting: string, valueType: valueType, prompt: PromptManager, array?: boolean) => {
-    if (valueType === 'boolean')
-        return prompt.boolean(array ? `What would you like to add to \`${setting}\`?` : `What would you like to change ${setting} to?`);
+    if (valueType === 'boolean') {
+        const res = await prompt.boolean(array ? `What would you like to add to \`${setting}\`?` : `What would you like to change ${setting} to?`);
+
+        console.log(res);
+
+        return res;
+    }
 
     const GUI = await prompt.sendMsg(
         array ? `What would you like to add to \`${setting}\`?` : `What would you like to change ${setting} to?`,
