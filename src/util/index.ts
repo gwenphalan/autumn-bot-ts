@@ -3,6 +3,8 @@ import { Client } from '../interfaces/Client';
 import { TextChannel, GuildMember, PermissionString, Message, Guild, CategoryChannel } from 'discord.js';
 import { inspect } from 'util';
 import constants from '../constants/constants';
+import { getGuildSettings, updateGuildSettings } from '../database';
+import { client } from '..';
 
 // Fetches remote content
 export const fetch = async (requestInfo: RequestInfo, requestOptions?: RequestInit) => {
@@ -118,6 +120,7 @@ export const createMutedRole = async (guild: Guild) => {
 
 export const createNonVerifiedRole = async (guild: Guild) => {
     const channels = guild.channels.cache;
+    const settings = await getGuildSettings(guild.id);
 
     const nonVerifiedRole = await guild.roles.create({
         data: {
@@ -128,27 +131,100 @@ export const createNonVerifiedRole = async (guild: Guild) => {
     });
 
     channels.forEach(channel => {
-        if (channel instanceof CategoryChannel) {
-            channel.createOverwrite(
-                nonVerifiedRole,
-                {
-                    SEND_MESSAGES: false
-                },
-                'Required to mute users.'
-            );
-        } else {
-            if (channel.parent?.permissionOverwrites !== channel.permissionOverwrites)
+        if (channel.id !== settings.verification.verifyChannel && !settings.verification.nonVerifiedChannels.includes(channel.id)) {
+            if (channel instanceof CategoryChannel) {
                 channel.createOverwrite(
                     nonVerifiedRole,
                     {
-                        SEND_MESSAGES: false
+                        VIEW_CHANNEL: false
                     },
-                    'Required to mute users.'
+                    'Required for Verification'
                 );
+            } else {
+                if (channel.parent?.permissionOverwrites !== channel.permissionOverwrites)
+                    channel.createOverwrite(
+                        nonVerifiedRole,
+                        {
+                            VIEW_CHANNEL: false
+                        },
+                        'Required for Verification'
+                    );
+            }
         }
     });
 
+    settings.verification.nonVerifiedRole = nonVerifiedRole.id;
+
+    await updateGuildSettings(guild.id, settings);
+
     return nonVerifiedRole;
+};
+
+export const createVerifyChannel = async (guild: Guild) => {
+    const settings = await getGuildSettings(guild.id);
+    if (!settings) return;
+
+    if (!client.user) return;
+
+    const nonVerifiedRole = guild.roles.cache.get(settings.verification.nonVerifiedRole) || (await createNonVerifiedRole(guild));
+
+    const channel = await guild.channels.create('verify', {
+        type: 'text',
+        permissionOverwrites: [
+            {
+                id: nonVerifiedRole?.id,
+                allow: ['VIEW_CHANNEL', 'SEND_MESSAGES']
+            },
+            {
+                id: guild.roles.everyone.id,
+                deny: ['VIEW_CHANNEL', 'SEND_MESSAGES']
+            },
+            {
+                id: client.user.id,
+                allow: ['VIEW_CHANNEL', 'SEND_MESSAGES']
+            }
+        ],
+        reason: 'Required for Verification'
+    });
+
+    settings.verification.verifyChannel = channel.id;
+
+    await updateGuildSettings(guild.id, settings);
+
+    return channel;
+};
+
+export const createModVerifyChannel = async (guild: Guild) => {
+    const settings = await getGuildSettings(guild.id);
+    if (!settings || !client.user) return;
+
+    const staffRole = guild.roles.cache.get(settings.verification.staffRole);
+
+    if (!staffRole) return;
+
+    const channel = await guild.channels.create('mod-verify', {
+        type: 'text',
+        permissionOverwrites: [
+            {
+                id: staffRole?.id,
+                allow: ['VIEW_CHANNEL']
+            },
+            {
+                id: guild.roles.everyone.id,
+                deny: ['VIEW_CHANNEL']
+            },
+            {
+                id: client.user.id,
+                allow: ['VIEW_CHANNEL', 'SEND_MESSAGES']
+            }
+        ]
+    });
+
+    settings.verification.modVerifyChannel = channel.id;
+
+    await updateGuildSettings(guild.id, settings);
+
+    return channel;
 };
 
 export const fetchNorris = async () => {

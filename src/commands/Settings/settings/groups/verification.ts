@@ -4,6 +4,7 @@ import { CategoryChannel, TextChannel, MessageEmbed, Collection, Guild } from 'd
 import { config } from '../../../../../config';
 import { client as botClient } from '../../../../index';
 import { getGuildSettings } from '../../../../database';
+import { createVerifyChannel, createNonVerifiedRole, createModVerifyChannel } from '../../../../util';
 
 const update = async (guild: Guild) => {
     if (!guild) return;
@@ -12,15 +13,17 @@ const update = async (guild: Guild) => {
     const verification = guildSettings.verification;
     const channels = guild.channels.cache;
 
-    if (!verification.verifyChannel || !verification.nonVerifiedRole) return;
+    if (!verification.enabled) return;
 
-    const verifyChannel = guild.channels.cache.get(verification.verifyChannel);
-    const nonVerifiedRole = guild.roles.cache.get(verification.nonVerifiedRole);
+    const nonVerifiedRole = guild.roles.cache.get(verification.nonVerifiedRole) || (await createNonVerifiedRole(guild));
+    const verifyChannel = guild.channels.cache.get(verification.verifyChannel) || (await createVerifyChannel(guild));
     const staffRole = guild.roles.cache.get(verification.staffRole);
-    const modVerifyChannel = guild.channels.cache.get(verification.modVerifyChannel);
+    const modVerifyChannel = verification.manualVerify
+        ? guild.channels.cache.get(verification.modVerifyChannel) || (await createModVerifyChannel(guild))
+        : undefined;
     const nonVerifiedChannels = verification.nonVerifiedChannels;
 
-    if (!verification.enabled || !verifyChannel || !nonVerifiedRole || !(verifyChannel instanceof TextChannel)) return;
+    if (!(verifyChannel instanceof TextChannel)) return;
 
     let messages = (await verifyChannel.messages.fetch({ limit: 50 }).catch(() => null)) as Collection<string, AMessage>;
     if (messages) {
@@ -126,25 +129,11 @@ export const group: SettingsGroup = {
             valueType: 'role'
         },
         {
-            name: 'Non Verified Role',
-            identifier: 'nonVerifiedRole',
-            description: 'Role given to non-verified users. Denied access to view all channels. Taken away upon verification.',
-            valueType: 'role',
-            required: true
-        },
-        {
             name: 'Non Verified Channels',
             identifier: 'nonVerifiedChannels',
             description: 'Channels that non-verified have access to view.',
             valueType: 'guildChannel',
             array: true
-        },
-        {
-            name: 'Verification Channel',
-            identifier: 'verifyChannel',
-            description: 'Channel where users go through verification. Whether it be through typing `{prefix}verify` or going through Manual Verification.',
-            valueType: 'textChannel',
-            required: true
         },
         {
             name: 'Manual Verification',
@@ -153,12 +142,6 @@ export const group: SettingsGroup = {
             valueType: 'boolean',
             default: false,
             dependencies: ['modVerifyChannel', 'staffRole']
-        },
-        {
-            name: 'Moderator Verification Channel',
-            identifier: 'modVerifyChannel',
-            description: 'Channel where moderators accept or deny user verification applications.',
-            valueType: 'textChannel'
         },
         {
             name: 'Ping Staff',

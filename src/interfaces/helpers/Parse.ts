@@ -113,8 +113,6 @@ export class Parse {
 
         if (!bool) return this.prompt.error(`${str} is not a valid boolean!`);
 
-        console.log(bool);
-
         return bool[0] === 'true';
     }
 

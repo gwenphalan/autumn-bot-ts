@@ -181,7 +181,6 @@ const callback = async (
                 } else {
                     // Send a setting embed.
                     response4 = await sendSetting(message, setting.identifier, setting.valueType, prompt);
-                    console.log(response4);
                 }
 
                 // Await the Promised answer.
@@ -226,7 +225,6 @@ const callback = async (
                 } else {
                     // Send a setting embed.
                     response1 = await sendSetting(message, setting.identifier, setting.valueType, prompt);
-                    console.log(response1);
                     if (!response1) return;
                 }
 
@@ -402,11 +400,14 @@ const callback = async (
                   `${setting.name} depends on the following settings. It will not function until they have settings.\n\n\`${dependencies.join('`\n`')}\``
               )
             : null;
+
+        await group.update(message.guild);
+
         // Send an embed containing the response
         await prompt.embed(`${group.name} Settings Edited`, responseArray.join('\n\n'), undefined, undefined, undefined, undefined, undefined, attachment);
 
         // Return and call the update method for the group.
-        return await group.update(message.guild);
+        return;
     }
 };
 
