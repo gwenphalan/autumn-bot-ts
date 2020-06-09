@@ -5,8 +5,6 @@ import { PromptManager } from '../../interfaces/helpers/PromptManager';
 const callback = async (_message: AMessage, _args: {}, prompt: PromptManager) => {
     const joke = await fetchNorris();
 
-    console.log(joke);
-
     prompt.embed('Chuck Norris', joke.value);
 };
 
