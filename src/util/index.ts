@@ -85,6 +85,7 @@ export const replace = (str: string, obj: { [prop: string]: string }) => {
 
 export const createMutedRole = async (guild: Guild) => {
     const channels = guild.channels.cache;
+    const settings = await getGuildSettings(guild.id);
 
     const mutedRole = await guild.roles.create({
         data: {
@@ -114,6 +115,10 @@ export const createMutedRole = async (guild: Guild) => {
                 );
         }
     });
+
+    settings.moderation.mutedRole = mutedRole.id;
+
+    await updateGuildSettings(guild.id, settings);
 
     return mutedRole;
 };

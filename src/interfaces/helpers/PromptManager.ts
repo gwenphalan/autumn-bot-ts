@@ -20,6 +20,7 @@ import {
 } from 'discord.js';
 import { Parse } from './Parse';
 import { replace } from '../../util';
+import { getGuildSettings } from '../../database';
 
 interface OptionsResponse {
     index: number;
@@ -95,7 +96,17 @@ export class PromptManager {
      * @param message
      */
     async error(message: string): Promise<void> {
-        const embed = new MessageEmbed().setColor('#DB6260').setTimestamp().setTitle('Uh Oh!').setDescription(message);
+        const guildSettings = this.guild ? await getGuildSettings(this.guild.id) : null;
+
+        const prefix = guildSettings?.general.prefix;
+
+        const placeholders: { [prop: string]: string } = {
+            guildName: this.trigger.guild ? this.trigger.guild.name : this.trigger.author.username,
+            username: this.user.username,
+            defaultPrefix: this.client.config.defaultPrefix,
+            prefix: prefix || this.client.config.defaultPrefix
+        };
+        const embed = new MessageEmbed().setColor('#DB6260').setTimestamp().setTitle('Uh Oh!').setDescription(replace(message, placeholders));
         if (this.module) embed.setAuthor(this.module, this.client.user?.displayAvatarURL({ format: 'png', dynamic: true }));
 
         this.channel.send(embed);
@@ -161,7 +172,7 @@ export class PromptManager {
             guildName: this.trigger.guild ? this.trigger.guild.name : this.trigger.author.username,
             username: this.user.username,
             defaultPrefix: this.client.config.defaultPrefix,
-            prefix: prefix ? prefix : this.client.config.defaultPrefix
+            prefix: prefix || this.client.config.defaultPrefix
         };
 
         footer ? embed.setFooter(replace(footer.text, placeholders), footer.iconURL) : null;
