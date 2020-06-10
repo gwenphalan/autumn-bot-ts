@@ -8,7 +8,7 @@ const callback = async (_message: AMessage, _args: {}, prompt: PromptManager) =>
 export const command: Command = {
     name: 'invite',
     category: 'Utility',
-    module: 'invite',
+    module: 'Invite',
     aliases: [],
     description: 'Provides the invite link for the bot',
     args: [],
