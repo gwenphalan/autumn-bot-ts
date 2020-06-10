@@ -101,6 +101,12 @@ export const server = net.createServer(socket => {
     });
 });
 
-server.listen(8124, '51.178.182.144', () => {
-    console.log(`Websocket Listening On Port 8124, Host 51.178.182.144`);
-});
+server.listen(
+    {
+        host: '51.178.182.144',
+        port: 8124
+    },
+    () => {
+        console.log(`Websocket Listening On Port 8124, Host 51.178.182.144`);
+    }
+);
