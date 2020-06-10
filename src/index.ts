@@ -104,7 +104,9 @@ export const server = net.createServer(socket => {
 server.listen(
     {
         host: config.hostIp,
-        port: 8124
+        port: 8124,
+        localAddress: config.hostIp,
+        localPort: 8124
     },
     () => {
         console.log(server.address());
