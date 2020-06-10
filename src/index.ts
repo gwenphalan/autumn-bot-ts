@@ -103,7 +103,7 @@ export const server = net.createServer(socket => {
 
 server.listen(
     {
-        host: '51.178.182.144',
+        host: config.hostIp,
         port: 8124
     },
     () => {

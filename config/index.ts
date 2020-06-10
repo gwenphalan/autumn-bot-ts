@@ -41,4 +41,8 @@ export interface Config {
      * This is the DBL API Token listed in the [requirements](https://docs.autumnbot.net/#requirements). Used to post stat to [Top.GG](https://top.gg/) and check for user votes.
      */
     dblToken: string;
+    /**
+     * IP/Domain of the host. Used to connect to the bot's websocket to remote update guilds.
+     */
+    hostIp: string;
 }
