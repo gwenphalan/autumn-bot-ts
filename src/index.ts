@@ -92,8 +92,6 @@ client.login(client.config.token);
 
 export const server = net.createServer(socket => {
     socket.on('data', async data => {
-        console.log(data);
-
         const a = await updateGuild(data);
 
         socket.write(JSON.stringify(a));
