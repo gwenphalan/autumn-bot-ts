@@ -83,7 +83,7 @@ const callback = async (message: AMessage, _args: {}, prompt: PromptManager): Pr
         return message;
     }
 
-    const amount = await prompt.number('What topic/question would you like to poll?');
+    const amount = await prompt.number('How many options would you like to have? (MAX: 20)');
     if (typeof amount !== 'number') return;
 
     if (amount > 20 || amount === 0) return prompt.error('Polls can only have 1-20 options!');
