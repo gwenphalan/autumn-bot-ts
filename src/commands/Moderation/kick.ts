@@ -20,7 +20,9 @@ const callback = async (message: AMessage, args: { member: GuildMember; reason?:
 
     const member = args.member;
 
-    if (message.member.roles.highest.position < member.roles.highest.position) return prompt.error(`You can't kick ${member}!`);
+    if (member.id === message.author.id) return prompt.error("You can't kick yourself!");
+
+    if (message.member.roles.highest.position <= member.roles.highest.position) return prompt.error(`You can't kick ${member}!`);
 
     if (!member.kickable) return prompt.error(`I can't ban ${member}!`);
 

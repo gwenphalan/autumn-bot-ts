@@ -21,7 +21,9 @@ const callback = async (message: AMessage, args: { member: GuildMember; reason?:
 
     const member = args.member;
 
-    if (message.member.roles.highest.position < member.roles.highest.position) return prompt.error(`You can't warn ${member}!`);
+    if (member.id === message.author.id) return prompt.error("You can't warn yourself!");
+
+    if (message.member.roles.highest.position <= member.roles.highest.position) return prompt.error(`You can't warn ${member}!`);
 
     const time = guildSettings.moderation.warnExpire || 2592000000;
 

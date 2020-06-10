@@ -21,7 +21,9 @@ const callback = async (message: AMessage, args: { member: GuildMember; reason?:
 
     const member = args.member;
 
-    if (message.member.roles.highest.position < member.roles.highest.position) return prompt.error(`You can't mute ${member}!`);
+    if (member.id === message.author.id) return prompt.error("You can't mute yourself!");
+
+    if (message.member.roles.highest.position <= member.roles.highest.position) return prompt.error(`You can't mute ${member}!`);
 
     if (!member.manageable) return prompt.error(`I can't mute ${member}!`);
 
