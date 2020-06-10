@@ -107,6 +107,7 @@ server.listen(
         port: 8124
     },
     () => {
+        console.log(server.address());
         console.log(`Websocket Listening On Port 8124, Host 51.178.182.144`);
     }
 );
