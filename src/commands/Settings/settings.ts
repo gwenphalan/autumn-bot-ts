@@ -34,9 +34,16 @@ const callback = async (
         groups.forEach(group => groupList.push(`\`${group.name}\``));
 
         // Send a message embed with the list groups
-        return prompt.embed('Settings Groups', groupList.join('\n'), undefined, undefined, undefined, {
-            text: "To view a group's settings do {prefix}settings <group>"
-        });
+        return prompt.embed(
+            'Settings Groups',
+            groupList.join('\n') + `\n\nManage your server on the [online dashboard](https://www.autumnbot.net/dashboard/${message.guild.id})`,
+            undefined,
+            undefined,
+            undefined,
+            {
+                text: "To view a group's settings do {prefix}settings <group>"
+            }
+        );
     }
 
     // if there is only 1 argument (EXAMPLE: '-settings general')
@@ -49,9 +56,19 @@ const callback = async (
         group.settings.forEach(setting => settingList.push(`\`${setting.identifier}\``));
 
         // Send an embed with the list of settings.
-        return prompt.embed(`${group.name} Settings`, group.description + '\n\n' + settingList.join('\n'), undefined, undefined, undefined, {
-            text: `To get more information on a setting do {prefix}settings ${group.name} [setting]`
-        });
+        return prompt.embed(
+            `${group.name} Settings`,
+            group.description +
+                '\n\n' +
+                settingList.join('\n') +
+                `\n\nManage your server on the [online dashboard](https://www.autumnbot.net/dashboard/${message.guild.id})`,
+            undefined,
+            undefined,
+            undefined,
+            {
+                text: `To get more information on a setting do {prefix}settings ${group.name} [setting]`
+            }
+        );
     }
 
     // If there is 2 arguments (EXAMPLE: '-settings general prefix')
@@ -141,7 +158,7 @@ const callback = async (
         }
 
         // Send the an embed with the information regarding the setting.
-        prompt.embed(
+        return prompt.embed(
             `${group.name} Settings - \`${setting.name}\``,
             setting.description,
             undefined,
