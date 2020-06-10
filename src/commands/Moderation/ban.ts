@@ -20,9 +20,9 @@ const callback = async (message: AMessage, args: { member: GuildMember; reason?:
 
     const member = args.member;
 
-    if (!member.bannable) return prompt.error(`I can't ban ${member}!`);
-
     if (message.member.roles.highest.position < member.roles.highest.position) return prompt.error(`You can't ban ${member}!`);
+
+    if (!member.bannable) return prompt.error(`I can't ban ${member}!`);
 
     const reason = args.reason;
 

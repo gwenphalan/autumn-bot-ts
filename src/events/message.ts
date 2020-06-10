@@ -1,5 +1,5 @@
 import { Client, sendEmbed, AMessage } from '../interfaces/Client';
-import { TextChannel, MessageEmbed, Message, MessageAttachment, PermissionString } from 'discord.js';
+import { TextChannel, MessageEmbed, Message, MessageAttachment, PermissionString, DMChannel } from 'discord.js';
 import { client as botClient } from '../index';
 import { createVerifyApp } from '../database';
 import { drawCard } from '../util/canvas';
@@ -246,6 +246,7 @@ export default async (client: Client, message: Message) => {
 
     if (!args) return;
 
+    if (!(message.channel instanceof DMChannel) && !message.channel.permissionsFor(message.guild!.me!)?.has('SEND_MESSAGES')) return;
     // Execute the command and handle any potential errors
     return command
         .callback(message, args || {}, prompt)
