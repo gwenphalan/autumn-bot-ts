@@ -62,8 +62,7 @@ export const updateGuild = async (d: Buffer) => {
             `• **ID:** ${guild.id}\n` +
                 `• **Name:** ${guild.name}\n` +
                 `• **Owner:** ${guild.owner?.user.username}#${guild.owner?.user.discriminator} (${guild?.owner?.id})\n` +
-                `• **Module:** ${module}` +
-                
+                `• **Module:** ${module}`
         );
     // Send useful info to the info channel
     infoChannel.send(embed);
