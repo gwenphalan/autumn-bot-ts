@@ -54,7 +54,7 @@ const callback = async (message: AMessage, args: { action?: 'view' | 'edit' | 'c
         const bio = await prompt.string('`Biography` - Tell me about yourself!', true);
         if (!bio) return;
 
-        const age = await prompt.number('`Age` - How old are you?', true);
+        const age = await prompt.number('`Age` - How old are you?', true, true);
         if (!age) return;
 
         const gender = await prompt.string('`Gender` - What is your gender?', true);
