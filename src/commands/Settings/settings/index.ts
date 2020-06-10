@@ -1,7 +1,7 @@
 import { readdirSync } from 'fs';
 import { join } from 'path';
 import { SettingsGroup } from '../../../interfaces/SettingsGroup';
-import { Collection, PermissionString, TextChannel, MessageEmbed } from 'discord.js';
+import { Collection, PermissionString } from 'discord.js';
 import { client } from '../../../index';
 
 export const groups: Collection<string, SettingsGroup> = new Collection();
@@ -48,24 +48,6 @@ export const updateGuild = async (d: Buffer) => {
     } catch (err) {
         return { status: 300, message: 'Internal Error' };
     }
-
-    // Get the info channel
-    const infoChannel = client.channels.cache.get(client.config.infoChannel) || (await client.channels.fetch(client.config.infoChannel));
-    if (!infoChannel || !(infoChannel instanceof TextChannel)) throw new Error('Provided info channel is unreachable or not a text channel.');
-
-    const embed = new MessageEmbed()
-        .setAuthor('Bot Information', client.user?.displayAvatarURL({ dynamic: true, format: 'png' }))
-        .setTimestamp()
-        .setColor(client.config.accentColor)
-        .setTitle(`Updated Guild Settings`)
-        .setDescription(
-            `• **ID:** ${guild.id}\n` +
-                `• **Name:** ${guild.name}\n` +
-                `• **Owner:** ${guild.owner?.user.username}#${guild.owner?.user.discriminator} (${guild?.owner?.id})\n` +
-                `• **Module:** ${module}`
-        );
-    // Send useful info to the info channel
-    infoChannel.send(embed);
 
     return { status: 200, message: `Success` };
 };
