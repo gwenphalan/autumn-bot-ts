@@ -12,7 +12,7 @@ const callback = async (message: AMessage, _args: {}, _prompt: PromptManager) =>
 
     const result = await neko.sfw.baka();
 
-    message.channel.send(new MessageEmbed().setDescription(`Baka!`).setColor(color).setImage(result.url).setTimestamp());
+    message.channel.send(new MessageEmbed().setColor(color).setImage(result.url).setTimestamp());
 };
 
 export const command: Command = {
