@@ -179,7 +179,7 @@ export default async (client: Client, reaction: MessageReaction, user: User) => 
                     new MessageEmbed()
                         .setColor('#DB6260')
                         .setTitle(`${message.guild.name} Verification`)
-                        .setDescription(verification.verifyMessage || "You've been denied verification.\n\nContact staff to find out why.")
+                        .setDescription(verification.denyMessage || "You've been denied verification.\n\nContact staff to find out why.")
                 );
             }
         } catch (err) {
