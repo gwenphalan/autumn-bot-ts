@@ -147,7 +147,6 @@ export default async (client: Client, message: Message) => {
         ];
 
         const pepe = [
-            '<:pogPepe:718187395052339350>',
             '<:PepeLaugh:718186414797357116>',
             '<:Pepega:718186418379292733>',
             '<:pepecross:718187394741829723>',
