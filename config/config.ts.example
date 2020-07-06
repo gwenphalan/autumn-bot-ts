@@ -5,7 +5,7 @@ export default {
     developers: [''], // Discord User IDs of you and fellow developers. These can use commands that are devOnly
     infoChannel: '', // Discord Channel ID of a channel, where info should be logged to
     errorChannel: '', // Discord Channel ID where errors should be logged to
-    accentColor: '', // Basic color of all embeds, as well as the welcome cards.
+    accentColor: '', // Basic color of all embeds, as well as the welcome cards, only hexa is supported as format of colour!
     backgroundImage: 'autumn-forest.jpg', // Default background image of the welcome card. Placed in assets/images
     imgurID: '',
     dblToken: ''
