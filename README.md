@@ -74,7 +74,7 @@ You'll then want to copy the contents of `config/config.ts.example` into 2 new f
 | developers      | String[] | Discord User IDs of you and fellow developers. These can use commands that are devOnly. |
 | infoChannel     | String   | Discord Channel ID where info should be logged to.                                      |
 | errorChannel    | String   | Discord Channel ID where errors should be logged to.                                    |
-| accentColor     | String   | Basic color of all embeds, as well as the welcome cards.                                |
+| accentColor     | String   | Basic color of all embeds, as well as the welcome cards, must be in hex!                |
 | backgroundImage | String   | Default background image of the welcome card. Placed in `assets/images`.                |
 | imgurID         | String   | This is the Imgur API Token listed in the [requirements](#requirements).                |
 | dblToken        | String   | This is the DBL API Token listed in the [requirements](#requirements).                  |
