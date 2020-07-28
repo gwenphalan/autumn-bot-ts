@@ -1,29 +1,29 @@
 Arguments: 
-  /home/gwen/.nvm/versions/node/v13.6.0/bin/node /home/gwen/.nvm/versions/node/v13.6.0/bin/yarn add @types/pastebin-js
+  /home/gwen/.nvm/versions/node/v14.4.0/bin/node /usr/share/yarn/bin/yarn.js add @types/imgur-file-upload
 
 PATH: 
-  /home/gwen/.nvm/versions/node/v13.6.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+  /home/gwen/.nvm/versions/node/v14.4.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/mnt/c/Program Files (x86)/Razer Chroma SDK/bin:/mnt/c/Program Files/Razer Chroma SDK/bin:/mnt/c/Program Files (x86)/Common Files/Oracle/Java/javapath:/mnt/c/Program Files (x86)/Razer/ChromaBroadcast/bin:/mnt/c/Program Files/Razer/ChromaBroadcast/bin:/mnt/c/Windows/system32:/mnt/c/Windows:/mnt/c/Windows/System32/Wbem:/mnt/c/Windows/System32/WindowsPowerShell/v1.0/:/mnt/c/Windows/System32/OpenSSH/:/mnt/c/Program Files (x86)/Intel/Intel(R) Management Engine Components/DAL:/mnt/c/Program Files/Intel/Intel(R) Management Engine Components/DAL:/mnt/c/Program Files (x86)/NVIDIA Corporation/PhysX/Common:/mnt/c/Program Files/NVIDIA Corporation/NVIDIA NvDLISR:/mnt/c/Windows/system32/config/systemprofile/AppData/Local/Microsoft/WindowsApps:/mnt/c/Program Files/nodejs/:/mnt/c/Program Files/Git/cmd:/mnt/c/Users/creep/AppData/Local/Microsoft/WindowsApps:/mnt/c/Users/creep/AppData/Local/Programs/Microsoft VS Code/bin:/mnt/c/Users/creep/AppData/Roaming/npm
 
 Yarn version: 
   1.22.4
 
 Node version: 
-  13.6.0
+  14.4.0
 
 Platform: 
   linux x64
 
 Trace: 
-  Error: https://registry.yarnpkg.com/@types%2fpastebin-js: Not found
-      at Request.params.callback [as _callback] (/home/gwen/.nvm/versions/node/v13.6.0/lib/node_modules/yarn/lib/cli.js:66987:18)
-      at Request.self.callback (/home/gwen/.nvm/versions/node/v13.6.0/lib/node_modules/yarn/lib/cli.js:140748:22)
-      at Request.emit (events.js:321:20)
-      at Request.<anonymous> (/home/gwen/.nvm/versions/node/v13.6.0/lib/node_modules/yarn/lib/cli.js:141720:10)
-      at Request.emit (events.js:321:20)
-      at IncomingMessage.<anonymous> (/home/gwen/.nvm/versions/node/v13.6.0/lib/node_modules/yarn/lib/cli.js:141642:12)
-      at Object.onceWrapper (events.js:427:28)
-      at IncomingMessage.emit (events.js:333:22)
-      at endReadableNT (_stream_readable.js:1220:12)
+  Error: https://registry.yarnpkg.com/@types%2fimgur-file-upload: Not found
+      at Request.params.callback [as _callback] (/usr/share/yarn/lib/cli.js:66987:18)
+      at Request.self.callback (/usr/share/yarn/lib/cli.js:140748:22)
+      at Request.emit (events.js:315:20)
+      at Request.<anonymous> (/usr/share/yarn/lib/cli.js:141720:10)
+      at Request.emit (events.js:315:20)
+      at IncomingMessage.<anonymous> (/usr/share/yarn/lib/cli.js:141642:12)
+      at Object.onceWrapper (events.js:421:28)
+      at IncomingMessage.emit (events.js:327:22)
+      at endReadableNT (_stream_readable.js:1224:12)
       at processTicksAndRejections (internal/process/task_queues.js:84:21)
 
 npm manifest: 
@@ -72,10 +72,10 @@ npm manifest:
           "dotenv": "^8.2.0",
           "express": "^4.17.1",
           "imgur": "^0.3.1",
+          "imgur-file-upload": "^1.1.0",
           "mongoose": "^5.9.10",
           "nekos.life": "^2.0.7",
           "node-fetch": "^2.6.0",
-          "pastebin-js": "^1.0.4",
           "pm2": "^4.4.0",
           "prettier": "^2.0.5",
           "pretty-ms": "^7.0.0",
@@ -1970,6 +1970,13 @@ Lockfile:
     resolved "https://registry.yarnpkg.com/ignore/-/ignore-4.0.6.tgz#750e3db5862087b4737ebac8207ffd1ef27b25fc"
     integrity sha512-cyFDKrqc/YdcWFniJhzI42+AzS+gNwmUzOSFcRCQYwySuBBBy/KjuxWLZ/FHEH6Moq1NizMOBWyTcv8O4OZIMg==
   
+  imgur-file-upload@^1.1.0:
+    version "1.1.0"
+    resolved "https://registry.yarnpkg.com/imgur-file-upload/-/imgur-file-upload-1.1.0.tgz#d6772bb698686d980623fbeca2433871d775bea7"
+    integrity sha512-dc0+evagBLuHtHenkPQfSDfwOuLm58BkbFvkt17UyktUA9Ej2WvMXLwMgQa/Jt6m9fDhl/JYZiKRntGfEk1qtQ==
+    dependencies:
+      axios "^0.19.0"
+  
   imgur@^0.3.1:
     version "0.3.1"
     resolved "https://registry.yarnpkg.com/imgur/-/imgur-0.3.1.tgz#8b13b424a88f91239c147af9ad78283510065398"
@@ -2929,16 +2936,6 @@ Lockfile:
     resolved "https://registry.yarnpkg.com/parseurl/-/parseurl-1.3.3.tgz#9da19e7bee8d12dff0513ed5b76957793bc2e8d4"
     integrity sha512-CiyeOxFT/JZyN5m0z9PfXw4SCBJ6Sygz1Dpl0wqjlhDEGGBP1GnsUVEL0p63hoG1fcj3fHynXi9NYO4nWOL+qQ==
   
-  pastebin-js@^1.0.4:
-    version "1.0.4"
-    resolved "https://registry.yarnpkg.com/pastebin-js/-/pastebin-js-1.0.4.tgz#ee68d640e16617c1aced4b45db0587dc847ec0ca"
-    integrity sha512-uqbJiaYYUJZcET9my8O0fDQRgKChzzQCL5x08PhOmgug6jENsOtdP1Wa6XyGdsyUCDss+xCXs9r7MGP1mcqUzw==
-    dependencies:
-      q "^1.5.0"
-      request "^2.84.0"
-      underscore "^1.8.3"
-      xml2js "^0.4.19"
-  
   path-exists@^3.0.0:
     version "3.0.0"
     resolved "https://registry.yarnpkg.com/path-exists/-/path-exists-3.0.0.tgz#ce0ebeaa5f78cb18925ea7d810d7b59b010fd515"
@@ -3181,7 +3178,7 @@ Lockfile:
     resolved "https://registry.yarnpkg.com/punycode/-/punycode-2.1.1.tgz#b58b010ac40c22c5657616c8d2c2c02c7bf479ec"
     integrity sha512-XRsRjdf+j5ml+y/6GKHPZbrF/8p2Yga0JPtdqTIY2Xe5ohJPD9saDJJLPvp9+NSBprVvevdXZybnj2cv8OEd0A==
   
-  q@^1.0.1, q@^1.5.0:
+  q@^1.0.1:
     version "1.5.1"
     resolved "https://registry.yarnpkg.com/q/-/q-1.5.1.tgz#7e32f75b41381291d04611f1bf14109ac00651d7"
     integrity sha1-fjL3W0E4EpHQRhHxvxQQmsAGUdc=
@@ -3311,7 +3308,7 @@ Lockfile:
     resolved "https://registry.yarnpkg.com/regexpp/-/regexpp-3.1.0.tgz#206d0ad0a5648cffbdb8ae46438f3dc51c9f78e2"
     integrity sha512-ZOIzd8yVsQQA7j8GCSlPGXwg5PfmA1mrq0JP4nGhh54LaKN3xdai/vHUDu74pKwV8OxseMS65u2NImosQcSD0Q==
   
-  request@^2.40.0, request@^2.84.0:
+  request@^2.40.0:
     version "2.88.2"
     resolved "https://registry.yarnpkg.com/request/-/request-2.88.2.tgz#d73c918731cb5a87da047e207234146f664d12b3"
     integrity sha512-MsvtOrfG9ZcrOwAW+Qi+F6HbD0CWXEh9ou77uOb7FM2WPhwT7smM833PzanhJLsgXjN89Ir6V2PczXNnMpwKhw==
@@ -3457,7 +3454,7 @@ Lockfile:
     dependencies:
       sparse-bitfield "^3.0.3"
   
-  sax@>=0.6.0, sax@^1.2.4:
+  sax@^1.2.4:
     version "1.2.4"
     resolved "https://registry.yarnpkg.com/sax/-/sax-1.2.4.tgz#2816234e2378bddc4e5354fab5caa895df7100d9"
     integrity sha512-NqVDv9TpANUjFm0N8uM5GxL36UgKi9/atZw+x7YFnQ8ckwFGKrl4xX4yWtrey3UJm5nP1kUbnYgLopqWNSRhWw==
@@ -4069,7 +4066,7 @@ Lockfile:
     dependencies:
       commander "~2.20.3"
   
-  underscore@>=1.8.3, underscore@^1.8.3, underscore@^1.9.1:
+  underscore@>=1.8.3, underscore@^1.9.1:
     version "1.10.2"
     resolved "https://registry.yarnpkg.com/underscore/-/underscore-1.10.2.tgz#73d6aa3668f3188e4adb0f1943bd12cfd7efaaaf"
     integrity sha512-N4P+Q/BuyuEKFJ43B9gYuOj4TQUHXX+j2FqguVOpjkssLUUrnJofCcBccJSCoeturDoZU6GorDTHSvUDlSQbTg==
@@ -4213,19 +4210,6 @@ Lockfile:
     version "7.2.5"
     resolved "https://registry.yarnpkg.com/ws/-/ws-7.2.5.tgz#abb1370d4626a5a9cd79d8de404aa18b3465d10d"
     integrity sha512-C34cIU4+DB2vMyAbmEKossWq2ZQDr6QEyuuCzWrM9zfw1sGc0mYiJ0UnG9zzNykt49C2Fi34hvr2vssFQRS6EA==
-  
-  xml2js@^0.4.19:
-    version "0.4.23"
-    resolved "https://registry.yarnpkg.com/xml2js/-/xml2js-0.4.23.tgz#a0c69516752421eb2ac758ee4d4ccf58843eac66"
-    integrity sha512-ySPiMjM0+pLDftHgXY4By0uswI3SPKLDw/i3UXbnO8M/p28zqexCUoPmQFrYD+/1BzhGJSs2i1ERWKJAtiLrug==
-    dependencies:
-      sax ">=0.6.0"
-      xmlbuilder "~11.0.0"
-  
-  xmlbuilder@~11.0.0:
-    version "11.0.1"
-    resolved "https://registry.yarnpkg.com/xmlbuilder/-/xmlbuilder-11.0.1.tgz#be9bae1c8a046e76b31127726347d0ad7002beb3"
-    integrity sha512-fDlsI/kFEx7gLvbecc0/ohLG50fugQp8ryHzMTuW9vSa1GJ0XYWKnhsUx7oie3G98+r56aTQIUB4kht42R3JvA==
   
   xregexp@2.0.0:
     version "2.0.0"

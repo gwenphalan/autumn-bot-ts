@@ -3,7 +3,7 @@ import { client } from '../index';
 import { database, updateGuildSettings } from '../database/index';
 import { createMutedRole } from '../util';
 
-const checkGuilds = async (): Promise<void> => {
+const taskCallback = async (): Promise<void> => {
     const guilds = client.guilds.cache;
 
     guilds.forEach(async guild => {
@@ -85,4 +85,4 @@ const checkGuilds = async (): Promise<void> => {
     });
 };
 
-export const task = new CronJob('*/60 * * * * *', checkGuilds);
+export const task = new CronJob('*/60 * * * * *', taskCallback);

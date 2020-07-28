@@ -165,12 +165,12 @@ export class Parse {
 
         const image = await Canvas.loadImage(imageUrl);
 
-        const canvas = Canvas.createCanvas(image.width * (500 / image.height), 500);
+        const canvas = Canvas.createCanvas(image.width * (1080 / image.height), 1080);
         const ctx = canvas.getContext('2d');
 
         ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
 
-        const buffer = canvas.toBuffer();
+        const buffer = canvas.toBuffer('image/png');
 
         const link = await uploadImgur(buffer);
         return link;

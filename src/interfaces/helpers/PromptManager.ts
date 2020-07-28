@@ -626,17 +626,23 @@ export class PromptManager {
 
         if (!input) return this.error('You ran out of time!');
 
-        await input.delete({ timeout: 100 }).catch(() => null);
+        if (input.content.toLowerCase() === 'cancel') {
+            await input.delete({ timeout: 100 }).catch(() => null);
+            return this.delete();
+        }
 
-        if (input.content.toLowerCase() === 'cancel') return this.delete();
-
-        if (input.content.toLowerCase() === 'none' && optional) return 'none';
+        if (input.content.toLowerCase() === 'none' && optional) {
+            await input.delete({ timeout: 100 }).catch(() => null);
+            return 'none';
+        }
 
         await this.done();
 
         const link = await this.parse.image(input as AMessage, input.content);
 
         await this.done();
+
+        await input.delete({ timeout: 100 }).catch(() => null);
 
         return link;
     }
