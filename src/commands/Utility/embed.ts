@@ -12,7 +12,7 @@ const callback = async (
 ) => {
     // * Load Guild Settings
     const guildSettings = message.guild?.id ? await getGuildSettings(message.guild?.id) : null;
-    const prefix = guildSettings?.general.prefix || message.client.config.defaultPrefix;
+    const prefix = guildSettings?.general?.prefix || message.client.config.defaultPrefix;
 
     if (!message.guild) return;
 

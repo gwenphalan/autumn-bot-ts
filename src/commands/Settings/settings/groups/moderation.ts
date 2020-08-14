@@ -7,7 +7,7 @@ const update = async (guild: Guild) => {
     const guildSettings = await getGuildSettings(guild.id);
     if (!guildSettings.moderation.enabled) return;
 
-    const mutedRole = guild.roles.cache.get(guildSettings.moderation.mutedRole) || (await createMutedRole(guild));
+    const mutedRole = (guildSettings.moderation.mutedRole ? guild.roles.cache.get(guildSettings.moderation.mutedRole) : null) || (await createMutedRole(guild));
 
     const channels = guild.channels.cache;
     channels.forEach(channel => {

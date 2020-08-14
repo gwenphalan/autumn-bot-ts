@@ -3,37 +3,37 @@ import mongoose from 'mongoose';
 export interface GuildSettings extends mongoose.Document {
     guild: string;
     general: {
-        prefix: string;
-        deleteCommands: boolean;
-        memberRole: string;
-        memeResponses: boolean;
+        prefix?: string;
+        deleteCommands?: boolean;
+        memberRole?: string;
+        memeResponses?: boolean;
     };
     moderation: {
         enabled: boolean;
-        modLog: string;
-        warnExpire: number;
-        mutedRole: string;
+        modLog?: string;
+        warnExpire?: number;
+        mutedRole?: string;
     };
     verification: {
         enabled: boolean;
-        staffRole: string;
-        nonVerifiedRole: string;
-        nonVerifiedChannels: string[];
-        verifyChannel: string;
-        manualVerify: boolean;
-        modVerifyChannel: string;
-        pingStaff: boolean;
-        verifyMessage: string;
-        denyMessage: string;
-        acceptMessage: string;
+        staffRole?: string;
+        nonVerifiedRole?: string;
+        nonVerifiedChannels?: string[];
+        verifyChannel?: string;
+        manualVerify?: boolean;
+        modVerifyChannel?: string;
+        pingStaff?: boolean;
+        verifyMessage?: string;
+        denyMessage?: string;
+        acceptMessage?: string;
     };
     welcome: {
         enabled: boolean;
-        backgroundColor: string;
-        textColor: string;
-        profileColor: string;
-        profileBackground: string;
-        welcomeChannel: string;
+        backgroundColor?: string;
+        textColor?: string;
+        profileColor?: string;
+        profileBackground?: string;
+        welcomeChannel?: string;
     };
 }
 

@@ -52,7 +52,7 @@ const callback = async (message: AMessage, args: { member: GuildMember; time: nu
         { text: `Case: ${infraction.case}` }
     );
 
-    const modLog = message.guild.channels.cache.get(moderation.modLog);
+    const modLog = moderation.modLog ? message.guild.channels.cache.get(moderation.modLog) : null;
 
     if (!modLog || !(modLog instanceof TextChannel)) return;
 

@@ -21,7 +21,7 @@ const taskCallback = async (): Promise<void> => {
 
             if (infraction.endTimestamp > Date.now()) return;
 
-            let mutedRole = guild.roles.cache.get(guildSettings.moderation.mutedRole);
+            let mutedRole = guildSettings.moderation.mutedRole ? guild.roles.cache.get(guildSettings.moderation.mutedRole) : null;
 
             if (!mutedRole) {
                 mutedRole = await createMutedRole(guild);

@@ -58,10 +58,10 @@ export default async (client: Client, reaction: MessageReaction, user: User) => 
 
         if (!message.guild || !message.member) return;
 
-        const verifyChannel = message.guild.channels.cache.get(verification.verifyChannel);
-        const nonVerifiedRole = message.guild.roles.cache.get(verification.nonVerifiedRole);
-        const staffRole = message.guild.roles.cache.get(verification.staffRole);
-        const modVerifyChannel = message.guild.channels.cache.get(verification.modVerifyChannel);
+        const verifyChannel = verification.verifyChannel ? message.guild.channels.cache.get(verification.verifyChannel) : null;
+        const nonVerifiedRole = verification.nonVerifiedRole ? message.guild.roles.cache.get(verification.nonVerifiedRole) : null;
+        const staffRole = verification.staffRole ? message.guild.roles.cache.get(verification.staffRole) : null;
+        const modVerifyChannel = verification.modVerifyChannel ? message.guild.channels.cache.get(verification.modVerifyChannel) : null;
 
         if (
             !verifyChannel ||
@@ -122,8 +122,8 @@ export default async (client: Client, reaction: MessageReaction, user: User) => 
                         .setTimestamp()
                 );
 
-                if (guildSettings.general.memberRole) {
-                    const memberRole = message.guild.roles.cache.get(guildSettings.general.memberRole);
+                if (guildSettings.general?.memberRole) {
+                    const memberRole = guildSettings.general?.memberRole ? message.guild.roles.cache.get(guildSettings.general.memberRole) : null;
 
                     if (memberRole) member.roles.add(memberRole);
                 }

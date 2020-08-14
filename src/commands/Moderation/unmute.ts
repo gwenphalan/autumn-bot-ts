@@ -23,9 +23,11 @@ const callback = async (message: AMessage, args: { member: GuildMember; reason?:
 
     if (!member.manageable) return prompt.error(`I can't unmute ${member}!`);
 
-    const mutedRole = message.guild.roles.cache.get(guildSettings.moderation.mutedRole) || (await createMutedRole(message.guild));
+    const mutedRole =
+        (guildSettings.moderation.mutedRole ? message.guild.roles.cache.get(guildSettings.moderation.mutedRole) : null) ||
+        (await createMutedRole(message.guild));
 
-    if (!message.guild.roles.cache.get(guildSettings.moderation.mutedRole)) {
+    if (!(guildSettings.moderation.mutedRole ? message.guild.roles.cache.get(guildSettings.moderation.mutedRole) : null)) {
         guildSettings.moderation.mutedRole = mutedRole.id;
 
         updateGuildSettings(message.guild.id, guildSettings);
@@ -48,7 +50,7 @@ const callback = async (message: AMessage, args: { member: GuildMember; reason?:
 
     prompt.embed('Unmuted User', ` **• User:** ${member}\n **• Reason:** ${reason || 'No Reason Provided'}`, undefined, undefined, undefined);
 
-    const modLog = message.guild.channels.cache.get(moderation.modLog);
+    const modLog = moderation.modLog ? message.guild.channels.cache.get(moderation.modLog) : null;
 
     if (!modLog || !(modLog instanceof TextChannel)) return;
 

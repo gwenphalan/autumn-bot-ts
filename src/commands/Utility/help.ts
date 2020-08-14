@@ -11,7 +11,7 @@ const callback = async (message: AMessage, args: { command?: string }, _prompt: 
     // Get the guild's settings if on a guild and determine the prefix that needs to be used in the help
     const client = message.client as Client;
     const guildSettings = message.guild ? await client.database.guildSettings.findOne({ guild: message.guild.id }) : null;
-    const prefix = guildSettings?.general.prefix || client.config.defaultPrefix;
+    const prefix = guildSettings?.general?.prefix || client.config.defaultPrefix;
     const developers = config.developers;
 
     // Initiate the output embed

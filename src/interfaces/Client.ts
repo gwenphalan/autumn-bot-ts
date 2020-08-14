@@ -159,7 +159,7 @@ export const sendEmbed = async (
 
     const embed = new MessageEmbed().setTimestamp().setColor(color ? color : config.accentColor);
 
-    const prefix = guildSettings?.general.prefix;
+    const prefix = guildSettings?.general?.prefix;
 
     const placeholders: { [prop: string]: string } = {
         guildName: message.guild ? message.guild.name : message.author.username,

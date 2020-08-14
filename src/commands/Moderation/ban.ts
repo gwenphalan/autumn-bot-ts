@@ -36,7 +36,7 @@ const callback = async (message: AMessage, args: { member: GuildMember; reason?:
 
     member.ban({ reason: reason || 'No Reason Provided' }).catch(() => null);
 
-    const modLog = message.guild.channels.cache.get(moderation.modLog);
+    const modLog = moderation.modLog ? message.guild.channels.cache.get(moderation.modLog) : null;
 
     if (!modLog || !(modLog instanceof TextChannel)) return;
 

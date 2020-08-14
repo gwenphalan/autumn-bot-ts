@@ -35,7 +35,13 @@ export const database = {
 export const getGuildSettings = async (guildId: string) => {
     return (
         (await GuildSettings.findOne({ guild: guildId })) ||
-        (await GuildSettings.create({ guild: guildId, moderation: { enabled: false }, verification: { enabled: false }, welcome: { enabled: false } }))
+        (await GuildSettings.create({
+            guild: guildId,
+            general: {},
+            moderation: { enabled: false },
+            verification: { enabled: false },
+            welcome: { enabled: false }
+        }))
     );
 };
 
@@ -130,7 +136,7 @@ export const createInfraction = async (message: Message, userId: string, infract
         user: userId,
         infractionType: infractionType,
         timestamp: message.createdTimestamp,
-        endTimestamp: end,
+        endTimestamp: end || undefined,
         needsTiming: duration !== undefined,
         reason: reason,
         moderator: {

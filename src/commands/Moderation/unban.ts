@@ -25,7 +25,7 @@ const callback = async (message: AMessage, args: { user: User; reason?: string }
 
     message.guild.members.unban(user.id);
 
-    const modLog = message.guild.channels.cache.get(moderation.modLog);
+    const modLog = moderation.modLog ? message.guild.channels.cache.get(moderation.modLog) : null;
 
     if (!modLog || !(modLog instanceof TextChannel)) return;
 

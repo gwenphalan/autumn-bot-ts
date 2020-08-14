@@ -1,10 +1,11 @@
 import color from 'tinycolor2';
 import { AMessage } from '../Client';
-import Canvas from 'canvas';
+// import Canvas from 'canvas';
 import { uploadImgur } from '../../util/imgur';
 import { PromptManager } from './PromptManager';
 import { GuildMember, Guild, TextChannel, NewsChannel, GuildChannel, Role, VoiceChannel, CategoryChannel, User, Message } from 'discord.js';
 import timestring from 'timestring';
+import { isImage } from '../../util/urlParse';
 
 const linkRegex = /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/gi;
 
@@ -157,22 +158,22 @@ export class Parse {
      */
     async image(message: Message | AMessage, str: string): Promise<string | void> {
         let imageUrl;
-        const urlSearch = str.match(/https?\:\/\/.*\..*.(gif|png|web(p|m)|jpe?g)/gi);
+        const urlSearch = message.content !== '' ? await isImage(str) : null;
 
-        if (urlSearch) imageUrl = urlSearch[0];
+        if (urlSearch) imageUrl = urlSearch;
         else if (message.attachments.first()) imageUrl = message.attachments.first()?.url;
-        if (!imageUrl) return this.prompt.error(`${urlSearch ? `${urlSearch[0]} is not a valid image URL!` : `You didn't provide an image!`}`);
+        if (!imageUrl) return this.prompt.error(`${urlSearch ? `${str} is not a valid image!` : `You didn't provide an image!`}`);
 
-        const image = await Canvas.loadImage(imageUrl);
+        // const image = await Canvas.loadImage(imageUrl);
 
-        const canvas = Canvas.createCanvas(image.width * (1080 / image.height), 1080);
-        const ctx = canvas.getContext('2d');
+        // const canvas = Canvas.createCanvas(image.width * (1080 / image.height), 1080);
+        // const ctx = canvas.getContext('2d');
 
-        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+        // ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
 
-        const buffer = canvas.toBuffer('image/png');
+        // const buffer = canvas.toBuffer('image/png');
 
-        const link = await uploadImgur(buffer);
+        const link = await uploadImgur(imageUrl);
         return link;
     }
 

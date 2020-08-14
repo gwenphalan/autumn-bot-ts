@@ -137,7 +137,7 @@ export const createNonVerifiedRole = async (guild: Guild) => {
     });
 
     channels.forEach(channel => {
-        if (channel.id !== settings.verification.verifyChannel && !settings.verification.nonVerifiedChannels.includes(channel.id)) {
+        if (channel.id !== settings.verification.verifyChannel && !settings.verification.nonVerifiedChannels?.includes(channel.id)) {
             if (channel instanceof CategoryChannel) {
                 channel.createOverwrite(
                     nonVerifiedRole,
@@ -172,7 +172,8 @@ export const createVerifyChannel = async (guild: Guild) => {
 
     if (!client.user) return;
 
-    const nonVerifiedRole = guild.roles.cache.get(settings.verification.nonVerifiedRole) || (await createNonVerifiedRole(guild));
+    const nonVerifiedRole =
+        (settings.verification.nonVerifiedRole ? guild.roles.cache.get(settings.verification.nonVerifiedRole) : null) || (await createNonVerifiedRole(guild));
 
     const channel = await guild.channels.create('verify', {
         type: 'text',
@@ -204,7 +205,7 @@ export const createModVerifyChannel = async (guild: Guild) => {
     const settings = await getGuildSettings(guild.id);
     if (!settings || !client.user) return;
 
-    const staffRole = guild.roles.cache.get(settings.verification.staffRole);
+    const staffRole = settings.verification.staffRole ? guild.roles.cache.get(settings.verification.staffRole) : null;
 
     if (!staffRole) return;
 

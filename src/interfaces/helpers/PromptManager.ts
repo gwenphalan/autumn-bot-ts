@@ -98,7 +98,7 @@ export class PromptManager {
     async error(message: string): Promise<void> {
         const guildSettings = this.guild ? await getGuildSettings(this.guild.id) : null;
 
-        const prefix = guildSettings?.general.prefix;
+        const prefix = guildSettings?.general?.prefix;
 
         const placeholders: { [prop: string]: string } = {
             guildName: this.trigger.guild ? this.trigger.guild.name : this.trigger.author.username,
@@ -166,7 +166,7 @@ export class PromptManager {
 
         const embed = new MessageEmbed().setTimestamp().setColor(color ? color : this.client.config.accentColor);
 
-        const prefix = guildSettings?.general.prefix;
+        const prefix = guildSettings?.general?.prefix;
 
         const placeholders: { [prop: string]: string } = {
             guildName: this.trigger.guild ? this.trigger.guild.name : this.trigger.author.username,

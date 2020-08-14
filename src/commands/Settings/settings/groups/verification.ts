@@ -15,11 +15,11 @@ const update = async (guild: Guild) => {
 
     if (!verification.enabled) return;
 
-    const nonVerifiedRole = guild.roles.cache.get(verification.nonVerifiedRole) || (await createNonVerifiedRole(guild));
-    const verifyChannel = guild.channels.cache.get(verification.verifyChannel) || (await createVerifyChannel(guild));
-    const staffRole = guild.roles.cache.get(verification.staffRole);
+    const nonVerifiedRole = (verification.nonVerifiedRole ? guild.roles.cache.get(verification.nonVerifiedRole) : null) || (await createNonVerifiedRole(guild));
+    const verifyChannel = (verification.verifyChannel ? guild.channels.cache.get(verification.verifyChannel) : null) || (await createVerifyChannel(guild));
+    const staffRole = verification.staffRole ? guild.roles.cache.get(verification.staffRole) : null;
     const modVerifyChannel = verification.manualVerify
-        ? guild.channels.cache.get(verification.modVerifyChannel) || (await createModVerifyChannel(guild))
+        ? (verification.modVerifyChannel ? guild.channels.cache.get(verification.modVerifyChannel) : null) || (await createModVerifyChannel(guild))
         : undefined;
     const nonVerifiedChannels = verification.nonVerifiedChannels;
 
@@ -35,7 +35,7 @@ const update = async (guild: Guild) => {
     await verifyChannel.send(
         new MessageEmbed()
             .setTitle('Verification')
-            .setDescription(verification.verifyMessage || `Type \`${guildSettings.general.prefix || config.defaultPrefix}verify\` to be verified.`)
+            .setDescription(verification.verifyMessage || `Type \`${guildSettings.general?.prefix || config.defaultPrefix}verify\` to be verified.`)
             .setColor(config.accentColor)
             .setAuthor(
                 guild.name,
@@ -47,7 +47,7 @@ const update = async (guild: Guild) => {
     );
 
     channels.forEach(channel => {
-        if (channel instanceof CategoryChannel && !nonVerifiedChannels.includes(channel.id)) {
+        if (channel instanceof CategoryChannel && !nonVerifiedChannels?.includes(channel.id)) {
             channel.createOverwrite(
                 nonVerifiedRole,
                 {
@@ -56,7 +56,7 @@ const update = async (guild: Guild) => {
                 'Required for verification'
             );
         } else {
-            if (channel.parent?.permissionOverwrites !== channel.permissionOverwrites && !nonVerifiedChannels.includes(channel.id))
+            if (channel.parent?.permissionOverwrites !== channel.permissionOverwrites && !nonVerifiedChannels?.includes(channel.id))
                 channel.createOverwrite(
                     nonVerifiedRole,
                     {
@@ -65,7 +65,7 @@ const update = async (guild: Guild) => {
                     'Required for verification'
                 );
 
-            if (nonVerifiedChannels.includes(channel.id)) {
+            if (nonVerifiedChannels?.includes(channel.id)) {
                 channel.createOverwrite(
                     nonVerifiedRole,
                     {

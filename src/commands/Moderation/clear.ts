@@ -36,7 +36,7 @@ const callback = async (message: AMessage, args: { amount: number; reason?: stri
         timeout: 5000
     });
 
-    const modLog = message.guild.channels.cache.get(moderation.modLog);
+    const modLog = moderation.modLog ? message.guild.channels.cache.get(moderation.modLog) : null;
 
     if (!modLog || !(modLog instanceof TextChannel)) return;
 

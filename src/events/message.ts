@@ -16,7 +16,7 @@ export default async (client: Client, message: Message) => {
 
     // Get the settings for the current guild and use the prefix defined there, or use the default prefix if no settings found.
     const guildSettings = message.guild ? await client.database.guildSettings.findOne({ guild: message.guild.id }) : null;
-    const guildPrefix = guildSettings?.general.prefix || client.config.defaultPrefix;
+    const guildPrefix = guildSettings?.general?.prefix || client.config.defaultPrefix;
     const prefixRegex = new RegExp(`^(<@!?${client.user!.id}>|${guildPrefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})\\s*`);
     const pingRegex = new RegExp(`(<@!?${client.user!.id}>)`);
     const matched = message.content.match(prefixRegex);
@@ -28,10 +28,10 @@ export default async (client: Client, message: Message) => {
     if (guildSettings && guildSettings.verification.enabled) {
         if (!message.guild || !message.member || !verification?.enabled || message.author.bot) return;
 
-        const verifyChannel = message.guild.channels.cache.get(verification.verifyChannel);
-        const nonVerifiedRole = message.guild.roles.cache.get(verification.nonVerifiedRole);
-        const staffRole = message.guild.roles.cache.get(verification.staffRole);
-        const modVerifyChannel = message.guild.channels.cache.get(verification.modVerifyChannel);
+        const verifyChannel = verification.verifyChannel ? message.guild.channels.cache.get(verification.verifyChannel) : null;
+        const nonVerifiedRole = verification.nonVerifiedRole ? message.guild.roles.cache.get(verification.nonVerifiedRole) : null;
+        const staffRole = verification.staffRole ? message.guild.roles.cache.get(verification.staffRole) : null;
+        const modVerifyChannel = verification.modVerifyChannel ? message.guild.channels.cache.get(verification.modVerifyChannel) : null;
 
         if (message.channel.id === verifyChannel?.id) {
             if (!verifyChannel || !nonVerifiedRole || message.channel != verifyChannel || !(verifyChannel instanceof TextChannel)) return;
@@ -108,7 +108,7 @@ export default async (client: Client, message: Message) => {
         }
     }
 
-    if (guildSettings?.general.memeResponses) {
+    if (guildSettings?.general?.memeResponses) {
         const kek = [
             '<:kekwHands:716365354917429359>',
             '<:sadkek:716365351436288011>',
@@ -251,7 +251,7 @@ export default async (client: Client, message: Message) => {
         .callback(message, args || {}, prompt)
         .then(async () => {
             const updatedSettings = message.guild ? await client.database.guildSettings.findOne({ guild: message.guild.id }) : null;
-            if (updatedSettings && updatedSettings.general.deleteCommands) await message.delete({ timeout: 10 }).catch(() => null);
+            if (updatedSettings && updatedSettings.general?.deleteCommands) await message.delete({ timeout: 10 }).catch(() => null);
             prompt.delete();
         })
         .catch(err => {
@@ -260,7 +260,9 @@ export default async (client: Client, message: Message) => {
                 .setColor(client.config.accentColor)
                 .setTitle(`Oops! Something went wrong!`)
                 .setDescription(
-                    "Don't  worry, the developers have been notified and are getting to work on fixing the issue!\n\nIn the meantime, please join the [Autumn Bot Support Server](https://discord.gg/DfByvyN)."
+                    `\`${
+                        err.message || err
+                    }\`\n\nDon't  worry, the developers have been notified and are getting to work on fixing the issue!\n\nIn the meantime, please join the [Autumn Bot Support Server](https://discord.gg/DfByvyN).`
                 );
             message.channel.send(oops);
             console.error(err);
