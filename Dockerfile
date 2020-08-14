@@ -1,4 +1,4 @@
-FROM node:13.6.0-stretch-slim
+FROM node:alpine
 LABEL maintainer="GwenBebe"
 WORKDIR /src
 
