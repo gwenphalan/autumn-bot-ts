@@ -55,5 +55,3 @@ export const isImage = async (url: string): Promise<string | undefined> => {
     console.log(i++);
     return contentType.search(/^image\//) != -1 ? url : undefined;
 };
-
-console.log(isUrl('https://i.chzbgr.com/full/6286328064/h9EBF17DC/i-want-you-to-suck-my-dick'));
