@@ -16,6 +16,9 @@ import { updateGuild } from './commands/Settings/settings/';
     - Partials are enabled for messages and reactions. This allows for reaction roles
  */
 
+console.log(config);
+console.log(process.env);
+
 export const client = new Client({
     disableMentions: 'everyone',
     presence: {
