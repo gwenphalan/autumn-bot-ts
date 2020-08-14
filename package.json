@@ -14,7 +14,7 @@
         "clean": "rm -rf dist/*",
         "reinstall": "yarn cleanCache && yarn deleteModules && yarn deleteLock && yarn installModules",
         "build": "tsc",
-        "start": "npm rebuild && npm run prod",
+        "start": "npm run prod",
         "cleanCache": "npm cache clean --force",
         "deleteModules": "rm -rf node_modules/*",
         "deleteLock": "rm yarn.lock",
