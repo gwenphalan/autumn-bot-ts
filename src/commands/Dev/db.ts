@@ -37,7 +37,7 @@ const callback = async (_message: AMessage, _args: {}, prompt: PromptManager) =>
         }
     }
 
-    return prompt.sendMsg('Updated Database', `Created ${c} Entries\nDeleted ${d} Entries`);
+    return prompt.embed('Updated Database', `Created ${c} Entries\nDeleted ${d} Entries`);
 };
 
 export const command: Command = {
