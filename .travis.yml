@@ -5,8 +5,8 @@ services:
 node_js:
     - 13.6.0
 before_install:
-    - chmod a+x ./deploy.sh
-    - chmod a+x ./docker_push.sh
+    - chmod a+x ./.travis/deploy.sh
+    - chmod a+x ./.travis/docker_push.sh
     - openssl aes-256-cbc -K $encrypted_2c66c6413907_key -iv $encrypted_2c66c6413907_iv -in .travis/deploy_rsa.enc -out .travis/deploy_rsa -d
     - eval "$(ssh-agent -s)"
     - chmod 600 .travis/deploy_rsa
@@ -18,10 +18,10 @@ script:
     - echo "skipping tests for now"
 after_success:
     - cd $TRAVIS_BUILD_DIR && docker build -t autumnbot:dev-"$TRAVIS_BUILD_NUMBER" . --label "version=$TRAVIS_BUILD_NUMBER" --label "commitMessage=$TRAVIS_COMMIT_MESSAGE" --label "commit=$TRAVIS_COMMIT"
-    - cd $TRAVIS_BUILD_DIR $$ ./docker_push.sh
+    - cd $TRAVIS_BUILD_DIR $$ /.travis/docker_push.sh
 deploy:
     - provider: script
-      script: './deploy.sh'
+      script: './.travis/deploy.sh'
       skip_cleanup: true
       on:
           branch: master
