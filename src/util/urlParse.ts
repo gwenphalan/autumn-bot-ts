@@ -26,32 +26,23 @@ export const isUrl = (string: string) => {
     return false;
 };
 export const isImage = async (url: string): Promise<string | undefined> => {
-    let i = 0;
-    console.log(i++);
     if (!url) return;
     const http = url.lastIndexOf('http');
     if (http != -1) url = url.substring(http);
-    console.log(i++);
     if (!isUrl(url)) return;
-    console.log(i++);
     let pathname = parse(url).pathname;
     if (!pathname) return;
     const last = pathname.search(/[:?&]/);
     if (last != -1) pathname = pathname.substring(0, last);
-    console.log(i++);
     if (/styles/i.test(pathname)) return;
     const res = await Axios({
         method: 'GET',
         url: url
     });
-    console.log(i++);
     if (!res) return;
     const headers = res.headers;
     if (!headers) return;
-    console.log(i++);
     const contentType = headers['content-type'];
-    console.log(i++);
     if (!contentType) return;
-    console.log(i++);
     return contentType.search(/^image\//) != -1 ? url : undefined;
 };

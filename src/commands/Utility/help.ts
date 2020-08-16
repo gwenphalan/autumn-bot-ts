@@ -37,16 +37,13 @@ const callback = async (message: AMessage, args: { command?: string }, _prompt: 
             commandList[command.category].push(`\`${prefix}${command.name}\` - ${command.description || 'This command has no description.'}`);
         });
 
-        output
-            .setTitle('Help menu')
-            .setFooter(`To get info on a specific command, use ${prefix}help [command name]`)
-            .addFields(
-                // Create one field per category having all commands separated by new lines
-                Object.keys(commandList).map(category => {
-                    return { name: category, value: commandList[category].join('\n') };
-                })
-            );
-        return message.channel.send(output);
+        const pages: string[] = Object.keys(commandList).map(category => {
+            return `**${category}**\n\n${commandList[category].join('\n')}`;
+        });
+
+        const book = client.guis.books.new('Help Menu', pages, message.author, message.channel, 1, false, 'INFO');
+        await book.init();
+        return;
     }
 
     // Get the command from the provided args

@@ -1,4 +1,4 @@
-import { Client as DClient, Collection, Message as BaseMessage, PermissionString, MessageEmbed, MessageAttachment } from 'discord.js';
+import { Collection, Message as BaseMessage, PermissionString, MessageEmbed, MessageAttachment } from 'discord.js';
 import { config } from '../../config';
 import { database } from '../database';
 import { client } from '../index';
@@ -9,8 +9,9 @@ import { PromptManager } from './helpers/PromptManager';
 import { Args, Argument, ArgumentManager } from './helpers/ArgumentManager';
 import { uploadHaste, fetchHaste } from '../util/hastebin';
 import { uploadImgur } from '../util/imgur';
+import { Client as BaseClient } from 'djsutil';
 // Our custom client adding new properties to the Discord Client
-export class Client extends DClient {
+export class Client extends BaseClient {
     commands: Collection<string, Command> = new Collection(); // Our commands
     config = config; // Store the config on the client for ease of access
     database = database; // Store the database on the client for ease of access

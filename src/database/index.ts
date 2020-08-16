@@ -6,6 +6,7 @@ import { GuildSettings } from './schemas/GuildSettings';
 import { UserProfile } from './schemas/UserProfile';
 import { VerifyApp } from './schemas/VerifyApp';
 import { ReactionRole } from './schemas/ReactionRoles';
+import { Logger } from '../Logger';
 
 // Connect to MongoDB
 mongoose.connect(config.mongoString, {
@@ -20,7 +21,7 @@ const db = mongoose.connection;
 db.on('error', err => console.error(err));
 
 // Log a message once the Database connection is made
-db.once('open', () => console.log(`Connected to MongoDB Atlas at ${db.name}!`));
+db.once('open', () => Logger.print(`Connected to MongoDB Atlas at ${db.name}!`, 'DB'));
 
 // Export our database with the different Schemas
 export const database = {

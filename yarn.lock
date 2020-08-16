@@ -662,6 +662,14 @@ discord.js@^12.2.0:
     tweetnacl "^1.0.3"
     ws "^7.2.1"
 
+djsutil@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/djsutil/-/djsutil-1.0.3.tgz#3144f90077742daa11f0f48b717afc010ce01bde"
+  integrity sha512-dwlzu0QglaxZhPNQSdFm6P4VAUx7MzgXUErRdrUFatEFI5PCuNOdl3A2XTRTW8Vtqi8elw84FCo19P8qlo6vQg==
+  dependencies:
+    discord.js "^12.2.0"
+    tinycolor2 "^1.4.1"
+
 doctrine@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/doctrine/-/doctrine-3.0.0.tgz#addebead72a6574db783639dc87a121773973961"

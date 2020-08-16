@@ -13,9 +13,7 @@ function createForm(params: { [key: string]: any } = {}, formDataOptions: { [key
 
 export const uploadImgur = async (img: string): Promise<string | void> => {
     const body = createForm();
-    console.log(1);
     body.append('image', img);
-    console.log(2);
 
     const result = await await Axios({
         method: 'post',
@@ -32,6 +30,5 @@ export const uploadImgur = async (img: string): Promise<string | void> => {
     //     headers: { Authorization: `Client-ID ${config.imgurID}` },
     //     body: `img=${img}`
     // });
-    console.log(result.data.data.link);
     return result ? result.data.data.link : null;
 };

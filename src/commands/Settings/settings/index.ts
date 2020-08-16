@@ -4,6 +4,7 @@ import { SettingsGroup } from '../../../interfaces/SettingsGroup';
 import { Collection } from 'discord.js';
 import { client } from '../../../index';
 import { GuildSettings } from '../../../database/schemas/GuildSettings';
+import { Logger } from '../../../Logger';
 
 export const groups: Collection<string, SettingsGroup> = new Collection();
 
@@ -14,7 +15,7 @@ try {
         groups.set(group.identifier, group);
     });
 } catch (err) {
-    console.log(err);
+    Logger.error(err);
 }
 
 interface Change {
@@ -41,14 +42,12 @@ export const updateGuild = async (change: Change) => {
 
     if (!guild) return;
 
-    console.log(change);
-
     for (const field in updatedFields) {
         const group = groups.get(field);
 
         if (!group) return;
 
-        console.log(`Updating ${group.name} in ${guild.name} (${guild.id})`);
+        Logger.debug(`Updating ${group.name} in ${guild.name} (${guild.id})`, 'Guild Settings');
 
         group.update(guild).catch(() => null);
     }

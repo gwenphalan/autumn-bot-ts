@@ -5,6 +5,7 @@ import { config } from '../../config';
 import Color from 'color';
 import { getGuildSettings } from '../database';
 import { words } from '../constants/words';
+import { Logger } from '../Logger';
 //import { style1 } from './autumnforest';
 Canvas.registerFont(path.join(__dirname, '../../../assets/fonts/Poppins-Regular.ttf'), { family: 'Poppins', style: 'Regular', weight: '400' });
 Canvas.registerFont(path.join(__dirname, '../../../assets/fonts/Poppins-Thin.ttf'), { family: 'Poppins', style: 'Thin', weight: '100' });
@@ -17,7 +18,7 @@ const defaultTextColor = '#FFFFFF';
 
 const loadDefaultBackgroundImage = async () => {
     defaultBackgroundImage = await Canvas.loadImage(defaultBackgroundImagePath);
-    console.log('Default Welcome Card Background Image Loaded');
+    Logger.print('Default Welcome Card Background Image Loaded', 'Welcome Cards');
 };
 
 loadDefaultBackgroundImage();

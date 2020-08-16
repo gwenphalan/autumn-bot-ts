@@ -5,6 +5,9 @@ import { Client, ClientEventTypes, Command } from './interfaces/Client';
 import { handleError } from './util';
 import DBL from 'dblapi.js';
 import { CronJob } from 'cron';
+import { Logger } from './Logger';
+
+if (process.env.NODE_ENV === 'development') Logger.setDebug(true);
 
 /* 
     Initiates our client with the following options:
@@ -12,8 +15,6 @@ import { CronJob } from 'cron';
     - Bot is listening to <prefix>help
     - Partials are enabled for messages and reactions. This allows for reaction roles
  */
-
-console.log('Hello');
 
 export const client = new Client({
     disableMentions: 'everyone',
@@ -34,18 +35,18 @@ export const updateActivity = async () => {
     });
 };
 
-export const dbl = new DBL(config.dblToken, client);
+export const dbl = process.env.NODE_ENV !== 'development' ? new DBL(config.dblToken, client) : undefined;
 
 client.on('ready', () => {
     if (dbl && process.env.NODE_ENV !== 'development') {
-        console.log('Posting Stats to DBL...');
-        dbl.postStats(client.guilds.cache.size).then(() => console.log('Stats Posted To DBL'));
+        Logger.print('Posting Stats...', 'DBL');
+        dbl.postStats(client.guilds.cache.size).then(() => Logger.print('Stats Posted', 'DBL'));
     }
 
     setInterval(() => {
         if (dbl && process.env.NODE_ENV !== 'development') {
-            console.log('Posting Stats to DBL...');
-            dbl.postStats(client.guilds.cache.size).then(() => console.log('Stats Posted To DBL'));
+            Logger.print('Posting Stats...', 'DBL');
+            dbl.postStats(client.guilds.cache.size).then(() => Logger.print('Stats Posted', 'DBL'));
         }
     }, 1800000);
 });
@@ -75,7 +76,7 @@ export const startTasks = () => {
     fs.readdirSync(taskPath).forEach(file => {
         const task: CronJob = require(path.join(taskPath, file)).task;
         task.start();
-        console.log(`Started Task: ${file}`);
+        Logger.print(`Starting ${file}`, 'Tasks');
     });
 };
 

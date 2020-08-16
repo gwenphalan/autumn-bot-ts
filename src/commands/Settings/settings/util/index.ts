@@ -7,8 +7,6 @@ export const sendSetting = async (message: AMessage, setting: string, valueType:
     if (valueType === 'boolean') {
         const res = await prompt.boolean(array ? `What would you like to add to \`${setting}\`?` : `What would you like to change ${setting} to?`);
 
-        console.log(res);
-
         return res;
     }
 

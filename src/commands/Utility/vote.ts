@@ -10,7 +10,7 @@ const callback = async (message: AMessage, args: { member?: GuildMember }, promp
 
     if (!member) return;
 
-    const hasVoted = await dbl.hasVoted(member.id);
+    const hasVoted = await dbl?.hasVoted(member.id);
 
     prompt.embed(
         `${hasVoted ? (member ? `${member.username} has` : "You've") : member ? `${member.username} hasn't` : "You haven't"} voted today!`,

@@ -10,7 +10,6 @@ import { client } from '..';
 export const fetch = async (requestInfo: RequestInfo, requestOptions?: RequestInit) => {
     const result = await nodeFetch(requestInfo, requestOptions)
         .then(response => {
-            console.log(response);
             return response.json().then(json => {
                 return response.ok ? json : Promise.reject(json);
             });
