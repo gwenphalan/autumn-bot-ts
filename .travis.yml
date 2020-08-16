@@ -22,6 +22,6 @@ after_success:
 deploy:
     - provider: script
       script: './deploy.sh'
-      cleanup: false
+      skip_cleanup: true
       on:
           branch: master
