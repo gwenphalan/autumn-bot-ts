@@ -1,6 +1,6 @@
 import { Command, AMessage } from '../../interfaces/Client';
 import { getGuildSettings } from '../../database';
-import { TextChannel, MessageEmbed } from 'discord.js';
+import { TextChannel, MessageEmbed, DMChannel } from 'discord.js';
 import { client } from '../..';
 import { PromptManager } from '../../interfaces/helpers/PromptManager';
 
@@ -12,6 +12,10 @@ const callback = async (message: AMessage, args: { amount: number; reason?: stri
     if (!guildSettings) return;
 
     const moderation = guildSettings.moderation;
+
+    const channel = message.channel;
+
+    if (channel instanceof DMChannel) return;
 
     if (!moderation.enabled)
         return prompt.error(
@@ -28,7 +32,7 @@ const callback = async (message: AMessage, args: { amount: number; reason?: stri
         reason: 'User Requested a Channel Clear'
     });
 
-    const a = await message.channel.bulkDelete(amount, true).catch(() => null);
+    const a = await channel.bulkDelete(amount, true).catch(() => null);
 
     const m = await prompt.embed(`Cleared ${a?.size || 0} messages.`);
 
