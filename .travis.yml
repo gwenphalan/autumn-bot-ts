@@ -22,7 +22,7 @@ install:
 script:
     - echo "skipping tests for now"
 after_success:
-    - cd $TRAVIS_BUILD_DIR && docker build -t autumnbot:dev-"$TRAVIS_BUILD_NUMBER" . --label "version=$TRAVIS_BUILD_NUMBER" --label "commitMessage=$TRAVIS_COMMIT_MESSAGE" --label "commit=$TRAVIS_COMMIT"
+    - echo "skipping build"
 deploy:
     - provider: script
       script: './.travis/deploy.sh'
