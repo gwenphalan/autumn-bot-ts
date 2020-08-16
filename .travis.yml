@@ -4,6 +4,10 @@ services:
     - docker
 node_js:
     - 13.6.0
+addons:
+    apt:
+        packages:
+            - sshpass
 before_install:
     - chmod a+x ./.travis/deploy.sh
     - chmod a+x ./.travis/docker_push.sh
