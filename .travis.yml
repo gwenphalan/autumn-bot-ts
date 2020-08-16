@@ -5,7 +5,7 @@ services:
 node_js:
     - 13.6.0
 env:
-    - WORK_DIR=~/autumn-bot/release/autumn-bot-ts
+    - WORK_DIR=/home/autumn-bot/release/autumn-bot-ts
 addons:
     apt:
         packages:
