@@ -1,7 +1,7 @@
 import { CronJob } from 'cron';
 
 const taskCallback = async (): Promise<void> => {
-    console.log('ignore');
+    return;
 };
 
 export const task = new CronJob('*/60 * * * * *', taskCallback);

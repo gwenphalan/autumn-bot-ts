@@ -6,9 +6,6 @@ import { handleError } from './util';
 import DBL from 'dblapi.js';
 import { CronJob } from 'cron';
 
-import net from 'net';
-import { updateGuild } from './commands/Settings/settings/';
-
 /* 
     Initiates our client with the following options:
     - @everyone, @here and @role pings are DISABLES
@@ -91,24 +88,3 @@ process.on('unhandledRejection', error => {
 });
 
 client.login(client.config.token);
-
-export const server = net.createServer(socket => {
-    socket.on('data', async data => {
-        const a = await updateGuild(data);
-
-        socket.write(JSON.stringify(a));
-        socket.pipe(socket);
-    });
-});
-
-server.listen(
-    {
-        host: config.hostIp,
-        port: 8124,
-        localAddress: config.hostIp,
-        localPort: 8124
-    },
-    () => {
-        console.log(`Websocket Listening On Port 8124, Host ${config.hostIp}`);
-    }
-);

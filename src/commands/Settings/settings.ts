@@ -418,8 +418,6 @@ const callback = async (
               )
             : null;
 
-        await group.update(message.guild);
-
         // Send an embed containing the response
         await prompt.embed(`${group.name} Settings Edited`, responseArray.join('\n\n'), undefined, undefined, undefined, undefined, undefined, attachment);
 
