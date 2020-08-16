@@ -9,8 +9,6 @@ export default async (client: Client, guild: Guild) => {
     const infoChannel = client.channels.cache.get(client.config.infoChannel) || (await client.channels.fetch(client.config.infoChannel));
     if (!infoChannel || !(infoChannel instanceof TextChannel)) throw new Error('Provided info channel is unreachable or not a text channel.');
 
-    GuildSettings.deleteOne({ guild: guild.id });
-
     const embed = new MessageEmbed()
         .setAuthor('Bot Information', client.user?.displayAvatarURL({ dynamic: true, format: 'png' }))
         .setTimestamp()
@@ -24,4 +22,10 @@ export default async (client: Client, guild: Guild) => {
     // Send useful info to the info channel
     infoChannel.send(embed);
     updateActivity();
+
+    const guildSettings = await GuildSettings.findOne({ guild: guild.id });
+
+    if (!guildSettings) return;
+
+    guildSettings.deleteOne();
 };
