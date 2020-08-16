@@ -21,7 +21,7 @@ after_success:
     - cd $TRAVIS_BUILD_DIR $$ ./docker_push.sh
 deploy:
     - provider: script
-      script: './deploy.sh'
+      script: 'chmod +x ./deploy.sh'
       cleanup: false
       on:
           branch: master
