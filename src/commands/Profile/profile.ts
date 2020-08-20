@@ -114,7 +114,7 @@ const callback = async (message: AMessage, args: { action?: 'view' | 'edit' | 'c
 
 export const command: Command = {
     name: 'profile',
-    category: 'Profile',
+    category: 'Fun',
     module: 'Profiles',
     aliases: [],
     description: `View someone's profile or edit your own!`,

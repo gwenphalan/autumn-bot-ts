@@ -28,7 +28,7 @@ const callback = async (message: AMessage, _args: {}, prompt: PromptManager) => 
 
 export const command: Command = {
     name: 'reactionrole',
-    category: 'Reaction Roles',
+    category: 'Utility',
     module: 'Reaction Roles',
     aliases: ['rr'],
     description: 'Creates a message reaction that gives users the specified role.',

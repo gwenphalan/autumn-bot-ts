@@ -7,6 +7,7 @@ import { UserProfile } from './schemas/UserProfile';
 import { VerifyApp } from './schemas/VerifyApp';
 import { ReactionRole } from './schemas/ReactionRoles';
 import { Logger } from '../Logger';
+import { Economy } from './schemas/Economy';
 
 // Connect to MongoDB
 mongoose.connect(config.mongoString, {
@@ -42,6 +43,16 @@ export const getGuildSettings = async (guildId: string) => {
             moderation: { enabled: false },
             verification: { enabled: false },
             welcome: { enabled: false }
+        }))
+    );
+};
+export const getUserEconomy = async (user: string) => {
+    return (
+        (await Economy.findOne({ user: user })) ||
+        (await Economy.create({
+            user: user,
+            balance: 500,
+            lastClaimedDaily: 0
         }))
     );
 };

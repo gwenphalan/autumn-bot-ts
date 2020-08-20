@@ -17,7 +17,7 @@ const callback = async (message: AMessage, args: { prefix?: string }, prompt: Pr
 
 export const command: Command = {
     name: 'prefix',
-    category: 'Administration',
+    category: 'Utility',
     module: 'Settings',
     description: 'Sets the prefix on this guild',
     aliases: [],

@@ -61,7 +61,7 @@ const callback = async (message: AMessage, _args: {}, prompt: PromptManager) => 
 
 export const command: Command = {
     name: 'removerole',
-    category: 'Reaction Roles',
+    category: 'Utility',
     module: 'Reaction Roles',
     aliases: [],
     description: 'Removes a reaction role from a message.',

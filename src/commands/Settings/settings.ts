@@ -429,7 +429,7 @@ const callback = async (
 // Command Information
 export const command: Command = {
     name: 'settings',
-    category: 'Administration',
+    category: 'Utility',
     module: 'Settings',
     aliases: ['setting', 's'],
     description: 'Change the settings for your server',

@@ -2,6 +2,7 @@ import { Client } from '../interfaces/Client';
 import { TextChannel, MessageEmbed } from 'discord.js';
 import { updateActivity, startTasks } from '../index';
 import { Logger } from '../Logger';
+import { BotInfo, CommandInfo } from '../database/schemas/BotInfo';
 
 export default async (client: Client) => {
     // Log useful info to the console
@@ -27,4 +28,30 @@ export default async (client: Client) => {
     infoChannel.send(embed);
     updateActivity();
     startTasks();
+
+    if (!client.user) return;
+
+    let info = (await BotInfo.find())[0];
+
+    const commands: CommandInfo[] = client.commands
+        .filter(command => !command.devOnly)
+        .map(command => {
+            return {
+                name: command.name,
+                category: command.category,
+                description: command.description,
+                aliases: command.aliases,
+                args: command.args,
+                guildOnly: command.guildOnly,
+                NSFW: command.NSFW,
+                userPermissions: command.userPermissions,
+                botPermissions: command.botPermissions
+            };
+        });
+
+    info.commands = commands;
+    info.botId = client.user?.id;
+    info.name = client.user?.username;
+
+    await info.save();
 };
