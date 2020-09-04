@@ -22,13 +22,23 @@ interface Change {
     _id: string;
     updateDescription: any;
 }
+const updatingGuilds: Collection<string, string> = new Collection();
 
-GuildSettings.watch().on('change', change => {
+GuildSettings.watch().on('change', async change => {
+    const guildSettings = await GuildSettings.findById(change._id);
+    if (!guildSettings) return;
+
+    if (updatingGuilds.has(guildSettings.guild)) return;
+
+    updatingGuilds.set(guildSettings.guild, guildSettings.guild);
+
     updateGuild({
         // @ts-ignore
         _id: change.documentKey._id,
         // @ts-ignore
         updateDescription: change.updateDescription
+    }).then(() => {
+        updatingGuilds.delete(guildSettings.guild);
     });
 });
 
