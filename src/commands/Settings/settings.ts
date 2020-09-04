@@ -5,7 +5,7 @@ import { getGuildSettings, updateGuildSettings } from '../../database/index';
 import Canvas from 'canvas';
 import { labelImage, drawExampleCard } from '../../util/canvas';
 import { parseType, sendSetting } from './settings/util';
-import { PromptManager } from '../../interfaces/helpers/PromptManager';
+import { PromptManager } from '../../helpers/PromptManager';
 
 const callback = async (
     message: AMessage,
@@ -220,7 +220,7 @@ const callback = async (
                  */
 
                 // Update guild settings
-                await updateGuildSettings(message.guild.id, settings);
+                await settings.save();
 
                 // Confirm to the user the value was changed.
                 response = toString1 || value5;

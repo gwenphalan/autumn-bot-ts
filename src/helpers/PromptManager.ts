@@ -1,4 +1,4 @@
-import { AMessage, Client, checkPerm } from '../Client';
+import { AMessage, Client, checkPerm } from '../interfaces/Client';
 import {
     TextChannel,
     DMChannel,
@@ -19,8 +19,8 @@ import {
     Guild
 } from 'discord.js';
 import { Parse } from './Parse';
-import { replace } from '../../util';
-import { getGuildSettings } from '../../database';
+import { replace } from '../util';
+import { getGuildSettings } from '../database';
 
 interface OptionsResponse {
     index: number;
@@ -539,6 +539,38 @@ export class PromptManager {
         await this.done();
 
         return member;
+    }
+    /**
+     * Prompts the user for a guild member. Returns the guild member object.
+     *
+     * @param {string} question
+     * @param {boolean} [optional] If optional, the prompt will state "Type `none` to leave this blank."
+     * @returns {(Promise<GuildMember | 'none' | void>)}
+     */
+    async dUser(question: string, optional: true): Promise<User | 'none' | void>;
+
+    async dUser(question: string, optional?: false): Promise<User | void>;
+
+    async dUser(question: string, optional?: boolean): Promise<User | 'none' | void> {
+        if (this.channel instanceof DMChannel || !this.trigger.guild) throw new Error('Member Prompt Used In DM');
+        await this.sendMsg(question, `${optional ? 'Type `none` to leave this blank.\n\n' : ''}Type \`cancel\` to cancel at any time.`);
+
+        const input = (await this.channel.awaitMessages((msg: Message) => msg.author.id === this.user.id, { max: 1, time: 1000 * 60 * this.timeout })).first();
+
+        if (!input) return this.error('You ran out of time!');
+
+        await input.delete({ timeout: 100 }).catch(() => null);
+
+        if (input.content.toLowerCase() === 'cancel') return this.delete();
+
+        if (input.content.toLowerCase() === 'none' && optional) return 'none';
+
+        const user = await this.parse.user(input.content);
+        if (!user) return;
+
+        await this.done();
+
+        return user;
     }
 
     /**

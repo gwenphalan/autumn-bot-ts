@@ -2,7 +2,7 @@ import { Command, AMessage } from '../../interfaces/Client';
 import { getGuildSettings } from '../../database';
 import { TextChannel, MessageEmbed, User } from 'discord.js';
 import { client } from '../..';
-import { PromptManager } from '../../interfaces/helpers/PromptManager';
+import { PromptManager } from '../../helpers/PromptManager';
 
 const callback = async (message: AMessage, args: { user: User; reason?: string }, prompt: PromptManager) => {
     if (!message.guild || !message.member) return;

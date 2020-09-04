@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { Argument } from '../../interfaces/helpers/ArgumentManager';
+import { Argument } from '../../helpers/ArgumentManager';
 import { PermissionString } from 'discord.js';
 
 export interface CommandInfo {

@@ -3,7 +3,7 @@ import { getGuildSettings, createInfraction } from '../../database';
 import { TextChannel, MessageEmbed, GuildMember } from 'discord.js';
 import { client } from '../..';
 import prettyMs from 'pretty-ms';
-import { PromptManager } from '../../interfaces/helpers/PromptManager';
+import { PromptManager } from '../../helpers/PromptManager';
 
 const callback = async (message: AMessage, args: { member: GuildMember; reason?: string }, prompt: PromptManager) => {
     if (!message.guild || !message.member) return;

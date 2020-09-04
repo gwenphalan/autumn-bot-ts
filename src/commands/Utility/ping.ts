@@ -1,5 +1,5 @@
 import { Command, AMessage } from '../../interfaces/Client';
-import { PromptManager } from '../../interfaces/helpers/PromptManager';
+import { PromptManager } from '../../helpers/PromptManager';
 
 const callback = async (message: AMessage, _args: {}, _prompt: PromptManager) => {
     const msg = await message.channel.send('Pinging...');

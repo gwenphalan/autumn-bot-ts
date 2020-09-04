@@ -1,6 +1,6 @@
 import { Message } from 'discord.js';
 import { Command } from '../../interfaces/Client';
-import { PromptManager } from '../../interfaces/helpers/PromptManager';
+import { PromptManager } from '../../helpers/PromptManager';
 
 const callback = async (_message: Message, args: { error?: string }, _prompt: PromptManager) => {
     throw new Error(args.error || 'Intentional Error');

@@ -1,6 +1,6 @@
-import { valueType } from '../SettingsGroup';
-import { Command } from '../Client';
-import { parseType } from '../../commands/Settings/settings/util';
+import { valueType } from '../interfaces/SettingsGroup';
+import { Command } from '../interfaces/Client';
+import { parseType } from '../commands/Settings/settings/util';
 import { PromptManager } from './PromptManager';
 import { GuildMember, Role, VoiceChannel, GuildChannel, User, Message } from 'discord.js';
 

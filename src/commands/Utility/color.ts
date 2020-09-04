@@ -1,7 +1,7 @@
 import { Command, AMessage } from '../../interfaces/Client';
 import color from 'tinycolor2';
 import Canvas from 'canvas';
-import { PromptManager } from '../../interfaces/helpers/PromptManager';
+import { PromptManager } from '../../helpers/PromptManager';
 
 const callback = async (_message: AMessage, args: { color?: string }, prompt: PromptManager) => {
     const arg = args.color || color.random().toHexString();

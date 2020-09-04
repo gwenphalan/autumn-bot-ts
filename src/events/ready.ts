@@ -31,7 +31,7 @@ export default async (client: Client) => {
 
     if (!client.user) return;
 
-    let info = (await BotInfo.find())[0];
+    const info = (await BotInfo.find())[0];
 
     const commands: CommandInfo[] = client.commands
         .filter(command => !command.devOnly)

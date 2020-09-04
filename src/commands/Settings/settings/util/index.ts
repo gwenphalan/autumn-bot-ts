@@ -1,6 +1,6 @@
 import { AMessage } from '../../../../interfaces/Client';
 import { valueType } from '../../../../interfaces/SettingsGroup';
-import { PromptManager } from '../../../../interfaces/helpers/PromptManager';
+import { PromptManager } from '../../../../helpers/PromptManager';
 import { GuildMember, Role, TextChannel, VoiceChannel, GuildChannel, User, Message } from 'discord.js';
 
 export const sendSetting = async (message: AMessage, setting: string, valueType: valueType, prompt: PromptManager, array?: boolean) => {
@@ -73,45 +73,45 @@ export async function parseType(
 ): Promise<number | string | GuildMember | Role | VoiceChannel | GuildChannel | boolean | User | void> {
     switch (type) {
         case 'number':
-            return prompt.parse.number(str);
+            return await prompt.parse.number(str);
         case 'color':
-            return prompt.parse.color(str);
+            return await prompt.parse.color(str);
         case 'image':
-            return prompt.parse.image(message, str);
+            return await prompt.parse.image(message, str);
         case 'string':
             return str;
         case 'url':
-            return prompt.parse.url(str);
+            return await prompt.parse.url(str);
         case 'guildMember':
             if (!message.guild) return;
 
-            return prompt.parse.member(message.guild, str);
+            return await prompt.parse.member(message.guild, str);
         case 'bannedUser':
             if (!message.guild) return;
 
-            return prompt.parse.bannedUser(message.guild, str);
+            return await prompt.parse.bannedUser(message.guild, str);
         case 'role':
             if (!message.guild) return;
 
-            return prompt.parse.role(message.guild, str);
+            return await prompt.parse.role(message.guild, str);
         case 'textChannel':
             if (!message.guild) return;
 
-            return prompt.parse.textChannel(message.guild, str);
+            return await prompt.parse.textChannel(message.guild, str);
         case 'voiceChannel':
             if (!message.guild) return;
 
-            return prompt.parse.voiceChannel(message.guild, str);
+            return await prompt.parse.voiceChannel(message.guild, str);
         case 'guildChannel':
             if (!message.guild) return;
 
-            return prompt.parse.guildChannel(message.guild, str);
+            return await prompt.parse.guildChannel(message.guild, str);
         case 'boolean':
-            return prompt.parse.boolean(str);
+            return await prompt.parse.boolean(str);
         case 'snowflake':
-            return prompt.parse.snowflake(str);
+            return await prompt.parse.snowflake(str);
         case 'timeLength':
-            return prompt.parse.timeLength(str);
+            return await prompt.parse.timeLength(str);
         default:
             return;
     }
