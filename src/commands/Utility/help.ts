@@ -2,8 +2,8 @@ import { MessageEmbed } from 'discord.js';
 import { Command, Client, AMessage } from '../../interfaces/Client';
 import { client } from '../../index';
 import { config } from '../../../config';
-import { PromptManager } from '../../interfaces/helpers/PromptManager';
-import { ArgumentManager } from '../../interfaces/helpers/ArgumentManager';
+import { PromptManager } from '../../helpers/PromptManager';
+import { ArgumentManager } from '../../helpers/ArgumentManager';
 
 const bot = client;
 

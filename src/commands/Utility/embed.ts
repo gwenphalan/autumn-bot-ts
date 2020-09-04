@@ -3,7 +3,7 @@ import { Command, AMessage } from '../../interfaces/Client';
 import { getGuildSettings } from '../../database';
 import { uploadHaste, fetchHaste } from '../../util/hastebin';
 import { client } from '../../index';
-import { PromptManager } from '../../interfaces/helpers/PromptManager';
+import { PromptManager } from '../../helpers/PromptManager';
 
 const callback = async (
     message: AMessage,

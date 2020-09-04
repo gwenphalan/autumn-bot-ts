@@ -4,8 +4,8 @@ import { client as botClient } from '../index';
 import { createVerifyApp } from '../database';
 import { drawCard } from '../util/canvas';
 import { toCamelCase, missingPermissions, nicerPermissions } from '../util';
-import { PromptManager } from '../interfaces/helpers/PromptManager';
-import { ArgumentManager } from '../interfaces/helpers/ArgumentManager';
+import { PromptManager } from '../helpers/PromptManager';
+import { ArgumentManager } from '../helpers/ArgumentManager';
 
 export default async (client: Client, message: Message) => {
     // We have partials enabled, so we have to make sure the message is fetched

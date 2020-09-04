@@ -1,11 +1,12 @@
 import color from 'tinycolor2';
-import { AMessage } from '../Client';
+import { AMessage } from '../interfaces/Client';
 // import Canvas from 'canvas';
-import { uploadImgur } from '../../util/imgur';
+import { uploadImgur } from '../util/imgur';
 import { PromptManager } from './PromptManager';
 import { GuildMember, Guild, TextChannel, NewsChannel, GuildChannel, Role, VoiceChannel, CategoryChannel, User, Message } from 'discord.js';
 import timestring from 'timestring';
-import { isImage } from '../../util/urlParse';
+import { isImage } from '../util/urlParse';
+import { client } from '../index';
 
 const linkRegex = /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/gi;
 
@@ -14,6 +15,11 @@ export const memberFilterInexact = (search: string) => (mem: GuildMember) =>
     (mem.nickname && mem.nickname.toLowerCase().includes(search.toLowerCase())) ||
     `${mem.user.username.toLowerCase()}#${mem.user.discriminator}`.includes(search.toLowerCase()) ||
     search.includes(mem.user.id);
+
+export const userFilterInexact = (search: string) => (user: User) =>
+    user.username.toLowerCase().includes(search.toLowerCase()) ||
+    `${user.username.toLowerCase()}#${user.discriminator}`.includes(search.toLowerCase()) ||
+    search.includes(user.id);
 
 export const channelFilterInexact = (search: string) => (chan: GuildChannel) =>
     chan.name.toLowerCase().includes(search.toLowerCase()) || search.toLowerCase().includes(chan.id);
@@ -209,6 +215,40 @@ export class Parse {
             return members[reply.index];
         } else {
             return this.prompt.error(`I couldn't find the member ${str}!`);
+        }
+    }
+
+    /**
+     * Returns user.
+     *
+     * @param {string} str
+     * @returns {(Promise<User | void>)}
+     * @memberof Parse
+     */
+    async user(str: string): Promise<User | void> {
+        const users = client.users.cache;
+
+        const result = users.filter(userFilterInexact(str));
+
+        const user = result.first();
+
+        if (result.size === 1) return user;
+
+        if (result.size > 1) {
+            const users: User[] = [];
+
+            result.each((u: User) => users.push(u));
+
+            const reply = await this.prompt.options(
+                'Multiple Users Found',
+                users.map(u => `${u}`)
+            );
+
+            if (!reply) return;
+
+            return users[reply.index];
+        } else {
+            return this.prompt.error(`I couldn't find the user ${str}!`);
         }
     }
 

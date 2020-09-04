@@ -2,7 +2,7 @@ import { Command, AMessage } from '../../interfaces/Client';
 import { neko } from '../../neko';
 import Color from 'color';
 import { MessageEmbed } from 'discord.js';
-import { PromptManager } from '../../interfaces/helpers/PromptManager';
+import { PromptManager } from '../../helpers/PromptManager';
 
 const callback = async (message: AMessage, _args: {}, _prompt: PromptManager) => {
     const hue = Math.floor(Math.random() * 360);

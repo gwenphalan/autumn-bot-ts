@@ -1,5 +1,5 @@
 import { Command, AMessage } from '../../interfaces/Client';
-import { PromptManager } from '../../interfaces/helpers/PromptManager';
+import { PromptManager } from '../../helpers/PromptManager';
 
 const callback = async (_message: AMessage, _args: {}, prompt: PromptManager) => {
     return prompt.embed('Please give me a new home!', `• Invite: http://autm.fr/autumnbot\n• Website: https://www.autumnbot.net/`);

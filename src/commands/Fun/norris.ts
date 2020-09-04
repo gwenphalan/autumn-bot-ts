@@ -1,6 +1,6 @@
 import { Command, AMessage } from '../../interfaces/Client';
 import { fetchNorris } from '../../util';
-import { PromptManager } from '../../interfaces/helpers/PromptManager';
+import { PromptManager } from '../../helpers/PromptManager';
 
 const callback = async (_message: AMessage, _args: {}, prompt: PromptManager) => {
     const joke = await fetchNorris();

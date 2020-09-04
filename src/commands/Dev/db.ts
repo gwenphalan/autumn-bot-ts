@@ -1,6 +1,6 @@
 import { Command, AMessage } from '../../interfaces/Client';
 import { client } from '../..';
-import { PromptManager } from '../../interfaces/helpers/PromptManager';
+import { PromptManager } from '../../helpers/PromptManager';
 import { GuildSettings } from '../../database/schemas/GuildSettings';
 
 const callback = async (_message: AMessage, _args: {}, prompt: PromptManager) => {

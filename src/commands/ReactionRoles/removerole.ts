@@ -3,7 +3,7 @@ import { getReactionRoles } from '../../database';
 import { client } from '../..';
 import { ReactionRole } from '../../database/schemas/ReactionRoles';
 import { GuildEmoji } from 'discord.js';
-import { PromptManager } from '../../interfaces/helpers/PromptManager';
+import { PromptManager } from '../../helpers/PromptManager';
 
 const callback = async (message: AMessage, _args: {}, prompt: PromptManager) => {
     if (!message.guild) return;

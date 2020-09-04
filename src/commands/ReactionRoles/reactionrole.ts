@@ -1,5 +1,5 @@
 import { Command, AMessage } from '../../interfaces/Client';
-import { PromptManager } from '../../interfaces/helpers/PromptManager';
+import { PromptManager } from '../../helpers/PromptManager';
 import { createReactionRole } from '../../database';
 
 const callback = async (message: AMessage, _args: {}, prompt: PromptManager) => {
@@ -37,6 +37,6 @@ export const command: Command = {
     guildOnly: true,
     NSFW: false,
     userPermissions: ['MANAGE_ROLES'],
-    botPermissions: ['MANAGE_ROLES', 'ADD_REACTIONS', 'EMBED_LINKS'],
+    botPermissions: ['MANAGE_ROLES', 'ADD_REACTIONS', 'EMBED_LINKS', 'MANAGE_MESSAGES'],
     callback: callback
 };

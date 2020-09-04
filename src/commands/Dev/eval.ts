@@ -1,7 +1,7 @@
 import { uploadHaste } from '../../util/hastebin';
 import { Command, Client, AMessage } from '../../interfaces/Client';
 import { MessageEmbed, Permissions } from 'discord.js';
-import { PromptManager } from '../../interfaces/helpers/PromptManager';
+import { PromptManager } from '../../helpers/PromptManager';
 
 const callback = async (message: AMessage, args: { code: string }, _prompt: PromptManager) => {
     // Define a bunch of shortcuts which will be usable in your eval code

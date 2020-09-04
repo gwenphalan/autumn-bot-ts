@@ -2,7 +2,7 @@ import { Command, AMessage } from '../../interfaces/Client';
 import { neko } from '../../neko/';
 import { MessageEmbed, GuildMember } from 'discord.js';
 import Color from 'color';
-import { PromptManager } from '../../interfaces/helpers/PromptManager';
+import { PromptManager } from '../../helpers/PromptManager';
 
 const callback = async (message: AMessage, args: { member: GuildMember }, _prompt: PromptManager) => {
     if (!message.guild) return;
